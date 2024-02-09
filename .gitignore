@@ -1,0 +1,22 @@
+.project
+target/
+
+.classpath
+.settings/
+
+# Visual Studio Code
+.vscode/
+
+# Apple Mac O.S. specific
+.DS_Store
+
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
+*.iml
+
+## Directory-based project format:
+.idea/
+
+## File-based project format:
+*.ipr
+*.iws
+

@@ -1,0 +1,113 @@
+options {
+//    OUTPUT_DIRECTORY = "./src/main/java/com/brentcroft/pxr/parser/out";
+	LOOKAHEAD = 6; // (default 1)
+    UNICODE_INPUT = true;
+    STATIC = false;
+
+	CHOICE_AMBIGUITY_CHECK = 2;
+	OTHER_AMBIGUITY_CHECK = 1;
+
+	DEBUG_PARSER = false;
+	DEBUG_LOOKAHEAD = false;
+	DEBUG_TOKEN_MANAGER = false;
+	ERROR_REPORTING = true;
+    IGNORE_CASE = false;
+    USER_TOKEN_MANAGER = false;
+    USER_CHAR_STREAM = false;
+    BUILD_PARSER = true;
+    BUILD_TOKEN_MANAGER = true;
+    SANITY_CHECK = true;
+    FORCE_LA_CHECK = false;
+}
+
+PARSER_BEGIN( MF2Parser )
+
+package com.mihnita.tests.mf2_parse_javacc.grammar;
+
+import java.io.BufferedReader;
+import java.io.Reader;
+import java.io.StringReader;
+
+import java.util.Arrays;
+
+public class MF2Parser {
+  StringBuilder text = new StringBuilder();
+
+  public static void message(String input) throws ParseException {
+	Reader reader = new BufferedReader(new StringReader(input));
+    MF2Parser parser = new MF2Parser(reader);
+    parser.message();
+  }
+}
+
+PARSER_END( MF2Parser )
+
+< DEFAULT > TOKEN : {
+  < STARTARG : "{" > : ARG
+}
+
+< DEFAULT > TOKEN : {
+  < TEXT : ~[] >
+}
+< ARG > TOKEN : {
+  < ENDARG : "}" > : DEFAULT
+  | < ID : ["A"-"Z", "a"-"z", "_"] (["A"-"Z", "a"-"z", "0"-"9", "_"])* >
+  | < COMMA : "," >
+}
+SKIP : {
+    " ": ARG
+}
+
+// =============
+void message() : {}
+{
+  messagePart() ( messagePart() )* < EOF >
+  { System.out.println("message");}
+}
+
+void messagePart() : {}
+{
+  messageText()
+  | < STARTARG > argument() < ENDARG >  
+}
+
+void messageText() : {System.out.print("<<");}
+{
+  ( < TEXT >
+  	{ System.out.print("\033[91m" + token + "\033[m");}
+  )*
+  { System.out.println(">>"); }
+}
+
+void argument() : {}
+{
+//  noneArg() | simpleArg()
+  argNameOrNumber() < COMMA > argType() 
+//  | argNameOrNumber()
+  { System.out.println("argument: '" + token + "'");}
+}
+
+void noneArg() : {}
+{
+  argNameOrNumber()
+  { System.out.println("noneArg: '" + token + "'");}
+}
+
+void simpleArg() : {}
+{
+   argNameOrNumber() < COMMA > argType()
+   { System.out.println("simpleArg: '" + token + "'");}
+}
+
+void argNameOrNumber() : {}
+{
+  < ID >
+  { System.out.println("argNameOrNumber: '" + token + "'");}
+}
+
+void argType() : {}
+{
+  "number" | "date" | "time" | "spellout" | "ordinal" | "duration"
+  { System.out.println("argType: '" + token + "'");}
+} 
+// simpleArg = '{' argNameOrNumber ',' argType [',' argStyle] '}'
