@@ -18,9 +18,22 @@ public class InputSource {
 		return cursor >= length;
 	}
 
+	int lastReadCursor = -1;
+	int lastReadCount = 0;
 	public char readChar() {
-		if (atEnd())
-			return ' ';		
+		if (lastReadCursor != cursor) {
+			lastReadCursor = cursor;
+			lastReadCount = 1;
+		} else {
+			lastReadCount++;
+			if (lastReadCount >= 5) {
+				throw new RuntimeException("Stuck in a loop!");
+			}
+		}
+		// intentionally crash, for now
+		if (atEnd()) {
+//			return ' ';
+		}
 		return buffer.charAt(cursor++);
 	}
 

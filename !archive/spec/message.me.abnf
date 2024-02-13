@@ -79,10 +79,6 @@ name       = name-start *name-char
 
 ; Restrictions on characters in various contexts
 
-text-char         = content-char / s / "." / "@" / "|"
-quoted-char       = content-char / s / "." / "@" / "{" / "}"
-reserved-char     = content-char / "."
-
 ; Character escapes
 quoted-escape   = backslash ( backslash / "|" )
 reserved-escape = backslash ( backslash / "{" / "|" / "}" )

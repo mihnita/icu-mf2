@@ -17,9 +17,11 @@ class Token<T> {
 	    NUMBER, // abnf: number-literal = ["-"] (%x30 / (%x31-39 *DIGIT)) ["." 1*DIGIT] [%i"e" ["-" / "+"] 1*DIGIT]
 		LCURLY, RCURLY, // "{" and "}"
 		LDBLCURLY, RDBLCURLY, // "{{" and "}}"
+		PATTERN,
 		INPUT, // .input
 		LOCAL, // .local
-		MATCH // .match
+		MATCH, // .match
+		RESERVED_KEYWORD
 		;
 	}
 
@@ -49,7 +51,8 @@ class Token<T> {
 
 	@Override
 	public String toString() {
-		return String.format("Token [kind=%s, begin=%s, end=%s, image=%s, value=%s]",
-				kind, begin, end, "\"" + buffer.substring(begin, end) + "\"", value);
+		return String.format("Token [kind=%s, begin=%s, end=%s, image=\"%s\", value=%s]",
+				kind, begin, end, buffer.substring(begin, end),
+				value instanceof CharSequence ? "\"" + value + "\"" : value);
 	}
 }

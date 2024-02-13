@@ -3,9 +3,12 @@ package com.ibm.icu.message2x;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.print.attribute.standard.RequestingUserName;
+
 public class Tokenizer {
 	private final InputSource input;
 	boolean complexMessage = false;
+	boolean firstTime = true;
 
 	public Tokenizer(String input) {
 		this.input = new InputSource(input);
@@ -16,12 +19,15 @@ public class Tokenizer {
 		Token<?> result = null;
 		while (!input.atEnd()) {
 			char c = input.readChar();
-			if (c == '.' && input.getPosition() == 0) {
-				// Shortcut for a lot of complexity.
-				// But TLDR is that all complex messages start with '.'
-				// (after going though many-many rules)
-				complexMessage = true;
-			} else if (c == '}') {
+			if (firstTime) {
+				firstTime = false;
+				if (startPos == 0 && c == '.') { // complex message
+					// A bit of a cheat, to simplify things.
+					// TODO: check the behavior for ".", ".123" and other strings that are probably simple-message
+					complexMessage = true;
+				}
+			}
+			if (c == '}') {
 				c = input.readChar();
 				if (c == '}') {
 					result = new TokenString(Token.Type.RDBLCURLY,
@@ -48,8 +54,55 @@ public class Tokenizer {
 				// abnf: number-literal = ["-"] (%x30 / (%x31-39 *DIGIT)) ["." 1*DIGIT] [%i"e" ["-" / "+"] 1*DIGIT]
 				input.backup(1);
 				result = getNumberLiteral();
+			} else if (complexMessage && c == '.') {
+				String keyworkName = getKeyword();
+				switch (keyworkName) {
+					case "input":
+						result = new TokenString(Token.Type.INPUT, input.buffer, startPos, input.getPosition(), keyworkName);
+						break;
+					case "local":
+						result = new TokenString(Token.Type.LOCAL, input.buffer, startPos, input.getPosition(), keyworkName);
+						break;
+					case "match":
+						result = new TokenString(Token.Type.MATCH, input.buffer, startPos, input.getPosition(), keyworkName);
+						break;
+					default:
+						if (!keyworkName.isEmpty()) {
+							result = new TokenString(Token.Type.RESERVED_KEYWORD, input.buffer, startPos, input.getPosition(), keyworkName);
+						} else {
+							// back to simple message?
+							input.backup(input.getPosition() - startPos);
+							complexMessage = false;
+						}
+						break;
+				}
+			} else if (isTextChar(c)) {
+				StringBuilder patternBuffer = new StringBuilder();
+				patternBuffer.append(c);
+				while (!input.atEnd()) {
+					c = input.readChar();
+					if (c == '\\') {
+						c = input.readChar();
+						// abnf: text-escape = backslash ( backslash / "{" / "}" )
+						if (c == '\\' || c == '{' || c == '}')
+							patternBuffer.append(c);
+						else {
+							error("invalid escape");
+						}
+					} else if (isTextChar(c)) {
+						patternBuffer.append(c);
+					}
+				}
+				if (!input.atEnd()) {
+					input.backup(1);
+				}
+				result = new TokenString(Token.Type.PATTERN, input.buffer, startPos, input.getPosition(), patternBuffer.toString());
 			} else {
+				error("Should never get here?");
 			}
+		}
+		if (result == null) {
+			return new TokenString(Token.Type.EOF, input.buffer, startPos, input.getPosition(), null);
 		}
 		return result;
 	}
@@ -93,6 +146,13 @@ public class Tokenizer {
 				&& !Character.isSurrogate(c)
 				;
 	}
+	
+	/*
+	 * abnf: text-char = content-char / s / "." / "@" / "|"
+	 */
+	boolean isTextChar(char c) {
+		return isContentChar(c) || isWhitespace(c) || c == '.' || c == '@' || c == '|';
+	}
 
 	/**
 	 * abnf: backslash = %x5C ; U+005C REVERSE SOLIDUS "\"
@@ -101,9 +161,34 @@ public class Tokenizer {
 		return c == '\\';
 	}
 
+	/* Covers all tokens that start with a '.', for now `.input`, `.local`, `.match`, and `reserved-keyword`
+	 * abnf: ; Keywords; Note that these are case-sensitive
+	 * abnf: input = %s".input"
+	 * abnf: local = %s".local"
+	 * abnf: match = %s".match"
+	 * abnf: reserved-keyword   = "." name
+	 */
+	private String getKeyword() {
+		if (input.atEnd()) {
+			return "";
+		}
+		StringBuilder result = new StringBuilder();
+		char c = input.readChar();
+		if (isNameChar(c)) {
+			result.append(c);
+		}
+		while (!input.atEnd()){
+			c = input.readChar();
+			if (isNameChar(c) && !input.atEnd()) {
+				result.append(c);
+			}
+		} 
+		return result.toString();
+	}
+	
 	/**
 	 * ; Whitespace
-	 * s = 1*( SP / HTAB / CR / LF / %x3000 )
+	 * abnf: s = 1*( SP / HTAB / CR / LF / %x3000 )
  	 */
 	boolean isWhitespace(char c) {
 		return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\u3000';
@@ -158,7 +243,6 @@ public class Tokenizer {
 		return codePoint == '^' || codePoint == '&';
   	}
 
-	
 	/*
 	 * abnf: simple-start = simple-start-char / text-escape / placeholder
 	 */
@@ -187,7 +271,7 @@ public class Tokenizer {
 		}
 		return ' ';
 	}
-	
+
 	/*
 	 * abnf: quoted = "|" *(quoted-char / quoted-escape) "|"
 	 */
@@ -200,26 +284,28 @@ public class Tokenizer {
 		}
 		do {
 			c = input.readChar();
-			if (c == '\\') {
-				System.out.println("breakpoint");
-			}
 			if (isQuotedChar(c)) {
 				value.append(c);
 			} else if (c == '\\') {
 				c = input.readChar();
 				// abnf: quoted-escape = backslash ( backslash / "|" )
-				if (c == '\\' || c == '|') {
+				if (c == '|' || c == '\\') {
 					value.append(c);
 				} else {
 					error("Invalid escape sequence \\{c}");
 				}
+			} else if (c == '|') {
+				// end of string. Exit the loop, and don't include it in the parsed value
+				break;
+			} else {
+				value.append(c);
 			}
 		} while (!input.atEnd());
 		if (c != '|') {
 			error("Expecter terminating '|' at offset {}, found {}");
 		}
-		return new Token<>(Token.Type.STRING,
-				input.buffer, start, input.getPosition(), "");
+		return new TokenString(Token.Type.STRING,
+				input.buffer, start, input.getPosition(), value.toString());
 	}
 
 	/*
@@ -234,6 +320,13 @@ public class Tokenizer {
 				|| c == '}';
 	}
 
+	/*
+	 * abnf: reserved-char = content-char / "."
+	 */
+	boolean isReservedChar(char c) {
+		return isContentChar(c) || c == '.';
+	}
+	
 	/* Other literals to encode:
 	 * "{{"
 	 * "}}"
