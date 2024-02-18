@@ -1,35 +1,46 @@
 package com.ibm.icu.message2x;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.print.attribute.standard.RequestingUserName;
-
 public class Tokenizer {
 	private final InputSource input;
-	boolean complexMessage = false;
-	boolean firstTime = true;
+	private boolean complexMessage = false;
+	private boolean firstTime = true;
+	
+	private final Queue<Token<?>> queue = new ArrayDeque<>();
 
 	public Tokenizer(String input) {
 		this.input = new InputSource(input);
 	}
 
 	public Token<?> nextToken() {
+		if (!queue.isEmpty()) {
+			return queue.poll();
+		}
+
 		int startPos = input.getPosition();
+		if (startPos == 0 && input.buffer.isEmpty()) {
+			queue.add(new TokenString(Token.Type.EOF, input.buffer, startPos, input.getPosition(), null));
+			return new TokenString(Token.Type.PATTERN, input.buffer, startPos, input.getPosition(), "");
+		}
+
 		Token<?> result = null;
 		while (!input.atEnd()) {
-			char c = input.readChar();
+			int cp = input.readCodePoint();
 			if (firstTime) {
 				firstTime = false;
-				if (startPos == 0 && c == '.') { // complex message
+				if (startPos == 0 && cp == '.') { // complex message
 					// A bit of a cheat, to simplify things.
 					// TODO: check the behavior for ".", ".123" and other strings that are probably simple-message
 					complexMessage = true;
 				}
 			}
-			if (c == '}') {
-				c = input.readChar();
-				if (c == '}') {
+			if (cp == '}') {
+				cp = input.readCodePoint();
+				if (cp == '}') {
 					result = new TokenString(Token.Type.RDBLCURLY,
 							input.buffer, startPos, startPos + 2, "}}");
 				} else {
@@ -37,9 +48,9 @@ public class Tokenizer {
 					result = new TokenString(Token.Type.RCURLY,
 							input.buffer, startPos, startPos + 1, "}");
 				}
-			} else if (c == '{') {
-				c = input.readChar();
-				if (c == '{') {
+			} else if (cp == '{') {
+				cp = input.readCodePoint();
+				if (cp == '{') {
 					result = new TokenString(Token.Type.LDBLCURLY,
 							input.buffer, startPos, startPos + 2, "{{");
 				} else {
@@ -47,14 +58,14 @@ public class Tokenizer {
 					result = new TokenString(Token.Type.LCURLY,
 							input.buffer, startPos, startPos + 1, "{");
 				}
-			} else if (c == '|') {
+			} else if (cp == '|') {
 				input.backup(1);
 				result = getQuoted();
-			} else if (c == '-' || (c >= '0' && c <= '9')) {
+			} else if (cp == '-' || (cp >= '0' && cp <= '9')) {
 				// abnf: number-literal = ["-"] (%x30 / (%x31-39 *DIGIT)) ["." 1*DIGIT] [%i"e" ["-" / "+"] 1*DIGIT]
 				input.backup(1);
 				result = getNumberLiteral();
-			} else if (complexMessage && c == '.') {
+			} else if (complexMessage && cp == '.') {
 				String keyworkName = getKeyword();
 				switch (keyworkName) {
 					case "input":
@@ -76,21 +87,21 @@ public class Tokenizer {
 						}
 						break;
 				}
-			} else if (isTextChar(c)) {
+			} else if (isTextChar(cp)) {
 				StringBuilder patternBuffer = new StringBuilder();
-				patternBuffer.append(c);
+				patternBuffer.appendCodePoint(cp);
 				while (!input.atEnd()) {
-					c = input.readChar();
-					if (c == '\\') {
-						c = input.readChar();
+					cp = input.readCodePoint();
+					if (isBackslash(cp)) {
+						cp = input.readCodePoint();
 						// abnf: text-escape = backslash ( backslash / "{" / "}" )
-						if (c == '\\' || c == '{' || c == '}')
-							patternBuffer.append(c);
+						if (isBackslash(cp) || cp == '{' || cp == '}')
+							patternBuffer.appendCodePoint(cp);
 						else {
 							error("invalid escape");
 						}
-					} else if (isTextChar(c)) {
-						patternBuffer.append(c);
+					} else if (isTextChar(cp)) {
+						patternBuffer.appendCodePoint(cp);
 					}
 				}
 				if (!input.atEnd()) {
@@ -107,7 +118,7 @@ public class Tokenizer {
 		return result;
 	}
 
-	final static Pattern NUMBER_PATTERN = Pattern.compile("-?(0|([1-9]\\d*))(\\.\\d*)?([eE][-+]?\\d+)?");
+	private static final Pattern NUMBER_PATTERN = Pattern.compile("-?(0|([1-9]\\d*))(\\.\\d*)?([eE][-+]?\\d+)?");
 	private Token<?> getNumberLiteral() {
 		int start = input.getPosition();
 		String tmpBuffer = input.buffer.substring(start);
@@ -133,7 +144,7 @@ public class Tokenizer {
  	 * abnf:              / %x007E-D7FF        ; omit surrogates
  	 * abnf:              / %xE000-10FFFF
  	 */
-	boolean isContentChar(char c) {
+	private boolean isContentChar(int c) {
 		return c != '\t'
 				&& c != '\r'
 				&& c != '\n'
@@ -143,21 +154,21 @@ public class Tokenizer {
 				&& c != '{'
 				&& c != '|'
 				&& c != '}'
-				&& !Character.isSurrogate(c)
+//				&& !Character.isSurrogate(c)
 				;
 	}
 	
 	/*
 	 * abnf: text-char = content-char / s / "." / "@" / "|"
 	 */
-	boolean isTextChar(char c) {
+	private boolean isTextChar(int c) {
 		return isContentChar(c) || isWhitespace(c) || c == '.' || c == '@' || c == '|';
 	}
 
 	/**
 	 * abnf: backslash = %x5C ; U+005C REVERSE SOLIDUS "\"
  	 */
-	boolean isBackslash(char c) {
+	private boolean isBackslash(int c) {
 		return c == '\\';
 	}
 
@@ -173,14 +184,14 @@ public class Tokenizer {
 			return "";
 		}
 		StringBuilder result = new StringBuilder();
-		char c = input.readChar();
-		if (isNameChar(c)) {
-			result.append(c);
+		int cp = input.readCodePoint();
+		if (isNameChar(cp)) {
+			result.appendCodePoint(cp);
 		}
 		while (!input.atEnd()){
-			c = input.readChar();
-			if (isNameChar(c) && !input.atEnd()) {
-				result.append(c);
+			cp = input.readCodePoint();
+			if (isNameChar(cp) && !input.atEnd()) {
+				result.appendCodePoint(cp);
 			}
 		} 
 		return result.toString();
@@ -190,7 +201,7 @@ public class Tokenizer {
 	 * ; Whitespace
 	 * abnf: s = 1*( SP / HTAB / CR / LF / %x3000 )
  	 */
-	boolean isWhitespace(char c) {
+	private boolean isWhitespace(int c) {
 		return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\u3000';
 	}
 
@@ -201,7 +212,7 @@ public class Tokenizer {
 	 * abnf:            / %x2070-218F / %x2C00-2FEF / %x3001-D7FF
 	 * abnf:            / %xF900-FDCF / %xFDF0-FFFC / %x10000-EFFFF
  	 */
-   	boolean isNameStart(int codePoint) {
+	private boolean isNameStart(int codePoint) {
    		// ALPHA means plain ASCII, A-Z and a-z, see
    		// https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_form
    		return (codePoint >= 'A' && codePoint <= 'Z') // ALPHA
@@ -224,7 +235,7 @@ public class Tokenizer {
      * abnf: name-char = name-start / DIGIT / "-" / "."
 	 * abnf:           / %xB7 / %x300-36F / %x203F-2040
  	 */
-  	boolean isNameChar(int codePoint) {
+	private boolean isNameChar(int codePoint) {
    		// DIGIT means plain ASCII, 0-9, see
    		// https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_form
   		return isNameStart(codePoint)
@@ -239,19 +250,18 @@ public class Tokenizer {
   	/*
   	 * abnf: private-start = "^" / "&"
   	 */
-	boolean isPrivateStart(int codePoint) {
+	private boolean isPrivateStart(int codePoint) {
 		return codePoint == '^' || codePoint == '&';
   	}
 
 	/*
 	 * abnf: simple-start = simple-start-char / text-escape / placeholder
 	 */
-	public char getSimpleStart() {
-		char c = input.readChar();
-
+	private int getSimpleStart() {
+		int cp = input.readCodePoint();
 		// abnf: simple-start-char = content-char / s / "@" / "|"
-		if (isContentChar(c) || isWhitespace(c) || c == '@' || c == '|') {
-			return c;
+		if (isContentChar(cp) || isWhitespace(cp) || cp == '@' || cp == '|') {
+			return cp;
 		}
 		getTextEscape();
 		// placeholder
@@ -259,49 +269,49 @@ public class Tokenizer {
 	}
 	
 	// abnf: text-escape = backslash ( backslash / "{" / "}" )
-	public char getTextEscape() {
-		char c = input.readChar();
-		if (c == '\\') {
-			c = input.readChar();
-			if (c == '\\' || c == '{' || c == '}') {
-				return c;
+	private int getTextEscape() {
+		int cp = input.readCodePoint();
+		if (isBackslash(cp)) {
+			cp = input.readCodePoint();
+			if (isBackslash(cp) || cp == '{' || cp == '}') {
+				return cp;
 			} else {
 				error("Invalid escape sequence, only '\\', '{' and '}' are acceptable here.");
 			}
 		}
-		return ' ';
+		return cp;
 	}
 
 	/*
 	 * abnf: quoted = "|" *(quoted-char / quoted-escape) "|"
 	 */
-	public Token<String> getQuoted() {
+	private Token<String> getQuoted() {
 		StringBuilder value = new StringBuilder();
 		int start = input.getPosition();
-		char c = input.readChar();
-		if (c != '|') {
+		int cp = input.readCodePoint();
+		if (cp != '|') {
 			error("Expecter starting '|' at offset {}, found {}");
 		}
 		do {
-			c = input.readChar();
-			if (isQuotedChar(c)) {
-				value.append(c);
-			} else if (c == '\\') {
-				c = input.readChar();
+			cp = input.readCodePoint();
+			if (isQuotedChar(cp)) {
+				value.appendCodePoint(cp);
+			} else if (isBackslash(cp)) {
+				cp = input.readCodePoint();
 				// abnf: quoted-escape = backslash ( backslash / "|" )
-				if (c == '|' || c == '\\') {
-					value.append(c);
+				if (cp == '|' || isBackslash(cp)) {
+					value.appendCodePoint(cp);
 				} else {
 					error("Invalid escape sequence \\{c}");
 				}
-			} else if (c == '|') {
+			} else if (cp == '|') {
 				// end of string. Exit the loop, and don't include it in the parsed value
 				break;
 			} else {
-				value.append(c);
+				value.appendCodePoint(cp);
 			}
 		} while (!input.atEnd());
-		if (c != '|') {
+		if (cp != '|') {
 			error("Expecter terminating '|' at offset {}, found {}");
 		}
 		return new TokenString(Token.Type.STRING,
@@ -311,7 +321,7 @@ public class Tokenizer {
 	/*
 	 * abnf: quoted-char = content-char / s / "." / "@" / "{" / "}"
 	 */
-	private boolean isQuotedChar(char c) {
+	private boolean isQuotedChar(int c) {
 		return isContentChar(c)
 				|| isWhitespace(c)
 				|| c == '.'
@@ -323,7 +333,7 @@ public class Tokenizer {
 	/*
 	 * abnf: reserved-char = content-char / "."
 	 */
-	boolean isReservedChar(char c) {
+	private boolean isReservedChar(char c) {
 		return isContentChar(c) || c == '.';
 	}
 	

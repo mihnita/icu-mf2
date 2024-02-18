@@ -1,6 +1,6 @@
 package com.ibm.icu.message2x;
 
-public class InputSource {
+class InputSource {
 	final String buffer;
 	final private int length;
 	private int cursor;
@@ -20,7 +20,8 @@ public class InputSource {
 
 	int lastReadCursor = -1;
 	int lastReadCount = 0;
-	public char readChar() {
+	public int readCodePoint() {
+		// TODO: START Detect possible infinite loop
 		if (lastReadCursor != cursor) {
 			lastReadCursor = cursor;
 			lastReadCount = 1;
@@ -30,11 +31,25 @@ public class InputSource {
 				throw new RuntimeException("Stuck in a loop!");
 			}
 		}
-		// intentionally crash, for now
+		// TODO: END Detect possible infinite loop
+
 		if (atEnd()) {
-//			return ' ';
+			return -1;
 		}
-		return buffer.charAt(cursor++);
+
+		char c = buffer.charAt(cursor++);
+		if (Character.isHighSurrogate(c)) {
+			if (!atEnd()) {
+				char c2 = buffer.charAt(cursor++);
+				if (Character.isLowSurrogate(c2)) {
+					return Character.toCodePoint(c, c2);
+				} else { // invalid, high surrogate followed by non-surrogate
+					cursor--;
+					return c;
+				}
+			}
+		}
+		return c;
 	}
 
 	// Backup a number of characters.

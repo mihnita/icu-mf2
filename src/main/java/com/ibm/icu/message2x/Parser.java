@@ -14,7 +14,7 @@ public class Parser {
 
 	public Mf2DataModel parseImpl() {
 		Token<?> token = tokenizer.nextToken();	
-		while (token != null && token.kind != Token.Type.EOF)
+		while (token != null && token.getKind() != Token.Type.EOF)
 			token = tokenizer.nextToken();
 		return null;
 	}
@@ -31,7 +31,7 @@ public class Parser {
 		do {
 			token = parser.tokenizer.nextToken();	
 			result.add(token);
-		} while (token.kind != Token.Type.EOF);
+		} while (token.getKind() != Token.Type.EOF);
 		return result;
 	}
 

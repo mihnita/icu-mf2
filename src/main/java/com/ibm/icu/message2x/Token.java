@@ -3,11 +3,11 @@ package com.ibm.icu.message2x;
 class Token<T> {
 	private static final boolean DEBUG = true;
 
-	final Type kind;
-	final String buffer;
-	final int begin;
-	final int end;
-	final T value;
+	private final Type kind;
+	private final String buffer;
+	private final int begin;
+	private final int end;
+	private final T value;
 //	private Token next;
 //	private Token specialToken;
 
@@ -24,7 +24,7 @@ class Token<T> {
 		RESERVED_KEYWORD
 		;
 	}
-
+	
 	/**
 	 * @param kind token type
 	 * @param begin starting index in string
@@ -43,6 +43,10 @@ class Token<T> {
 		if (DEBUG) {
 			System.out.println(this.toString());
 		}
+	}
+
+	public Type getKind() {
+		return kind;
 	}
 
 	public T getValue() {

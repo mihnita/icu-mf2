@@ -15,19 +15,19 @@ public class MessageFormatter {
 		this.pattern = pattern;
 	}
 
-	String format(Map<String,Object> arguments) {
+	public String format(Map<String,Object> arguments) {
 		return "";
 	}
-	String	formatToString(Map<String,Object> arguments) {
+	public String formatToString(Map<String,Object> arguments) {
 		return "";
 	}
-	Mf2DataModel getDataModel() {
+	public Mf2DataModel getDataModel() {
 		return dataModel;
 	}
-	Locale getLocale() {
+	public Locale getLocale() {
 		return locale;
 	}
-	String getPattern() {
+	public String getPattern() {
 		return pattern;
 	}
 

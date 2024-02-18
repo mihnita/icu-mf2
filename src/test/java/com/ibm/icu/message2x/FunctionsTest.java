@@ -20,6 +20,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 
 @RunWith(JUnit4.class)
+@SuppressWarnings({ "javadoc" })
 public class FunctionsTest {
 	final static private String JSON_FILE = "test-functions.json";
 	Gson gson = new GsonBuilder().create();
