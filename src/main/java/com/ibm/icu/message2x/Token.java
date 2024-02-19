@@ -1,7 +1,7 @@
 package com.ibm.icu.message2x;
 
 class Token<T> {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private final Type kind;
     private final String buffer;

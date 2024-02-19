@@ -54,7 +54,6 @@ public class Tokenizer {
                     result = new TokenString(Token.Type.LDBLCURLY,
                             input.buffer, startPos, startPos + 2, "{{");
                 } else {
-                    input.backup(1);
                     result = new TokenString(Token.Type.LCURLY,
                             input.buffer, startPos, startPos + 1, "{");
                 }
@@ -102,6 +101,8 @@ public class Tokenizer {
                         }
                     } else if (isTextChar(cp)) {
                         patternBuffer.appendCodePoint(cp);
+                    } else {
+                        break;
                     }
                 }
                 if (!input.atEnd()) {
@@ -111,11 +112,11 @@ public class Tokenizer {
             } else {
                 error("Should never get here?");
             }
+            if (result != null) {
+                return result;
+            }
         }
-        if (result == null) {
-            return new TokenString(Token.Type.EOF, input.buffer, startPos, input.getPosition(), null);
-        }
-        return result;
+        return new TokenString(Token.Type.EOF, input.buffer, startPos, input.getPosition(), null);
     }
 
     private static final Pattern NUMBER_PATTERN = Pattern.compile("-?(0|([1-9]\\d*))(\\.\\d*)?([eE][-+]?\\d+)?");

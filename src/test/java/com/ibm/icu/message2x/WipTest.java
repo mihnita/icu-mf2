@@ -19,7 +19,7 @@ import com.ibm.icu.message2x.Token.Type;
 @SuppressWarnings({ "static-method", "javadoc" })
 public class WipTest {
 
-    static final boolean IGNORE_OK = true;
+    static final boolean IGNORE_OK = false;
 
     @Rule
     public ErrorCollector collector = new ErrorCollector();
@@ -54,15 +54,10 @@ public class WipTest {
                 return true;
             if (obj == null)
                 return false;
-            if (getClass() == obj.getClass()) {
-                MiniToken<?> other = (MiniToken<?>) obj;
-                return kind == other.kind && Objects.equals(value, other.value);
-            }
-            if (obj instanceof Token) {
-                MiniToken<?> other = fromToken((Token<?>) obj);
-                return kind == other.kind && Objects.equals(value, other.value);
-            }
-            return false;
+            if (getClass() != obj.getClass())
+                return false;
+            MiniToken<?> other = (MiniToken<?>) obj;
+            return kind == other.kind && Objects.equals(value, other.value);
         }
 
         @Override
@@ -112,7 +107,7 @@ public class WipTest {
                             new MiniToken<>(Token.Type.PATTERN, "Hello world"),
                             new MiniToken<>(Token.Type.EOF, null)
                             )),
-            new TokenizerTestCase("{{Hello world}}", TokenizerTestCase.Test.SKIP,
+            new TokenizerTestCase("{{Hello world}}",
                     Arrays.asList(
                             new MiniToken<>(Token.Type.LDBLCURLY, "{{"),
                             new MiniToken<>(Token.Type.PATTERN, "Hello world"),
@@ -155,9 +150,9 @@ public class WipTest {
             new TokenizerTestCase("Hello {$user}", TokenizerTestCase.Test.SKIP,
                     Arrays.asList(
                             new MiniToken<>(Token.Type.PATTERN, "Hello "),
-                            //            new MiniToken<>(Token.Type.EXPRESSION, "{$user}"),
                             new MiniToken<>(Token.Type.LCURLY, "{"),
-                            //            new MiniToken<>(Token.Type.EXPRESSION, "{$user}"),
+                            new MiniToken<>(Token.Type.PATTERN, "$user"),
+                            // new MiniToken<>(Token.Type.EXPRESSION, "{$user}"),
                             new MiniToken<>(Token.Type.RCURLY, "}"),
                             new MiniToken<>(Token.Type.EOF, null)
                             )),  
@@ -207,7 +202,7 @@ public class WipTest {
     @Test
     public void testTok() {
         List<Token<?>> actual;
-        List<?> actualMini;
+        List<MiniToken<?>> actualMini;
         for (TokenizerTestCase test : TOK_TEST) {
             switch (test.skip) {
                 case OK:
@@ -224,7 +219,14 @@ public class WipTest {
                     actual = Parser.tokenizeAll(test.input);
                     actualMini = actual.stream().map(MiniToken::fromToken).collect(Collectors.toList());
                     System.out.println("Expected:");
-                    System.out.println(actualMini.toString());
+                    for (MiniToken<?> mt : test.expectedTokens) {
+                        System.out.println("  " + mt);
+                    }
+                    System.out.println("Actual  :");
+                    for (MiniToken<?> mt : actualMini) {
+                        System.out.println("  " + mt);
+                    }
+                    collector.checkThat(actualMini, IsEqual.equalTo(test.expectedTokens));
                     break;
                 case SKIP:
                     break;
