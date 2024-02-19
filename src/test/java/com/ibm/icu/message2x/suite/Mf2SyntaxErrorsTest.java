@@ -17,19 +17,19 @@ import com.google.gson.GsonBuilder;
  */
 @RunWith(JUnit4.class)
 public class Mf2SyntaxErrorsTest {
-	Gson gson = new GsonBuilder().setDateFormat("yyyyMMdd'T'HHmmss").create();
-	
-	/**
-	 * Rigorous Test :-)
-	 * @throws IOException 
-	 */
-	@Test
-	public void test() throws IOException {
-		try (FileReader reader = new FileReader("")) {
-			List<String> tests = gson.fromJson(reader, ArrayList.class);
-			for (String test : tests) {
-				System.out.println(test);
-			}
-		}
-	}
+    Gson gson = new GsonBuilder().setDateFormat("yyyyMMdd'T'HHmmss").create();
+
+    /**
+     * Rigorous Test :-)
+     * @throws IOException 
+     */
+    @Test
+    public void test() throws IOException {
+        try (FileReader reader = new FileReader("")) {
+            List<String> tests = gson.fromJson(reader, ArrayList.class);
+            for (String test : tests) {
+                System.out.println(test);
+            }
+        }
+    }
 }

@@ -22,21 +22,21 @@ import java.lang.reflect.Type;
 @RunWith(JUnit4.class)
 @SuppressWarnings({ "javadoc" })
 public class FunctionsTest {
-	final static private String JSON_FILE = "test-functions.json";
-	Gson gson = new GsonBuilder().create();
+    final static private String JSON_FILE = "test-functions.json";
+    Gson gson = new GsonBuilder().create();
 
-	@Test
-	public void test() throws IOException, URISyntaxException {
-		Path json = Utilities.getTestFile(this.getClass(), JSON_FILE);
-		try (BufferedReader reader = Files.newBufferedReader(json, StandardCharsets.UTF_8)) {
-			Type mapType = new TypeToken<Map<String, Unit[]>>(){}.getType();
-			Map<String, Unit[]> unitList = gson.fromJson(reader, mapType); 
-			for (Entry<String, Unit[]> testGroup : unitList.entrySet()) {
-				System.out.println(testGroup.getKey());
-				for (Unit unit : testGroup.getValue()) {
-					System.out.println("    " + unit);
-				}
-			}
-		}
-	}
+    @Test
+    public void test() throws IOException, URISyntaxException {
+        Path json = Utilities.getTestFile(this.getClass(), JSON_FILE);
+        try (BufferedReader reader = Files.newBufferedReader(json, StandardCharsets.UTF_8)) {
+            Type mapType = new TypeToken<Map<String, Unit[]>>(){}.getType();
+            Map<String, Unit[]> unitList = gson.fromJson(reader, mapType); 
+            for (Entry<String, Unit[]> testGroup : unitList.entrySet()) {
+                System.out.println(testGroup.getKey());
+                for (Unit unit : testGroup.getValue()) {
+                    System.out.println("    " + unit);
+                }
+            }
+        }
+    }
 }

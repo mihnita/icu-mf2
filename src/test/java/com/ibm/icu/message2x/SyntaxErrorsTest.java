@@ -16,17 +16,17 @@ import com.google.gson.GsonBuilder;
 
 @RunWith(JUnit4.class)
 public class SyntaxErrorsTest {
-	final Gson gson = new GsonBuilder().create();
-	final static private String JSON_FILE = "syntax-errors.json";
+    final Gson gson = new GsonBuilder().create();
+    final static private String JSON_FILE = "syntax-errors.json";
 
-	@Test
-	public void test() throws IOException, URISyntaxException {
-		Path json = Utilities.getTestFile(this.getClass(), JSON_FILE);
-		try (BufferedReader reader = Files.newBufferedReader(json, StandardCharsets.UTF_8)) {
-			String[] unitList = gson.fromJson(reader, String[].class); 
-			for (String unit : unitList) {
-				System.out.println(Utilities.str(unit));
-			}
-		}
-	}
+    @Test
+    public void test() throws IOException, URISyntaxException {
+        Path json = Utilities.getTestFile(this.getClass(), JSON_FILE);
+        try (BufferedReader reader = Files.newBufferedReader(json, StandardCharsets.UTF_8)) {
+            String[] unitList = gson.fromJson(reader, String[].class); 
+            for (String unit : unitList) {
+                System.out.println(Utilities.str(unit));
+            }
+        }
+    }
 }

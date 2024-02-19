@@ -11,11 +11,11 @@ import org.junit.runners.JUnit4;
  */
 @RunWith(JUnit4.class)
 public class Mf2CoreTest {
-	/**
-	 * Rigorous Test :-)
-	 */
-	@Test
-	public void shouldAnswerWithTrue() {
-		assertTrue(true);
-	}
+    /**
+     * Rigorous Test :-)
+     */
+    @Test
+    public void shouldAnswerWithTrue() {
+        assertTrue(true);
+    }
 }
