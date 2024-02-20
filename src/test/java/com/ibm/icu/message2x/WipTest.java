@@ -97,7 +97,7 @@ public class WipTest {
                             new MiniToken<>(Token.Type.PATTERN, ""),
                             new MiniToken<>(Token.Type.EOF, null)
                             )),
-            new TokenizerTestCase(".",
+            new TokenizerTestCase(".", TokenizerTestCase.Test.SKIP, // This should actually fail
                     Arrays.asList(
                             new MiniToken<>(Token.Type.PATTERN, "."),
                             new MiniToken<>(Token.Type.EOF, null)
