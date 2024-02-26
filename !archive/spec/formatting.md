@@ -131,12 +131,11 @@ its resolved value is defined according to the implementation's specification.
 Else, if the _expression_ contains an _annotation_,
 its resolved value is defined by _function resolution_.
 
-Else, the _expression_ will contain only either a _literal_ or a _variable_.
-
-If the _expression_ consists of a _variable_,
+Else, if the _expression_ consists of a _variable_,
 its resolved value is defined by _variable resolution_.
 An implementation MAY perform additional processing
-when resolving the value of the _expression_.
+when resolving the value of an _expression_
+that consists only of a _variable_.
 
 > For example, it could apply _function resolution_ using a _function_
 > and a set of _options_ chosen based on the value or type of the _variable_.
@@ -151,8 +150,8 @@ when resolving the value of the _expression_.
 > the implementation could interpret the _placeholder_ `{$date}` as if
 > the pattern included the function `:datetime` with some set of default options.
 
-Else, if the _expression_ consists of a _literal_,
-its resolved value is defined by _literal resolution_.
+Else, the _expression_ consists of a _literal_.
+Its resolved value is defined by _literal resolution_.
 
 > **Note**
 > This means that a _literal_ value with no _annotation_
@@ -237,8 +236,17 @@ the following steps are taken:
 
 5. If the call succeeds,
    resolve the value of the _expression_ as the result of that function call.
+
    If the call fails or does not return a valid value,
-   emit a _Resolution Error_ and use a _fallback value_ for the _expression_.
+   emit a _Invalid Expression_ error.
+
+   Implementations MAY provide a mechanism for the _function_ to provide
+   additional detail about internal failures.
+   Specifically, if the cause of the failure was that the datatype, value, or format of the
+   _operand_ did not match that expected by the _function_,
+   the _function_ might cause an _Operand Mismatch Error_ to be emitted.
+  
+   In all failure cases, use the _fallback value_ for the _expression_ as the resolved value.
 
 #### Option Resolution
 
@@ -267,8 +275,7 @@ The resolved value of _markup_ includes the following fields:
 
 - The type of the markup: open, standalone, or close
 - The _identifier_ of the _markup_
-- For _markup-open_ and _markup_standalone_,
-  the resolved _options_ values after _option resolution_.
+- The resolved _options_ values after _option resolution_.
 
 The resolution of _markup_ MUST always succeed.
 
@@ -364,6 +371,30 @@ the implementation needs to determine which _variant_ will be used
 to provide the _pattern_ for the formatting operation.
 This is done by ordering and filtering the available _variant_ statements
 according to their _key_ values and selecting the first one.
+
+> [!NOTE]
+> At least one _variant_ is required to have all of its _keys_ consist of
+> the fallback value `*`.
+> Some _selectors_ might be implemented in a way that the key value `*`
+> cannot be selected in a _valid_ _message_.
+> In other cases, this key value might be unreachable only in certain locales.
+> This could result in the need in some locales to create
+> one or more _variants_ that do not make sense grammatically for that language.
+> > For example, in the `pl` (Polish) locale, this _message_ cannot reach
+> > the `*` _variant_:
+> > ```
+> > .match {$num :integer}
+> > 0    {{ }}
+> > one  {{ }}
+> > few  {{ }}
+> > many {{ }}
+> > *    {{Only used by fractions in Polish.}}
+> > ```
+>
+> In the Tech Preview, feedback from users and implementers is desired about
+> whether to relax the requirement that such a "fallback _variant_" appear in
+> every message, versus the potential for a _message_ to fail at runtime
+> because no matching _variant_ is available.
 
 The number of _keys_ in each _variant_ MUST equal the number of _selectors_.
 
@@ -584,8 +615,8 @@ foo bar {{Foo and bar}}
 
 A more-complex example is the matching found in selection APIs
 such as ICU's `PluralFormat`.
-Suppose that this API is represented here by the function `:plural`.
-This `:plural` function can match a given numeric value to a specific number _literal_
+Suppose that this API is represented here by the function `:number`.
+This `:number` function can match a given numeric value to a specific number _literal_
 and **_also_** to a plural category (`zero`, `one`, `two`, `few`, `many`, `other`)
 according to locale rules defined in CLDR.
 
@@ -594,7 +625,7 @@ and an `en` (English) locale,
 the pattern selection proceeds as follows for this message:
 
 ```
-.match {$count :plural}
+.match {$count :number}
 one {{Category match}}
 1   {{Exact match}}
 *   {{Other match}}

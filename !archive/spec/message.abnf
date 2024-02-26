@@ -32,11 +32,8 @@ annotation            = function
                       / private-use-annotation
                       / reserved-annotation
 
-; Markup; Note that standalone markup is part of the first line
-markup       = "{" [s] markup-open *(s attribute) [s] ["/"] "}"
-             / "{" [s] markup-close *(s attribute) [s] "}"
-markup-open  = "#" identifier *(s option)
-markup-close = "/" identifier
+markup = "{" [s] "#" identifier *(s option) *(s attribute) [s] ["/"] "}"  ; open and standalone
+       / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}"  ; close
 
 ; Expression and literal parts
 function       = ":" identifier *(s option)
@@ -93,7 +90,7 @@ quoted-char       = content-char / s / "." / "@" / "{" / "}"
 reserved-char     = content-char / "."
 content-char      = %x00-08        ; omit HTAB (%x09) and LF (%x0A)
                   / %x0B-0C        ; omit CR (%x0D)
-                  / %x0E-19        ; omit SP (%x20)
+                  / %x0E-1F        ; omit SP (%x20)
                   / %x21-2D        ; omit . (%x2E)
                   / %x2F-3F        ; omit @ (%x40)
                   / %x41-5B        ; omit \ (%x5C)
