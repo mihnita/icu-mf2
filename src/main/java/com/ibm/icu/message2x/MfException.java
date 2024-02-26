@@ -1,15 +1,15 @@
 package com.ibm.icu.message2x;
 
-public class Mf2Exception extends RuntimeException {
+public class MfException extends RuntimeException {
     private static final long serialVersionUID = -7634219305388292407L;
 
-    public Mf2Exception(String message) {
+    public MfException(String message) {
         super(message);
     }
-    public Mf2Exception(Throwable cause) {
+    public MfException(Throwable cause) {
         super(cause);
     }
-    public Mf2Exception(String message, Throwable cause) {
+    public MfException(String message, Throwable cause) {
         super(message, cause);
     }
 }

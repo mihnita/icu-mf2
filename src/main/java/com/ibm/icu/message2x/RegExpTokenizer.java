@@ -135,9 +135,9 @@ public class RegExpTokenizer {
 //        ALL_TOKENS.put(Token.Kind.ERROR, RE_CATCH_ALL);
     }
 
-    public RegExpTokenizer(InputSource input) throws Mf2Exception {
+    public RegExpTokenizer(InputSource input) throws MfException {
         if (input == null) {
-            throw new Mf2Exception("Null input");
+            throw new MfException("Null input");
         }
         this.input = input;
 //        if (input.atEnd()) {

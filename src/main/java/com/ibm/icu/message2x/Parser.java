@@ -13,7 +13,7 @@ public class Parser {
         this.tokenizer = new RegExpTokenizer(input);
     }
 
-    static public Mf2DataModel.Message parse(String input) {
+    static public MfDataModel.Message parse(String input) {
         return new Parser(input).parseImpl();
     }
     // abnf: message           = simple-message / complex-message
@@ -31,7 +31,7 @@ public class Parser {
     }
 
     // Parser proper
-    public Mf2DataModel.Message parseImpl() {
+    public MfDataModel.Message parseImpl() {
         int cp = input.peakChar();
         if (cp == '.') { // declarations or .match
             ComplexMessage complexMessage = getComplexMessage();
@@ -54,9 +54,9 @@ public class Parser {
     }
 
     static class SimpleMessage {
-        final Mf2DataModel.Pattern parts;
+        final MfDataModel.Pattern parts;
 
-        public SimpleMessage(Mf2DataModel.Pattern parts) {
+        public SimpleMessage(MfDataModel.Pattern parts) {
             this.parts = parts;
         }
         @Override
@@ -72,9 +72,9 @@ public class Parser {
     // abnf: simple-start      = simple-start-char / text-escape / placeholder
     // abnf: pattern           = *(text-char / text-escape / placeholder)
     private SimpleMessage getSimpleMessage() {
-        Mf2DataModel.Pattern parts = new Mf2DataModel.Pattern();
+        MfDataModel.Pattern parts = new MfDataModel.Pattern();
         while (true) {
-            Mf2DataModel.PatternPart part = getPatternPart();
+            MfDataModel.PatternPart part = getPatternPart();
             if (part == null) {
                 break;
             }
@@ -84,18 +84,18 @@ public class Parser {
         return new SimpleMessage(parts);
     }
 
-    private Mf2DataModel.PatternPart getPatternPart() {
+    private MfDataModel.PatternPart getPatternPart() {
         int cp = input.peakChar();
         switch (cp) {
             case -1: // EOF
                 return null;
             case '{':
-                Mf2DataModel.Expression ph = getPlaceholder();
+                MfDataModel.Expression ph = getPlaceholder();
                 spy("placeholder", ph);
                 return ph;
             default:
                 String plainText = getText();
-                Mf2DataModel.StringPart sp = new Mf2DataModel.StringPart(plainText);
+                MfDataModel.StringPart sp = new MfDataModel.StringPart(plainText);
                 spy("plainText", plainText);
                 return sp;
         }
@@ -171,12 +171,12 @@ public class Parser {
     //abnf: annotation-expression = "{" [s] annotation *(s attribute) [s] "}"
     //abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s] ["/"] "}"  ; open and standalone
     //abnf:        / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}"  ; close
-    private Mf2DataModel.Expression getPlaceholder() {
+    private MfDataModel.Expression getPlaceholder() {
         int cp = input.readCodePoint();
         if (cp != '{') {
             return null;
         }
-        Mf2DataModel.Expression result = null;
+        MfDataModel.Expression result = null;
         skipOptionalWhitespaces();
         cp = input.readCodePoint();
         switch (cp) {
@@ -188,10 +188,10 @@ public class Parser {
                     //abnf: function       = ":" identifier *(s option)
                     String identifier = getIdentifier();
                     spy("identifier", identifier);
-                    List<Mf2DataModel.Option> options = getOptions();
+                    List<MfDataModel.Option> options = getOptions();
                     spy("options", options);
-                    Mf2DataModel.FunctionAnnotation fa = new Mf2DataModel.FunctionAnnotation(identifier, options);
-                    result = new Mf2DataModel.FunctionExpression(fa, null);
+                    MfDataModel.FunctionAnnotation fa = new MfDataModel.FunctionAnnotation(identifier, options);
+                    result = new MfDataModel.FunctionExpression(fa, null);
                     break;
                 case '^': // intentional fallthrough
                 case '&': // annotation, private
@@ -209,10 +209,10 @@ public class Parser {
                     break;
                 case '$': // variable
                     //abnf: variable       = "$" name
-                    Mf2DataModel.VariableRef var = getVariable();
+                    MfDataModel.VariableRef var = getVariable();
                     break;
                 default: // literal, we hope
-                    Mf2DataModel.LiteralOrVariableRef litOrVar = getLiteralOrVariableRef();
+                    MfDataModel.LiteralOrVariableRef litOrVar = getLiteralOrVariableRef();
         }
         cp = input.readCodePoint();
         if (cp != '}') {
@@ -243,10 +243,10 @@ public class Parser {
     }
 
     //abnf helper: *(s option)
-    private List<Mf2DataModel.Option> getOptions() {
-        List<Mf2DataModel.Option> options = new ArrayList<>();
+    private List<MfDataModel.Option> getOptions() {
+        List<MfDataModel.Option> options = new ArrayList<>();
         while (true) {
-            Mf2DataModel.Option option = getOption();
+            MfDataModel.Option option = getOption();
             if (option == null) {
                 break;
             }
@@ -256,7 +256,7 @@ public class Parser {
     }
 
     //abnf: option         = identifier [s] "=" [s] (literal / variable)
-    private Mf2DataModel.Option getOption() {
+    private MfDataModel.Option getOption() {
         // TODO Auto-generated method stub
         skipOptionalWhitespaces();
         String identifier = getIdentifier();
@@ -270,17 +270,17 @@ public class Parser {
             return null;
         }
         skipOptionalWhitespaces();
-        Mf2DataModel.LiteralOrVariableRef litOrVar = getLiteralOrVariableRef();
+        MfDataModel.LiteralOrVariableRef litOrVar = getLiteralOrVariableRef();
         return null;
     }
 
-    private Mf2DataModel.VariableRef getVariable() {
+    private MfDataModel.VariableRef getVariable() {
         return null;
     }
 
     //abnf: variable       = "$" name
     //abnf: literal        = quoted / unquoted
-    private Mf2DataModel.LiteralOrVariableRef getLiteralOrVariableRef() {
+    private MfDataModel.LiteralOrVariableRef getLiteralOrVariableRef() {
         int cp = input.readCodePoint();
         switch (cp) {
             case '$': // variableRef
@@ -291,17 +291,17 @@ public class Parser {
             case '|': // quoted
                 //abnf: quoted         = "|" *(quoted-char / quoted-escape) "|"
                 input.backup(1);
-                Mf2DataModel.Literal ql = getQuotedLiteral();
+                MfDataModel.Literal ql = getQuotedLiteral();
                 spy("QuotedLiteral", ql);
                 break;
             default : // unquoted
-                Mf2DataModel.Literal unql = getUnQuotedLiteral();
+                MfDataModel.Literal unql = getUnQuotedLiteral();
                 spy("UnQuotedLiteral", unql);
         }
         return null;
     }
 
-    private Mf2DataModel.Literal getQuotedLiteral() {
+    private MfDataModel.Literal getQuotedLiteral() {
         StringBuilder result = new StringBuilder();
         int cp = input.readCodePoint();
         if (cp != '|') {
@@ -340,7 +340,7 @@ public class Parser {
 
     }
 
-    private Mf2DataModel.Literal getUnQuotedLiteral() {
+    private MfDataModel.Literal getUnQuotedLiteral() {
         return null;
     }
 
@@ -381,9 +381,9 @@ public class Parser {
     }
 
     private ComplexMessage getComplexMessage() {
-        List<Mf2DataModel.Declaration> declarations = new ArrayList<>();
+        List<MfDataModel.Declaration> declarations = new ArrayList<>();
         while (true) {
-            Mf2DataModel.Declaration declaration = getDeclaration();
+            MfDataModel.Declaration declaration = getDeclaration();
             if (declaration == null) {
                 break;
             }
@@ -392,7 +392,7 @@ public class Parser {
         return null;
     }
 
-    private Mf2DataModel.Declaration getDeclaration() {
+    private MfDataModel.Declaration getDeclaration() {
         return null;
     }
 
@@ -433,7 +433,7 @@ public class Parser {
         return result.toString();
     }
 
-    private void error(String message) throws Mf2Exception {
+    private void error(String message) throws MfException {
         StringBuilder finalMsg = new StringBuilder();
         if (input == null) {
             finalMsg.append("Parse error: ");

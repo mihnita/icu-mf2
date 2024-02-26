@@ -4,11 +4,11 @@ import java.util.Locale;
 import java.util.Map;
 
 public class MessageFormatter {
-    final Mf2DataModel.Message message;
+    final MfDataModel.Message message;
     final Locale locale;
     final String pattern;
 
-    public MessageFormatter(Mf2DataModel.Message message, Locale locale, String pattern) {
+    public MessageFormatter(MfDataModel.Message message, Locale locale, String pattern) {
         super();
         this.message = message;
         this.locale = locale;
@@ -21,7 +21,7 @@ public class MessageFormatter {
     public String formatToString(Map<String,Object> arguments) {
         return "";
     }
-    public Mf2DataModel.Message getDataModel() {
+    public MfDataModel.Message getDataModel() {
         return message;
     }
     public Locale getLocale() {
@@ -37,7 +37,7 @@ public class MessageFormatter {
         String pattern;
 
         MessageFormatter build() {
-            Mf2DataModel.Message dataModel = Parser.parse(pattern);
+            MfDataModel.Message dataModel = Parser.parse(pattern);
             return new MessageFormatter(dataModel, locale, pattern);
         }
         //		Builder setDataModel(Mf2DataModel dataModel) {

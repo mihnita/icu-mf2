@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class Mf2DataModel {
+public class MfDataModel {
 
     // Messages
 
@@ -75,7 +75,7 @@ public class Mf2DataModel {
 
         StringPart(String value) {
             if (value == null) {
-                throw new Mf2Exception("StringPart initialized with null");
+                throw new MfException("StringPart initialized with null");
             }
             this.value = value;
         }

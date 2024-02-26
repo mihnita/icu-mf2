@@ -41,7 +41,7 @@ public class WipTest2 {
         for (String test : someTests) {
             System.out.println("======================");
             System.out.println(Utilities.str(test));
-            Mf2DataModel.Message z = Parser.parse(test);
+            MfDataModel.Message z = Parser.parse(test);
         }
     }
 }
