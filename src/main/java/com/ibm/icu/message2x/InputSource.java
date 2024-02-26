@@ -18,16 +18,24 @@ class InputSource {
         return cursor >= length;
     }
 
+    public int peakChar() {
+        if (atEnd()) {
+            return -1;
+        }
+        return buffer.charAt(cursor);
+    }
+
     int lastReadCursor = -1;
     int lastReadCount = 0;
     public int readCodePoint() {
-        // TODO: START Detect possible infinite loop
+        // TODO: REMOVE
+        // START Detect possible infinite loop
         if (lastReadCursor != cursor) {
             lastReadCursor = cursor;
             lastReadCount = 1;
         } else {
             lastReadCount++;
-            if (lastReadCount >= 5) {
+            if (lastReadCount >= 10) {
                 throw new RuntimeException("Stuck in a loop!");
             }
         }
@@ -70,5 +78,10 @@ class InputSource {
     public void skip(int amount) {
         //TODO: validate
         cursor += amount;
+    }
+
+    public void gotoPosition(int position) {
+        //TODO: validate
+        cursor = position;
     }
 }

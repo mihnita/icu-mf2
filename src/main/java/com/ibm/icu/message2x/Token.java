@@ -1,18 +1,18 @@
 package com.ibm.icu.message2x;
 
 class Token<T> {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
-    private final Type kind;
-    private final String buffer;
-    private final int begin;
-    private final int end;
-    private final T value;
+    public final Kind kind;
+    public final String buffer;
+    public final int begin;
+    public final int end;
+    public final T value;
     //	private Token next;
     //	private Token specialToken;
-
-    static enum Type {
+    static enum Kind {
         EOF,
+        PATTERN_PART,
         STRING, // |....|
         NUMBER, // abnf: number-literal = ["-"] (%x30 / (%x31-39 *DIGIT)) ["." 1*DIGIT] [%i"e" ["-" / "+"] 1*DIGIT]
         LCURLY, RCURLY, // "{" and "}"
@@ -21,8 +21,26 @@ class Token<T> {
         INPUT, // .input
         LOCAL, // .local
         MATCH, // .match
-        RESERVED_KEYWORD
-        ;
+        RESERVED_KEYWORD,
+        EQUAL, // "="
+        STAR, // "*"
+        SLASH, // "/"
+        POUND, // "#"
+        COLON, // ":"
+        AT, // "@"
+        DOLLAR, // "$"
+        PIPE, // "|"
+        MINUS,
+        PLUS,
+        DOT,
+        EXP,
+        RESERVED_ANNOTATION,
+        RESERVED_START,
+        WHITESPACE,
+        NAME_START,
+        NAME_CHAR,
+        CONTENT_CHAR,
+        ERROR;
     }
 
     /**
@@ -34,7 +52,7 @@ class Token<T> {
      *        For example a real string, with all escapes resolved,
      *        or a number, when the input string was "3.14" or "-3e7"  
      */
-    public Token(Type kind, String buffer, int begin, int end, T value) {
+    public Token(Kind kind, String buffer, int begin, int end, T value) {
         this.kind = kind;
         this.buffer = buffer;
         this.begin = begin;
@@ -43,10 +61,6 @@ class Token<T> {
         if (DEBUG) {
             System.out.println(this.toString());
         }
-    }
-
-    public Type getKind() {
-        return kind;
     }
 
     public T getValue() {

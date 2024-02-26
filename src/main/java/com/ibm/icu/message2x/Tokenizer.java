@@ -24,8 +24,8 @@ public class Tokenizer {
         int startPos = input.getPosition();
         if (startPos == 0 && input.buffer.isEmpty()) {
             // Empty string
-            queue.add(new TokenString(Token.Type.EOF, input.buffer, startPos, input.getPosition(), null));
-            return new TokenString(Token.Type.PATTERN, input.buffer, startPos, input.getPosition(), "");
+            queue.add(new TokenString(Token.Kind.EOF, input.buffer, startPos, input.getPosition(), null));
+            return new TokenString(Token.Kind.PATTERN, input.buffer, startPos, input.getPosition(), "");
         }
 
         Token<?> result = null;
@@ -42,20 +42,20 @@ public class Tokenizer {
             if (cp == '}') {
                 cp = input.readCodePoint();
                 if (cp == '}') {
-                    result = new TokenString(Token.Type.RDBLCURLY,
+                    result = new TokenString(Token.Kind.RDBLCURLY,
                             input.buffer, startPos, startPos + 2, "}}");
                 } else {
                     input.backup(1);
-                    result = new TokenString(Token.Type.RCURLY,
+                    result = new TokenString(Token.Kind.RCURLY,
                             input.buffer, startPos, startPos + 1, "}");
                 }
             } else if (cp == '{') {
                 cp = input.readCodePoint();
                 if (cp == '{') {
-                    result = new TokenString(Token.Type.LDBLCURLY,
+                    result = new TokenString(Token.Kind.LDBLCURLY,
                             input.buffer, startPos, startPos + 2, "{{");
                 } else {
-                    result = new TokenString(Token.Type.LCURLY,
+                    result = new TokenString(Token.Kind.LCURLY,
                             input.buffer, startPos, startPos + 1, "{");
                 }
             } else if (cp == '|') {
@@ -69,17 +69,17 @@ public class Tokenizer {
                 String keyworkName = getKeyword();
                 switch (keyworkName) {
                     case "input":
-                        result = new TokenString(Token.Type.INPUT, input.buffer, startPos, input.getPosition(), keyworkName);
+                        result = new TokenString(Token.Kind.INPUT, input.buffer, startPos, input.getPosition(), keyworkName);
                         break;
                     case "local":
-                        result = new TokenString(Token.Type.LOCAL, input.buffer, startPos, input.getPosition(), keyworkName);
+                        result = new TokenString(Token.Kind.LOCAL, input.buffer, startPos, input.getPosition(), keyworkName);
                         break;
                     case "match":
-                        result = new TokenString(Token.Type.MATCH, input.buffer, startPos, input.getPosition(), keyworkName);
+                        result = new TokenString(Token.Kind.MATCH, input.buffer, startPos, input.getPosition(), keyworkName);
                         break;
                     default:
                         if (!keyworkName.isEmpty()) {
-                            result = new TokenString(Token.Type.RESERVED_KEYWORD, input.buffer, startPos, input.getPosition(), keyworkName);
+                            result = new TokenString(Token.Kind.RESERVED_KEYWORD, input.buffer, startPos, input.getPosition(), keyworkName);
                         } else {
                             // back to simple message?
                             input.backup(input.getPosition() - startPos);
@@ -109,7 +109,7 @@ public class Tokenizer {
                 if (!input.atEnd()) {
                     input.backup(1);
                 }
-                result = new TokenString(Token.Type.PATTERN, input.buffer, startPos, input.getPosition(), patternBuffer.toString());
+                result = new TokenString(Token.Kind.PATTERN, input.buffer, startPos, input.getPosition(), patternBuffer.toString());
             } else {
                 error("Should never get here?");
             }
@@ -117,7 +117,7 @@ public class Tokenizer {
                 return result;
             }
         }
-        return new TokenString(Token.Type.EOF, input.buffer, startPos, input.getPosition(), null);
+        return new TokenString(Token.Kind.EOF, input.buffer, startPos, input.getPosition(), null);
     }
 
     private static final Pattern NUMBER_PATTERN = Pattern.compile("-?(0|([1-9]\\d*))(\\.\\d*)?([eE][-+]?\\d+)?");
@@ -128,11 +128,11 @@ public class Tokenizer {
         if (m.matches()) {
             String matchingPart = m.group();
             input.skip(matchingPart.length());
-            return new TokenNumber(Token.Type.NUMBER,
+            return new TokenNumber(Token.Kind.NUMBER,
                     input.buffer, start, input.getPosition(),
                     Double.valueOf(matchingPart));			
         }
-        return new TokenNumber(Token.Type.NUMBER, input.buffer, start, input.getPosition(), 0);
+        return new TokenNumber(Token.Kind.NUMBER, input.buffer, start, input.getPosition(), 0);
     }
 
     /* Covers all tokens that start with a '.', for now `.input`, `.local`, `.match`, and `reserved-keyword`
@@ -220,7 +220,7 @@ public class Tokenizer {
         if (cp != '|') {
             error("Expecter terminating '|' at offset {}, found {}");
         }
-        return new TokenString(Token.Type.STRING,
+        return new TokenString(Token.Kind.STRING,
                 input.buffer, start, input.getPosition(), value.toString());
     }
 

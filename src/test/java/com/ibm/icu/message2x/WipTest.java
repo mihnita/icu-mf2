@@ -13,7 +13,7 @@ import org.junit.rules.ErrorCollector;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import com.ibm.icu.message2x.Token.Type;
+import com.ibm.icu.message2x.Token.Kind;
 
 @RunWith(JUnit4.class)
 @SuppressWarnings({ "static-method", "javadoc" })
@@ -30,17 +30,17 @@ public class WipTest {
     }
 
     static private class MiniToken<T> {
-        final Token.Type kind;
+        final Token.Kind kind;
         final T value;
 
-        public MiniToken(Type kind, T value) {
+        public MiniToken(Kind kind, T value) {
             super();
             this.kind = kind;
             this.value = value;
         }
 
         static public MiniToken<?> fromToken(Token<?> other) {
-            return new MiniToken<>(other.getKind(), other.getValue());
+            return new MiniToken<>(other.kind, other.getValue());
         }
 
         @Override
@@ -94,67 +94,67 @@ public class WipTest {
     private static final TokenizerTestCase [] TOK_TEST = {
             new TokenizerTestCase("", // TokenizerTestCase.Test.SKIP,
                     Arrays.asList(
-                            new MiniToken<>(Token.Type.PATTERN, ""),
-                            new MiniToken<>(Token.Type.EOF, null)
+                            new MiniToken<>(Token.Kind.PATTERN, ""),
+                            new MiniToken<>(Token.Kind.EOF, null)
                             )),
             new TokenizerTestCase(".", TokenizerTestCase.Test.SKIP, // This should actually fail
                     Arrays.asList(
-                            new MiniToken<>(Token.Type.PATTERN, "."),
-                            new MiniToken<>(Token.Type.EOF, null)
+                            new MiniToken<>(Token.Kind.PATTERN, "."),
+                            new MiniToken<>(Token.Kind.EOF, null)
                             )),
             new TokenizerTestCase("Hello world",
                     Arrays.asList(
-                            new MiniToken<>(Token.Type.PATTERN, "Hello world"),
-                            new MiniToken<>(Token.Type.EOF, null)
+                            new MiniToken<>(Token.Kind.PATTERN, "Hello world"),
+                            new MiniToken<>(Token.Kind.EOF, null)
                             )),
             new TokenizerTestCase("{{Hello world}}",
                     Arrays.asList(
-                            new MiniToken<>(Token.Type.LDBLCURLY, "{{"),
-                            new MiniToken<>(Token.Type.PATTERN, "Hello world"),
-                            new MiniToken<>(Token.Type.RDBLCURLY, "}}"), // missing
-                            new MiniToken<>(Token.Type.EOF, null)
+                            new MiniToken<>(Token.Kind.LDBLCURLY, "{{"),
+                            new MiniToken<>(Token.Kind.PATTERN, "Hello world"),
+                            new MiniToken<>(Token.Kind.RDBLCURLY, "}}"), // missing
+                            new MiniToken<>(Token.Kind.EOF, null)
                             )),
             new TokenizerTestCase("|Hello world|",
                     Arrays.asList(
-                            new MiniToken<>(Token.Type.STRING, "Hello world"),
-                            new MiniToken<>(Token.Type.EOF, null)
+                            new MiniToken<>(Token.Kind.STRING, "Hello world"),
+                            new MiniToken<>(Token.Kind.EOF, null)
                             )),
             new TokenizerTestCase("|Hello\tworld|",
                     Arrays.asList( // real tab, does not get to the parser 
-                            new MiniToken<>(Token.Type.STRING, "Hello\tworld"),
-                            new MiniToken<>(Token.Type.EOF, null)
+                            new MiniToken<>(Token.Kind.STRING, "Hello\tworld"),
+                            new MiniToken<>(Token.Kind.EOF, null)
                             )),
             new TokenizerTestCase("|Hello\tworld|",
                     Arrays.asList( // escaped tab, gets to the parser
-                            new MiniToken<>(Token.Type.STRING, "Hello\tworld"),
-                            new MiniToken<>(Token.Type.EOF, null)
+                            new MiniToken<>(Token.Kind.STRING, "Hello\tworld"),
+                            new MiniToken<>(Token.Kind.EOF, null)
                             )),
             new TokenizerTestCase("|Hello|world|", TokenizerTestCase.Test.SKIP,
                     Arrays.asList(
-                            new MiniToken<>(Token.Type.STRING, "Hello"),
-                            new MiniToken<>(Token.Type.EOF, null)
+                            new MiniToken<>(Token.Kind.STRING, "Hello"),
+                            new MiniToken<>(Token.Kind.EOF, null)
                             )),
             new TokenizerTestCase("|Hello\\|world|",
                     Arrays.asList(
-                            new MiniToken<>(Token.Type.STRING, "Hello|world"),
-                            new MiniToken<>(Token.Type.EOF, null)
+                            new MiniToken<>(Token.Kind.STRING, "Hello|world"),
+                            new MiniToken<>(Token.Kind.EOF, null)
                             )),
             new TokenizerTestCase("|Hello\\\\|world|", TokenizerTestCase.Test.SKIP,
                     // Java makes this into Backslash-Backslash-Pipe, and that is what MF2 sees.
                     // MF2 unescapes Backslash-Backslash to Backslash and puts it in the "raw string".
                     // And coming after that the `|` marks the end of the string, it is not unescaped.
                     Arrays.asList(
-                            new MiniToken<>(Token.Type.STRING, "Hello\\|world"),
-                            new MiniToken<>(Token.Type.EOF, null)
+                            new MiniToken<>(Token.Kind.STRING, "Hello\\|world"),
+                            new MiniToken<>(Token.Kind.EOF, null)
                             )),
             new TokenizerTestCase("Hello {$user}", TokenizerTestCase.Test.SKIP,
                     Arrays.asList(
-                            new MiniToken<>(Token.Type.PATTERN, "Hello "),
-                            new MiniToken<>(Token.Type.LCURLY, "{"),
-                            new MiniToken<>(Token.Type.PATTERN, "$user"),
+                            new MiniToken<>(Token.Kind.PATTERN, "Hello "),
+                            new MiniToken<>(Token.Kind.LCURLY, "{"),
+                            new MiniToken<>(Token.Kind.PATTERN, "$user"),
                             // new MiniToken<>(Token.Type.EXPRESSION, "{$user}"),
-                            new MiniToken<>(Token.Type.RCURLY, "}"),
-                            new MiniToken<>(Token.Type.EOF, null)
+                            new MiniToken<>(Token.Kind.RCURLY, "}"),
+                            new MiniToken<>(Token.Kind.EOF, null)
                             )),  
     };
 

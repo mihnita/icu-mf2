@@ -1,6 +1,8 @@
 package com.ibm.icu.message2x;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 public class Mf2DataModel {
 
@@ -52,13 +54,53 @@ public class Mf2DataModel {
 
     // type Pattern = Array<string | Expression | Markup>;
     static class Pattern {
-        List<PatternPart> parts;
+        final List<PatternPart> parts;
+        Pattern() {
+            this.parts = new ArrayList<>();
+        }
+        @Override
+        public String toString() {
+            StringJoiner result = new StringJoiner(", ", "[", "]");
+            for (PatternPart part: parts) {
+                result.add(part.toString());
+            }
+            return result.toString();
+        }
     }
 
     interface PatternPart {}
     
     static class StringPart implements PatternPart {       
-        String value;
+        final String value;
+
+        StringPart(String value) {
+            if (value == null) {
+                throw new Mf2Exception("StringPart initialized with null");
+            }
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return "StringPart { value: " + stringEscape(value) + " }";
+        }
+    }
+    
+    private static String stringEscape(String text) {
+        final StringBuilder result = new StringBuilder();
+        result.append("\"");
+        text.chars().forEach(ch ->{
+            switch (ch) {
+                case '\n': result.append("\\n"); break;
+                case '\t': result.append("\\t"); break;
+                case '\r': result.append("\\r"); break;
+                case '\b': result.append("\\b"); break;
+                case '\f': result.append("\\f"); break;
+                default: result.append((char)ch);
+            }
+        });
+        result.append("\"");
+        return result.toString();
     }
 
     // type Expression =
@@ -72,6 +114,13 @@ public class Mf2DataModel {
         Literal arg;
         FunctionAnnotationOrUnsupportedAnnotation annotation;
         List<Attribute> attributes;
+
+        @Override
+        public String toString() {
+            return "LiteralExpression { arg:" + arg
+                    + ", annotation:" + annotation
+                    + ", attributes:" + attributes + " }";
+        }
     }
 
     static class VariableExpression implements Expression {
@@ -87,8 +136,18 @@ public class Mf2DataModel {
     }
 
     static class FunctionExpression implements Expression {
-        FunctionAnnotation annotation;
-        List<Attribute> attributes;
+        final FunctionAnnotation annotation;
+        final List<Attribute> attributes;
+
+        public FunctionExpression(FunctionAnnotation annotation, List<Attribute> attributes) {
+            this.annotation = annotation;
+            this.attributes = attributes;
+        }
+
+        @Override
+        public String toString() {
+            return "FunctionExpression { annotation:" + annotation + ", attributes:" + attributes + " }";
+        }
     }
 
     static class UnsupportedExpression {
@@ -114,8 +173,18 @@ public class Mf2DataModel {
     }
 
     static class FunctionAnnotation {
-        String name;
-        List<Option> options;
+        final String name;
+        final List<Option> options;
+
+        public FunctionAnnotation(String name, List<Option> options) {
+            this.name = name;
+            this.options = options;
+        }
+
+        @Override
+        public String toString() {
+            return "FunctionAnnotation { name:" + name + ", options:" + options + " }";
+        }
     }
 
     static class Option {
