@@ -11,8 +11,22 @@ public class MfDataModel {
     interface Message {}
 
     static class PatternMessage implements Message {
-        List<Declaration> declarations;
-        Pattern pattern;
+        final List<Declaration> declarations;
+        final Pattern pattern;
+
+        public PatternMessage(List<Declaration> declarations, Pattern pattern) {
+            super();
+            this.declarations = declarations;
+            this.pattern = pattern;
+        }
+
+        @Override
+        public String toString() {
+            return "PatternMessage ["
+                    + "declarations=" + declarations
+                    + ", pattern=" + pattern
+                    + "]";
+        }
     }
 
     static class SelectMessage implements Message {
@@ -82,7 +96,9 @@ public class MfDataModel {
 
         @Override
         public String toString() {
-            return "StringPart { value: " + stringEscape(value) + " }";
+            return "StringPart ["
+                    + "value=" + stringEscape(value)
+                    + "]";
         }
     }
     
@@ -117,9 +133,11 @@ public class MfDataModel {
 
         @Override
         public String toString() {
-            return "LiteralExpression { arg:" + arg
-                    + ", annotation:" + annotation
-                    + ", attributes:" + attributes + " }";
+            return "LiteralExpression ["
+                    + "arg=" + arg
+                    + ", annotation=" + annotation
+                    + ", attributes=" + attributes
+                    + "]";
         }
     }
 
@@ -129,11 +147,7 @@ public class MfDataModel {
         List<Attribute> attributes;
     }
 
-    static class FunctionAnnotationOrUnsupportedAnnotation {
-        // one of
-        FunctionAnnotation functionAnnotation;
-        UnsupportedAnnotation unsupportedAnnotation;
-    }
+    interface FunctionAnnotationOrUnsupportedAnnotation {}
 
     static class FunctionExpression implements Expression {
         final FunctionAnnotation annotation;
@@ -146,7 +160,10 @@ public class MfDataModel {
 
         @Override
         public String toString() {
-            return "FunctionExpression { annotation:" + annotation + ", attributes:" + attributes + " }";
+            return "FunctionExpression ["
+                    + "annotation=" + annotation
+                    + ", attributes=" + attributes
+                    + "]";
         }
     }
 
@@ -172,7 +189,7 @@ public class MfDataModel {
         String name;
     }
 
-    static class FunctionAnnotation {
+    static class FunctionAnnotation implements FunctionAnnotationOrUnsupportedAnnotation {
         final String name;
         final List<Option> options;
 
@@ -183,7 +200,10 @@ public class MfDataModel {
 
         @Override
         public String toString() {
-            return "FunctionAnnotation { name:" + name + ", options:" + options + " }";
+            return "FunctionAnnotation ["
+                    + "name=" + name
+                    + ", options=" + options
+                    + "]";
         }
     }
 
@@ -192,7 +212,7 @@ public class MfDataModel {
         LiteralOrVariableRef value;
     }
 
-    static class UnsupportedAnnotation {
+    static class UnsupportedAnnotation implements FunctionAnnotationOrUnsupportedAnnotation {
         char sigil; // "!" | "%" | "^" | "&" | "*" | "+" | "<" | ">" | "?" | "~";
         String source;
     }

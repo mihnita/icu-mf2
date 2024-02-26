@@ -25,10 +25,9 @@ public class WipTest2 {
     public void test() {
         String [] someTests = {
                 // Simple messages
-//                "Hello",
-//                "Hello world!",
-//                "Hello \\t \\n \\r \\{ world!",
-//                "Hello \t \n \r { world!",
+                "Hello",
+                "Hello world!",
+                "Hello \\t \\n \\r \\{ world!",
                 "Hello world {:datetime}",
 //                "Hello world {$exp}",
 //                "Hello world {$exp :datetime}",
@@ -42,6 +41,8 @@ public class WipTest2 {
             System.out.println("======================");
             System.out.println(Utilities.str(test));
             MfDataModel.Message z = Parser.parse(test);
+            System.out.println("======================");
+            System.out.println(z);
         }
     }
 }
