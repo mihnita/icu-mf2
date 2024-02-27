@@ -145,6 +145,14 @@ public class MfDataModel {
         VariableRef arg;
         FunctionAnnotationOrUnsupportedAnnotation annotation;
         List<Attribute> attributes;
+        @Override
+        public String toString() {
+            return "VariableExpression ["
+                    + "arg=" + arg
+                    + ", annotation=" + annotation
+                    + ", attributes=" + attributes
+                    + "]";
+        }
     }
 
     interface FunctionAnnotationOrUnsupportedAnnotation {}
@@ -167,9 +175,18 @@ public class MfDataModel {
         }
     }
 
-    static class UnsupportedExpression {
-        UnsupportedAnnotation annotation;
-        List<Attribute> attributes;
+    static class UnsupportedExpression implements Expression {
+        final UnsupportedAnnotation annotation;
+        final List<Attribute> attributes;
+
+        public UnsupportedExpression(UnsupportedAnnotation annotation, List<Attribute> attributes) {
+            this.annotation = annotation;
+            this.attributes = attributes;
+        }
+        @Override
+        public String toString() {
+            return "UnsupportedExpression [annotation=" + annotation + ", attributes=" + attributes + "]";
+        }
     }
 
     static class Attribute {
@@ -180,13 +197,41 @@ public class MfDataModel {
     // Expressions
 
     interface LiteralOrVariableRef {}
+    interface Literal extends LiteralOrVariableRef {}
 
-    static class Literal implements LiteralOrVariableRef {
-        String value;
+    // Data model feedback: I think this should be StringLiteral
+    static class StringLiteral implements Literal {
+        final String value;
+        public StringLiteral(String value) {
+            this.value = value;
+        }
+        @Override
+        public String toString() {
+            return "Literal [value=" + value + "]";
+        }
+    }
+
+    // Not in the official data model
+    static class NumberLiteral implements Literal {
+        final Number value;
+        public NumberLiteral(Number value) {
+            this.value = value;
+        }
+        @Override
+        public String toString() {
+            return "NumberLiteral [value=" + value + "]";
+        }
     }
 
     static class VariableRef implements LiteralOrVariableRef {
-        String name;
+        final String name;
+        public VariableRef(String name) {
+            this.name = name;
+        }
+        @Override
+        public String toString() {
+            return "VariableRef [name=" + name + "]";
+        }
     }
 
     static class FunctionAnnotation implements FunctionAnnotationOrUnsupportedAnnotation {
@@ -208,13 +253,31 @@ public class MfDataModel {
     }
 
     static class Option {
-        String name;
-        LiteralOrVariableRef value;
+        final String name;
+        final LiteralOrVariableRef value;
+        public Option(String name, LiteralOrVariableRef value) {
+            super();
+            this.name = name;
+            this.value = value;
+        }
+        @Override
+        public String toString() {
+            return "Option [name=" + name + ", value=" + value + "]";
+        }
     }
 
     static class UnsupportedAnnotation implements FunctionAnnotationOrUnsupportedAnnotation {
-        char sigil; // "!" | "%" | "^" | "&" | "*" | "+" | "<" | ">" | "?" | "~";
-        String source;
+        final int sigil;
+        final String source;
+        public UnsupportedAnnotation(int sigil, String source) {
+            super();
+            this.sigil = sigil;
+            this.source = source;
+        }
+        @Override
+        public String toString() {
+            return "UnsupportedAnnotation [sigil=" + sigil + ", source=" + source + "]";
+        }
     }
 
     // Markup

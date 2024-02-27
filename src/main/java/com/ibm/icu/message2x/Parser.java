@@ -3,6 +3,17 @@ package com.ibm.icu.message2x;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.StringJoiner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.ibm.icu.message2x.MfDataModel.Attribute;
+import com.ibm.icu.message2x.MfDataModel.FunctionAnnotationOrUnsupportedAnnotation;
+import com.ibm.icu.message2x.MfDataModel.Literal;
+import com.ibm.icu.message2x.MfDataModel.Option;
+import com.ibm.icu.message2x.MfDataModel.PatternPart;
+import com.ibm.icu.message2x.MfDataModel.UnsupportedAnnotation;
+import com.ibm.icu.message2x.MfDataModel.VariableRef;
 
 public class Parser {
     final InputSource input;
@@ -61,7 +72,12 @@ public class Parser {
         }
         @Override
         public String toString() {
-            return "SimpleMessage { parts:" + parts.toString() + "}";
+            StringJoiner result = new StringJoiner(",\n    ", "[\n    ", "\n]");
+            result.setEmptyValue("[]");
+            for (PatternPart part : parts.parts) {
+                result.add(part.toString());
+            }
+            return "SimpleMessage parts: " + result;
         }
     }
 
@@ -148,48 +164,86 @@ public class Parser {
             return null;
         }
         MfDataModel.Expression result = null;
+        MfDataModel.LiteralOrVariableRef lvr = null;
+
         skipOptionalWhitespaces();
+
         cp = input.readCodePoint();
-        switch (cp) {
-                case '#': // open or standalone markup
-                case '/': // close markup
-                    Object mk = getMarkup();
-                    break;
-                case ':': // annotation, function
-                    //abnf: function       = ":" identifier *(s option)
-                    String identifier = getIdentifier();
-                    spy("identifier", identifier);
-                    List<MfDataModel.Option> options = getOptions();
-                    spy("options", options);
-                    MfDataModel.FunctionAnnotation fa = new MfDataModel.FunctionAnnotation(identifier, options);
-                    result = new MfDataModel.FunctionExpression(fa, null);
-                    break;
-                case '^': // intentional fallthrough
-                case '&': // annotation, private
-                    //abnf: private-start = "^" / "&"
-                    break;
-                case '!': // intentional fallthrough
-                case '%': // intentional fallthrough
-                case '*': // intentional fallthrough
-                case '+': // intentional fallthrough
-                case '<': // intentional fallthrough
-                case '>': // intentional fallthrough
-                case '?': // intentional fallthrough
-                case '~': // reserved-annotation
-                    //abnf: reserved-annotation-start = "!" / "%" / "*" / "+" / "<" / ">" / "?" / "~"
-                    break;
-                case '$': // variable
-                    //abnf: variable       = "$" name
-                    MfDataModel.VariableRef var = getVariable();
-                    break;
-                default: // literal, we hope
-                    MfDataModel.LiteralOrVariableRef litOrVar = getLiteralOrVariableRef();
+        String annotationSigils = ":" //abnf: function = ":" identifier *(s option)
+                + "^&" //abnf: private-start = "^" / "&"
+                + "!%*+<>?~" //abnf: reserved-annotation-start = "!" / "%" / "*" / "+" / "<" / ">" / "?" / "~"
+                + "#/" // markup
+                ;
+        if (annotationSigils.indexOf(cp) == -1) {
+            // If it does not start with any of the above sigils it should be a literal or a variable
+            //abnf: expression            = literal-expression
+            //abnf:                       / variable-expression
+            //abnf: literal-expression    = "{" [s] literal [s annotation] *(s attribute) [s] "}"
+            //abnf: variable-expression   = "{" [s] variable [s annotation] *(s attribute) [s] "}"
+            input.backup(1);
+            lvr = getLiteralOrVariableRef();
+            spy("lvr", lvr);
+            cp = input.peakChar();
+            if (cp != '}') {
+                skipMandatoryWhitespaces();
+                cp = input.readCodePoint();
+            }
         }
+
+        switch (cp) {
+            case '}':
+                break;
+            case '#': // open or standalone markup
+            case '/': // close markup
+                if (lvr != null) {
+                    error("Markdown can't have literals or variables");
+                }
+                Object mk = getMarkup();
+                break;
+            case ':': // annotation, function
+                //abnf: function       = ":" identifier *(s option)
+                String identifier = getIdentifier();
+                spy("identifier", identifier);
+                List<MfDataModel.Option> options = getOptions();
+                spy("options", options);
+                MfDataModel.FunctionAnnotation fa = new MfDataModel.FunctionAnnotation(identifier, options);
+                result = new MfDataModel.FunctionExpression(fa, null);
+                skipOptionalWhitespaces();
+                break;
+            case '^': // intentional fallthrough
+            case '&': // annotation, private
+                //abnf: private-start = "^" / "&"
+                break;
+            case '!': // intentional fallthrough
+            case '%': // intentional fallthrough
+            case '*': // intentional fallthrough
+            case '+': // intentional fallthrough
+            case '<': // intentional fallthrough
+            case '>': // intentional fallthrough
+            case '?': // intentional fallthrough
+            case '~': // reserved-annotation
+                //abnf: reserved-annotation-start = "!" / "%" / "*" / "+" / "<" / ">" / "?" / "~"
+                String body = getReservedBody();
+                UnsupportedAnnotation unsup = new UnsupportedAnnotation(cp, body);
+                result = new MfDataModel.UnsupportedExpression(unsup, null);
+                break;
+        }
+        // TODO: read attributes
         cp = input.readCodePoint();
         if (cp != '}') {
             error("Placeholder not closed");
         }
+        if (result == null && lvr != null) {
+            // We found a literal or variable, but no annotations
+            // For example ...{$foo}... or ...{|foo bar|} or ...{foo}... 
+//            MfDataModel.LiteralOrVariableRef
+        }
         return result;
+    }
+
+    private String getReservedBody() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     //abnf: identifier = [namespace ":"] name
@@ -242,11 +296,7 @@ public class Parser {
         }
         skipOptionalWhitespaces();
         MfDataModel.LiteralOrVariableRef litOrVar = getLiteralOrVariableRef();
-        return null;
-    }
-
-    private MfDataModel.VariableRef getVariable() {
-        return null;
+        return new MfDataModel.Option(identifier, litOrVar);
     }
 
     //abnf: variable       = "$" name
@@ -258,18 +308,22 @@ public class Parser {
                 //abnf: variable       = "$" name
                 String name = getName();
                 spy("varName", name);
-                break;
+                if (name == null) {
+                    error("Invalid variable reference following $");
+                }
+                return new MfDataModel.VariableRef(name);
             case '|': // quoted
                 //abnf: quoted         = "|" *(quoted-char / quoted-escape) "|"
                 input.backup(1);
                 MfDataModel.Literal ql = getQuotedLiteral();
                 spy("QuotedLiteral", ql);
-                break;
+                return ql;
             default : // unquoted
+                input.backup(1);
                 MfDataModel.Literal unql = getUnQuotedLiteral();
                 spy("UnQuotedLiteral", unql);
+                return unql;
         }
-        return null;
     }
 
     private MfDataModel.Literal getQuotedLiteral() {
@@ -298,10 +352,29 @@ public class Parser {
         if (cp != '|') {
             error("expected ending '|'");
         }
-        return null;
+        return new MfDataModel.StringLiteral(result.toString());
     }
 
     private MfDataModel.Literal getUnQuotedLiteral() {
+        String name = getName();
+        if (name != null) {
+            return new MfDataModel.StringLiteral(name);
+        }
+        return getNumberLiteral();
+    }
+
+    //abnf: ; number-literal matches JSON number (https://www.rfc-editor.org/rfc/rfc8259#section-6)
+    //abnf: number-literal = ["-"] (%x30 / (%x31-39 *DIGIT)) ["." 1*DIGIT] [%i"e" ["-" / "+"] 1*DIGIT]
+    final static Pattern RE_NUMBER_LITERAL = Pattern.compile("^-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+\\-]?[0-9]+)?");
+    private MfDataModel.NumberLiteral getNumberLiteral() {
+        String numberString = getWithRegExp(RE_NUMBER_LITERAL);
+        if (numberString != null) {
+            spy("numberString", numberString);
+            // TODO: be smarter about it? Integer / Long / Double / BigNumber?
+            double value = Double.parseDouble(numberString);
+            spy("numberDouble", numberString);
+            return new MfDataModel.NumberLiteral(value);
+        }
         return null;
     }
 
@@ -415,14 +488,24 @@ public class Parser {
         throw new RuntimeException(finalMsg.toString());
     }
 
+    private String getWithRegExp(Pattern pattern) {
+        StringView sv = new StringView(input.buffer, input.getPosition());
+        Matcher m = pattern.matcher(sv);
+        boolean found = m.find();
+        if (found) {
+            input.skip(m.group().length());
+            return m.group();
+        }
+        return null;
+    }    
+
     private void spy(String label, Object obj) {
-        int position = input.getPosition();
         System.out.printf("SPY: %s: %s%n", label, Objects.toString(obj));
+//        int position = input.getPosition();
 //        System.out.printf("%s: %s // [%d] '%s\u2191%s'%n", label, Objects.toString(obj),
 //                position,
 //                input.buffer.substring(0, position),
 //                input.buffer.substring(position)
 //                );
     }
-
 }
