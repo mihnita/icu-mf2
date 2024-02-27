@@ -61,6 +61,11 @@ public class WipTest2 {
                 "Hello world {$exp @valid @attr=a @attrb=123 @atrn=|foo bar|}",
                 "Hello world {$exp :date @valid @attr=aaaa @attrb=123 @atrn=|foo bar|}",
                 "Hello world {$exp :date year=numeric month=long day=numeric int=12 @valid @attr=a @attrb=123 @atrn=|foo bar|}",
+                // Reserved
+                "Reserved {$exp &foo something more protected} and more", // private
+                "Reserved {$exp %foo something |quoted \\| inside| more protected} and more", // reserved
+                "{{.starting with dot is OK here}}",
+                "{{Some string pattern, with {$foo} and {$exp :date style=long}!}}",
 //                // Simple messages, with declarations
 //                ".input foo = {$expiration}",
 //                ".input foo = {$expiration :date}",

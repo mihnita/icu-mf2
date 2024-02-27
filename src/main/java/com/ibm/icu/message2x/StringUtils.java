@@ -110,7 +110,7 @@ public class StringUtils {
     /*
      * abnf: reserved-char = content-char / "."
      */
-    static boolean isReservedChar(char cp) {
+    static boolean isReservedChar(int cp) {
         return isContentChar(cp) || cp == '.';
     }
 

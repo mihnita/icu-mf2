@@ -43,16 +43,16 @@ public class Parser {
         } else if (cp == '{') { // `{` or `{{`
             cp = input.readCodePoint();
             if (cp == '{') { // `{{`, complex body without declarations
-                input.backup(1);
+                input.backup(1); // let complexBody deal with the wrapping {{ and }}
                 ComplexMessage complexBody = getComplexBody();
                 spy("complexBody", complexBody);
             } else { // placeholder
-                SimpleMessage simpleMessage = getSimpleMessage();
+                SimpleMessage simpleMessage = getPattern();
                 spy("simpleMessage1", simpleMessage);
             }
         } else {
-            SimpleMessage simpleMessage = getSimpleMessage();
-            spy("simpleMessage2", simpleMessage);
+            SimpleMessage simpleMessage = getPattern();
+            spy(true, "simpleMessage2", simpleMessage);
         }
         return null;
     }
@@ -70,7 +70,7 @@ public class Parser {
     // abnf: simple-message    = [simple-start pattern]
     // abnf: simple-start      = simple-start-char / text-escape / placeholder
     // abnf: pattern           = *(text-char / text-escape / placeholder)
-    private SimpleMessage getSimpleMessage() {
+    private SimpleMessage getPattern() {
         MfDataModel.Pattern parts = new MfDataModel.Pattern();
         while (true) {
             MfDataModel.PatternPart part = getPatternPart();
@@ -87,6 +87,8 @@ public class Parser {
         int cp = input.peakChar();
         switch (cp) {
             case -1: // EOF
+                return null;
+            case '}': // This is the end, otherwise it would be escaped
                 return null;
             case '{':
                 MfDataModel.Expression ph = getPlaceholder();
@@ -196,7 +198,6 @@ public class Parser {
             case '^': // intentional fallthrough
             case '&': // annotation, private
                 //abnf: private-start = "^" / "&"
-                break;
             case '!': // intentional fallthrough
             case '%': // intentional fallthrough
             case '*': // intentional fallthrough
@@ -206,8 +207,12 @@ public class Parser {
             case '?': // intentional fallthrough
             case '~': // reserved-annotation
                 //abnf: reserved-annotation-start = "!" / "%" / "*" / "+" / "<" / ">" / "?" / "~"
+                identifier = getIdentifier();
+                spy("identifier", identifier);
                 String body = getReservedBody();
-                faOrUa = new MfDataModel.UnsupportedAnnotation(cp, body);
+                spy("reserved-body", body);
+                // safe to cast, we already know if it one of the ascii symbols (^&?<>~ etc.) 
+                faOrUa = new MfDataModel.UnsupportedAnnotation((char) cp, body);
                 break;
         }
 
@@ -225,10 +230,10 @@ public class Parser {
         if (cp != '}') {
             error("Placeholder not closed");
         }
-        // faOrUa
+
         MfDataModel.Expression result = null;
         if (lvr instanceof MfDataModel.StringLiteral || lvr instanceof MfDataModel.NumberLiteral) {
-            result = new MfDataModel.LiteralExpression((MfDataModel.Literal)lvr, faOrUa, attributes);
+            result = new MfDataModel.LiteralExpression((MfDataModel.Literal) lvr, faOrUa, attributes);
         } else if (lvr instanceof MfDataModel.VariableRef) {
             result = new MfDataModel.VariableExpression((MfDataModel.VariableRef) lvr, faOrUa, attributes);
         } else {
@@ -275,9 +280,34 @@ public class Parser {
         return null;
     }
 
+    //abnf: reserved-body   = *([s] 1*(reserved-char / reserved-escape / quoted))
+    //abnf: reserved-escape = backslash ( backslash / "{" / "|" / "}" )
     private String getReservedBody() {
+        StringBuilder result = new StringBuilder();
         // TODO Auto-generated method stub
-        return null;
+        while(true) {
+            int cp = input.readCodePoint();
+            //TODO: whitespace is problematic in the grammar
+            if (StringUtils.isReservedChar(cp) || StringUtils.isWhitespace(cp)) {
+                result.appendCodePoint(cp);
+            } else if (cp == '\\') {
+                cp = input.readCodePoint();
+                if (cp == '{' || cp == '|' || cp == '}') {
+                    result.append(cp);
+                } else {
+                    error("Invalid escape sequence. Only \\{, \\| and \\} are valid here.");
+                }
+            } else if (cp == '|') {
+                input.backup(1);
+                MfDataModel.StringLiteral quoted = (MfDataModel.StringLiteral) getQuotedLiteral();
+                result.append(quoted.value);
+            } else if (cp == -1) {
+                return result.toString();
+            } else {
+                input.backup(1);
+                return result.toString();
+            }
+        }
     }
 
     //abnf: identifier = [namespace ":"] name
@@ -442,12 +472,6 @@ public class Parser {
         }
     }
 
-    private class Placeholder {
-    }
-
-    private void getPattern() {
-    }
-
     private ComplexMessage getComplexMessage() {
         List<MfDataModel.Declaration> declarations = new ArrayList<>();
         while (true) {
@@ -467,6 +491,16 @@ public class Parser {
     // complex-body      = quoted-pattern / matcher
     // quoted-pattern    = "{{" pattern "}}"
     private ComplexMessage getComplexBody() { // {{ ... }}
+        int cp = input.readCodePoint();
+        assertTrue(cp == '{', "Expected { for a complex body");
+        cp = input.readCodePoint();
+        assertTrue(cp == '{', "Expected second { for a complex body");
+        SimpleMessage pattern = getPattern();
+        spy(true, "pattern in complex body", pattern);
+        cp = input.readCodePoint();
+        assertTrue(cp == '}', "Expected } to end a complex body");
+        cp = input.readCodePoint();
+        assertTrue(cp == '}', "Expected second } to end a complex body");
         return null;
     }
 
@@ -499,6 +533,12 @@ public class Parser {
             }
         }
         return result.toString();
+    }
+
+    private void assertTrue(boolean condition, String message) throws MfException {
+        if (!condition) {
+            error(message);
+        }
     }
 
     private void error(String message) throws MfException {
@@ -537,8 +577,18 @@ public class Parser {
             //.setPrettyPrinting()
             .create();
 
+    final static boolean DEBUG = true;
     private void spy(String label, Object obj) {
-        System.out.printf("SPY: %s: %s%n", label, gson.toJson(obj));
+        spy(false, label, obj);
+    }
+
+    private void spy(boolean force, String label, Object obj) {
+        if (DEBUG) {
+            if (force)
+                System.out.printf("SPY: %s: %s%n", label, gson.toJson(obj));
+            else
+                System.out.printf("\033[90mSPY: %s: %s\033[m%n", label, gson.toJson(obj));
+        }
 //        int position = input.getPosition();
 //        System.out.printf("%s: %s // [%d] '%s\u2191%s'%n", label, Objects.toString(obj),
 //                position,
