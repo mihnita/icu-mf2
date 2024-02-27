@@ -2,7 +2,6 @@ package com.ibm.icu.message2x;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 
 public class MfDataModel {
 
@@ -13,26 +12,21 @@ public class MfDataModel {
     static class PatternMessage implements Message {
         final List<Declaration> declarations;
         final Pattern pattern;
-
         public PatternMessage(List<Declaration> declarations, Pattern pattern) {
-            super();
             this.declarations = declarations;
             this.pattern = pattern;
-        }
-
-        @Override
-        public String toString() {
-            return "PatternMessage ["
-                    + "declarations=" + declarations
-                    + ", pattern=" + pattern
-                    + "]";
         }
     }
 
     static class SelectMessage implements Message {
-        List<Declaration> declarations;
-        List<Expression> selectors;
-        List<Variant> variants;
+        final List<Declaration> declarations;
+        final List<Expression> selectors;
+        final List<Variant> variants;
+        public SelectMessage(List<Declaration> declarations, List<Expression> selectors, List<Variant> variants) {
+            this.declarations = declarations;
+            this.selectors = selectors;
+            this.variants = variants;
+        }
     }
 
     interface Declaration {}
@@ -72,14 +66,6 @@ public class MfDataModel {
         Pattern() {
             this.parts = new ArrayList<>();
         }
-        @Override
-        public String toString() {
-            StringJoiner result = new StringJoiner(", ", "[", "]");
-            for (PatternPart part: parts) {
-                result.add(part.toString());
-            }
-            return result.toString();
-        }
     }
 
     interface PatternPart {}
@@ -93,30 +79,6 @@ public class MfDataModel {
             }
             this.value = value;
         }
-
-        @Override
-        public String toString() {
-            return "StringPart ["
-                    + "value=" + stringEscape(value)
-                    + "]";
-        }
-    }
-    
-    private static String stringEscape(String text) {
-        final StringBuilder result = new StringBuilder();
-        result.append("\"");
-        text.chars().forEach(ch ->{
-            switch (ch) {
-                case '\n': result.append("\\n"); break;
-                case '\t': result.append("\\t"); break;
-                case '\r': result.append("\\r"); break;
-                case '\b': result.append("\\b"); break;
-                case '\f': result.append("\\f"); break;
-                default: result.append((char)ch);
-            }
-        });
-        result.append("\"");
-        return result.toString();
     }
 
     // type Expression =
@@ -127,31 +89,26 @@ public class MfDataModel {
     interface Expression extends PatternPart {}
 
     static class LiteralExpression implements Expression {
-        Literal arg;
-        FunctionAnnotationOrUnsupportedAnnotation annotation;
-        List<Attribute> attributes;
-
-        @Override
-        public String toString() {
-            return "LiteralExpression ["
-                    + "arg=" + arg
-                    + ", annotation=" + annotation
-                    + ", attributes=" + attributes
-                    + "]";
+        final Literal arg;
+        final FunctionAnnotationOrUnsupportedAnnotation annotation;
+        final List<Attribute> attributes;
+        public LiteralExpression(Literal arg, FunctionAnnotationOrUnsupportedAnnotation annotation,
+                List<Attribute> attributes) {
+            this.arg = arg;
+            this.annotation = annotation;
+            this.attributes = attributes;
         }
     }
 
     static class VariableExpression implements Expression {
-        VariableRef arg;
-        FunctionAnnotationOrUnsupportedAnnotation annotation;
-        List<Attribute> attributes;
-        @Override
-        public String toString() {
-            return "VariableExpression ["
-                    + "arg=" + arg
-                    + ", annotation=" + annotation
-                    + ", attributes=" + attributes
-                    + "]";
+        final VariableRef arg;
+        final FunctionAnnotationOrUnsupportedAnnotation annotation;
+        final List<Attribute> attributes;
+        public VariableExpression(VariableRef arg, FunctionAnnotationOrUnsupportedAnnotation annotation,
+                List<Attribute> attributes) {
+            this.arg = arg;
+            this.annotation = annotation;
+            this.attributes = attributes;
         }
     }
 
@@ -160,38 +117,28 @@ public class MfDataModel {
     static class FunctionExpression implements Expression {
         final FunctionAnnotation annotation;
         final List<Attribute> attributes;
-
         public FunctionExpression(FunctionAnnotation annotation, List<Attribute> attributes) {
             this.annotation = annotation;
             this.attributes = attributes;
-        }
-
-        @Override
-        public String toString() {
-            return "FunctionExpression ["
-                    + "annotation=" + annotation
-                    + ", attributes=" + attributes
-                    + "]";
         }
     }
 
     static class UnsupportedExpression implements Expression {
         final UnsupportedAnnotation annotation;
         final List<Attribute> attributes;
-
         public UnsupportedExpression(UnsupportedAnnotation annotation, List<Attribute> attributes) {
             this.annotation = annotation;
             this.attributes = attributes;
         }
-        @Override
-        public String toString() {
-            return "UnsupportedExpression [annotation=" + annotation + ", attributes=" + attributes + "]";
-        }
     }
 
     static class Attribute {
-        String name;
-        LiteralOrVariableRef value;
+        final String name;
+        final LiteralOrVariableRef value;
+        public Attribute(String name, LiteralOrVariableRef value) {
+            this.name = name;
+            this.value = value;
+        }
     }
 
     // Expressions
@@ -205,10 +152,6 @@ public class MfDataModel {
         public StringLiteral(String value) {
             this.value = value;
         }
-        @Override
-        public String toString() {
-            return "Literal [value=" + value + "]";
-        }
     }
 
     // Not in the official data model
@@ -217,10 +160,6 @@ public class MfDataModel {
         public NumberLiteral(Number value) {
             this.value = value;
         }
-        @Override
-        public String toString() {
-            return "NumberLiteral [value=" + value + "]";
-        }
     }
 
     static class VariableRef implements LiteralOrVariableRef {
@@ -228,27 +167,14 @@ public class MfDataModel {
         public VariableRef(String name) {
             this.name = name;
         }
-        @Override
-        public String toString() {
-            return "VariableRef [name=" + name + "]";
-        }
     }
 
     static class FunctionAnnotation implements FunctionAnnotationOrUnsupportedAnnotation {
         final String name;
         final List<Option> options;
-
         public FunctionAnnotation(String name, List<Option> options) {
             this.name = name;
             this.options = options;
-        }
-
-        @Override
-        public String toString() {
-            return "FunctionAnnotation ["
-                    + "name=" + name
-                    + ", options=" + options
-                    + "]";
         }
     }
 
@@ -256,13 +182,8 @@ public class MfDataModel {
         final String name;
         final LiteralOrVariableRef value;
         public Option(String name, LiteralOrVariableRef value) {
-            super();
             this.name = name;
             this.value = value;
-        }
-        @Override
-        public String toString() {
-            return "Option [name=" + name + ", value=" + value + "]";
         }
     }
 
@@ -270,13 +191,8 @@ public class MfDataModel {
         final int sigil;
         final String source;
         public UnsupportedAnnotation(int sigil, String source) {
-            super();
             this.sigil = sigil;
             this.source = source;
-        }
-        @Override
-        public String toString() {
-            return "UnsupportedAnnotation [sigil=" + sigil + ", source=" + source + "]";
         }
     }
 

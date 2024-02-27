@@ -25,8 +25,8 @@ class InputSource {
         return buffer.charAt(cursor);
     }
 
-    int lastReadCursor = -1;
-    int lastReadCount = 0;
+    private int lastReadCursor = -1;
+    private int lastReadCount = 0;
     public int readCodePoint() {
         // TODO: REMOVE
         // START Detect possible infinite loop

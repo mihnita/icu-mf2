@@ -33,7 +33,9 @@
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>${gson.version}</version>
+      <!-- Temporary, for development
       <scope>test</scope>
+      -->
     </dependency>
     <dependency>
       <groupId>junit</groupId>

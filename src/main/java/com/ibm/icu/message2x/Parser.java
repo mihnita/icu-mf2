@@ -3,16 +3,16 @@ package com.ibm.icu.message2x;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.ibm.icu.message2x.MfDataModel.Attribute;
 import com.ibm.icu.message2x.MfDataModel.FunctionAnnotationOrUnsupportedAnnotation;
-import com.ibm.icu.message2x.MfDataModel.Literal;
-import com.ibm.icu.message2x.MfDataModel.Option;
-import com.ibm.icu.message2x.MfDataModel.PatternPart;
-import com.ibm.icu.message2x.MfDataModel.UnsupportedAnnotation;
+import com.ibm.icu.message2x.MfDataModel.LiteralOrVariableRef;
+import com.ibm.icu.message2x.MfDataModel.NumberLiteral;
+import com.ibm.icu.message2x.MfDataModel.StringLiteral;
 import com.ibm.icu.message2x.MfDataModel.VariableRef;
 
 public class Parser {
@@ -66,18 +66,8 @@ public class Parser {
 
     static class SimpleMessage {
         final MfDataModel.Pattern parts;
-
         public SimpleMessage(MfDataModel.Pattern parts) {
             this.parts = parts;
-        }
-        @Override
-        public String toString() {
-            StringJoiner result = new StringJoiner(",\n    ", "[\n    ", "\n]");
-            result.setEmptyValue("[]");
-            for (PatternPart part : parts.parts) {
-                result.add(part.toString());
-            }
-            return "SimpleMessage parts: " + result;
         }
     }
 
@@ -163,8 +153,8 @@ public class Parser {
         if (cp != '{') {
             return null;
         }
-        MfDataModel.Expression result = null;
         MfDataModel.LiteralOrVariableRef lvr = null;
+        MfDataModel.FunctionAnnotationOrUnsupportedAnnotation faOrUa = null;
 
         skipOptionalWhitespaces();
 
@@ -206,9 +196,9 @@ public class Parser {
                 spy("identifier", identifier);
                 List<MfDataModel.Option> options = getOptions();
                 spy("options", options);
-                MfDataModel.FunctionAnnotation fa = new MfDataModel.FunctionAnnotation(identifier, options);
-                result = new MfDataModel.FunctionExpression(fa, null);
+                faOrUa = new MfDataModel.FunctionAnnotation(identifier, options);
                 skipOptionalWhitespaces();
+                cp = input.readCodePoint();
                 break;
             case '^': // intentional fallthrough
             case '&': // annotation, private
@@ -224,21 +214,71 @@ public class Parser {
             case '~': // reserved-annotation
                 //abnf: reserved-annotation-start = "!" / "%" / "*" / "+" / "<" / ">" / "?" / "~"
                 String body = getReservedBody();
-                UnsupportedAnnotation unsup = new UnsupportedAnnotation(cp, body);
-                result = new MfDataModel.UnsupportedExpression(unsup, null);
+                faOrUa = new MfDataModel.UnsupportedAnnotation(cp, body);
                 break;
         }
-        // TODO: read attributes
+
+        List<MfDataModel.Attribute> attributes = null;
+        if (cp == '@') {
+            // We have attribute, parse them
+            // But put back the '@', because each attribute should have one
+            input.backup(1);
+            attributes = getAttributes();
+            spy("attributes", attributes);
+        }
+
         cp = input.readCodePoint();
         if (cp != '}') {
             error("Placeholder not closed");
         }
-        if (result == null && lvr != null) {
-            // We found a literal or variable, but no annotations
-            // For example ...{$foo}... or ...{|foo bar|} or ...{foo}... 
-//            MfDataModel.LiteralOrVariableRef
+
+        // faOrUa
+        MfDataModel.Expression result = null;
+        if (lvr instanceof StringLiteral || lvr instanceof NumberLiteral) {
+            result = new MfDataModel.LiteralExpression((MfDataModel.Literal)lvr, faOrUa, attributes);
+        } else if (lvr instanceof VariableRef) {
+            result = new MfDataModel.VariableExpression((MfDataModel.VariableRef) lvr, faOrUa, attributes);
+        } else {
+            result = new MfDataModel.VariableExpression(null, faOrUa, attributes);
         }
         return result;
+    }
+
+    private List<Attribute> getAttributes() {
+        List<Attribute> result = new ArrayList<>();
+        while (true) {
+            Attribute attribute = getAttribute();
+            if (attribute == null) {
+                break;
+            }
+            spy("    attribute", attribute);
+            result.add(attribute);
+        }
+        return result;
+    }
+
+    //abnf: attribute      = "@" identifier [[s] "=" [s] (literal / variable)]
+    private Attribute getAttribute() {
+        int position = input.getPosition();
+        skipOptionalWhitespaces();
+        int cp = input.readCodePoint();
+        if (cp == '@') {
+            String id = getIdentifier();
+            skipOptionalWhitespaces();
+            cp = input.readCodePoint();
+            LiteralOrVariableRef lvr = null;
+            if (cp == '=') {
+                skipOptionalWhitespaces();
+                lvr = getLiteralOrVariableRef();
+            } else {
+                // was not equal, attribute without a value
+                input.backup(1);
+            }
+            return new Attribute(id, lvr);
+        } else {
+            input.gotoPosition(position);
+        }
+        return null;
     }
 
     private String getReservedBody() {
@@ -497,10 +537,14 @@ public class Parser {
             return m.group();
         }
         return null;
-    }    
+    }
+
+    final static Gson gson = new GsonBuilder()
+            //.setPrettyPrinting()
+            .create();
 
     private void spy(String label, Object obj) {
-        System.out.printf("SPY: %s: %s%n", label, Objects.toString(obj));
+        System.out.printf("SPY: %s: %s%n", label, gson.toJson(obj));
 //        int position = input.getPosition();
 //        System.out.printf("%s: %s // [%d] '%s\u2191%s'%n", label, Objects.toString(obj),
 //                position,
