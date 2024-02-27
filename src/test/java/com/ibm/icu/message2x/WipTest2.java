@@ -1,6 +1,5 @@
 package com.ibm.icu.message2x;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
@@ -16,49 +15,50 @@ public class WipTest2 {
     @Rule
     public ErrorCollector collector = new ErrorCollector();
 
-//    @Test(expected = IllegalArgumentException.class)
-//    public void testNullInput() {
-//        Parser.parse(null);
-//    }
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullInput() {
+        Parser.parse(null);
+    }
 
     @Test
     public void test() {
         String [] someTests = {
                 // Simple messages
-//                "Hello",
-//                "Hello world!",
-//                "Hello \\t \\n \\r \\{ world!",
-//                "Hello world {:datetime}",
-//                "Hello world {foo}",
-//                "Hello {0} world",
-//                "Hello {123} world",
-//                "Hello {-123} world",
-//                "Hello {3.1416} world",
-//                "Hello {-3.1416} world",
-//                "Hello {123E+2} world",
-//                "Hello {123E-2} world",
-//                "Hello {123.456E+2} world",
-//                "Hello {123.456E-2} world",
-//                "Hello {-123.456E+2} world",
-//                "Hello {-123.456E-2} world",
-//                "Hello {-123E+2} world",
-//                "Hello {-123E-2} world",
-//                "Hello world {$exp}",
-//                "Hello world {$exp :datetime}",
-//                "Hello world {|2024-02-27| :datetime}",
-//                "Hello world {$exp :datetime style=long} and more",
-//                "Hello world {$exp :function number=1234} and more",
-//                "Hello world {$exp :function unquoted=left   } and more",
-//                "Hello world {$exp :function quoted=|Something| } and more",
-//                "Hello world {$exp :function quoted=|Something with spaces| } and more",
-//                "Hello world {$exp :function quoted=|Something with \\| spaces and \\| escapes| } and more",
-//                "Hello world {$exp :function number=1234 unquoted=left quoted=|Something|}",
-//                "Hello world {$exp :function number=1234 unquoted=left quoted=|Something longer|}",
-//                "Hello world {$exp :function number=1234 unquoted=left quoted=|Something \\| longer|}",
+                "",
+                "Hello",
+                "Hello world!",
+                "Hello \\t \\n \\r \\{ world!",
+                "Hello world {:datetime}",
+                "Hello world {foo}",
+                "Hello {0} world",
+                "Hello {123} world",
+                "Hello {-123} world",
+                "Hello {3.1416} world",
+                "Hello {-3.1416} world",
+                "Hello {123E+2} world",
+                "Hello {123E-2} world",
+                "Hello {123.456E+2} world",
+                "Hello {123.456E-2} world",
+                "Hello {-123.456E+2} world",
+                "Hello {-123.456E-2} world",
+                "Hello {-123E+2} world",
+                "Hello {-123E-2} world",
+                "Hello world {$exp}",
+                "Hello world {$exp :datetime}",
+                "Hello world {|2024-02-27| :datetime}",
+                "Hello world {$exp :datetime style=long} and more",
+                "Hello world {$exp :function number=1234} and more",
+                "Hello world {$exp :function unquoted=left   } and more",
+                "Hello world {$exp :function quoted=|Something| } and more",
+                "Hello world {$exp :function quoted=|Something with spaces| } and more",
+                "Hello world {$exp :function quoted=|Something with \\| spaces and \\| escapes| } and more",
+                "Hello world {$exp :function number=1234 unquoted=left quoted=|Something|}",
+                "Hello world {$exp :function number=1234 unquoted=left quoted=|Something longer|}",
+                "Hello world {$exp :function number=1234 unquoted=left quoted=|Something \\| longer|}",
                 // Attributes
-//                "Hello world {$exp}",
-//                "Hello world {$exp @attr}",
-//                "Hello world {$exp @valid @attr=a @attrb=123 @atrn=|foo bar|}",
+                "Hello world {$exp}",
+                "Hello world {$exp @attr}",
+                "Hello world {$exp @valid @attr=a @attrb=123 @atrn=|foo bar|}",
                 "Hello world {$exp :date @valid @attr=aaaa @attrb=123 @atrn=|foo bar|}",
                 "Hello world {$exp :date year=numeric month=long day=numeric int=12 @valid @attr=a @attrb=123 @atrn=|foo bar|}",
 //                // Simple messages, with declarations

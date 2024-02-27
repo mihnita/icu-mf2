@@ -2,18 +2,11 @@ package com.ibm.icu.message2x;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.ibm.icu.message2x.MfDataModel.Attribute;
-import com.ibm.icu.message2x.MfDataModel.FunctionAnnotationOrUnsupportedAnnotation;
-import com.ibm.icu.message2x.MfDataModel.LiteralOrVariableRef;
-import com.ibm.icu.message2x.MfDataModel.NumberLiteral;
-import com.ibm.icu.message2x.MfDataModel.StringLiteral;
-import com.ibm.icu.message2x.MfDataModel.VariableRef;
 
 public class Parser {
     final InputSource input;
@@ -198,7 +191,7 @@ public class Parser {
                 spy("options", options);
                 faOrUa = new MfDataModel.FunctionAnnotation(identifier, options);
                 skipOptionalWhitespaces();
-                cp = input.readCodePoint();
+                cp = input.peakChar();
                 break;
             case '^': // intentional fallthrough
             case '&': // annotation, private
@@ -218,6 +211,7 @@ public class Parser {
                 break;
         }
 
+        // Read the attributes
         List<MfDataModel.Attribute> attributes = null;
         if (cp == '@') {
             // We have attribute, parse them
@@ -231,23 +225,23 @@ public class Parser {
         if (cp != '}') {
             error("Placeholder not closed");
         }
-
         // faOrUa
         MfDataModel.Expression result = null;
-        if (lvr instanceof StringLiteral || lvr instanceof NumberLiteral) {
+        if (lvr instanceof MfDataModel.StringLiteral || lvr instanceof MfDataModel.NumberLiteral) {
             result = new MfDataModel.LiteralExpression((MfDataModel.Literal)lvr, faOrUa, attributes);
-        } else if (lvr instanceof VariableRef) {
+        } else if (lvr instanceof MfDataModel.VariableRef) {
             result = new MfDataModel.VariableExpression((MfDataModel.VariableRef) lvr, faOrUa, attributes);
         } else {
             result = new MfDataModel.VariableExpression(null, faOrUa, attributes);
         }
+
         return result;
     }
 
-    private List<Attribute> getAttributes() {
-        List<Attribute> result = new ArrayList<>();
+    private List<MfDataModel.Attribute> getAttributes() {
+        List<MfDataModel.Attribute> result = new ArrayList<>();
         while (true) {
-            Attribute attribute = getAttribute();
+            MfDataModel.Attribute attribute = getAttribute();
             if (attribute == null) {
                 break;
             }
@@ -258,7 +252,7 @@ public class Parser {
     }
 
     //abnf: attribute      = "@" identifier [[s] "=" [s] (literal / variable)]
-    private Attribute getAttribute() {
+    private MfDataModel.Attribute getAttribute() {
         int position = input.getPosition();
         skipOptionalWhitespaces();
         int cp = input.readCodePoint();
@@ -266,7 +260,7 @@ public class Parser {
             String id = getIdentifier();
             skipOptionalWhitespaces();
             cp = input.readCodePoint();
-            LiteralOrVariableRef lvr = null;
+            MfDataModel.LiteralOrVariableRef lvr = null;
             if (cp == '=') {
                 skipOptionalWhitespaces();
                 lvr = getLiteralOrVariableRef();
@@ -274,7 +268,7 @@ public class Parser {
                 // was not equal, attribute without a value
                 input.backup(1);
             }
-            return new Attribute(id, lvr);
+            return new MfDataModel.Attribute(id, lvr);
         } else {
             input.gotoPosition(position);
         }
