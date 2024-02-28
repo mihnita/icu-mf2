@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.ibm.icu.message2x.MfDataModel.Expression;
+import com.ibm.icu.message2x.MfDataModel.LiteralOrVariableRef;
 
 public class Parser {
     final InputSource input;
@@ -481,10 +483,43 @@ public class Parser {
             }
             declarations.add(declaration);
         }
+        spy("declarations", declarations);
         return null;
     }
 
+    //abnf: input-declaration     = input [s] variable-expression
+    //abnf: local-declaration     = local s variable [s] "=" [s] expression
+    //abnf: reserved-statement    = reserved-keyword [s reserved-body] 1*([s] expression)
+    //abnf: reserved-keyword      = "." name
     private MfDataModel.Declaration getDeclaration() {
+        int cp = input.readCodePoint();
+        if (cp != '.') {
+            return null;
+        }
+        String declName = getName();
+        if (declName == null) {
+            error("Expected a declaration after the '.'");
+            return null;
+        }
+        switch(declName) {
+            case "input":
+                skipMandatoryWhitespaces();
+                Expression ph = getPlaceholder();
+                break;
+            case "local":
+                skipMandatoryWhitespaces();
+                LiteralOrVariableRef varName = getLiteralOrVariableRef();
+                skipOptionalWhitespaces();
+                cp = input.readCodePoint();
+                assertTrue(cp == '=', declName);
+                skipOptionalWhitespaces();
+//                getExpression();
+                break;
+            case "match":
+                break;
+            default:
+                // reserved
+        }
         return null;
     }
 
