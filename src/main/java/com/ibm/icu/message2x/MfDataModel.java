@@ -5,6 +5,11 @@ import java.util.List;
 
 public class MfDataModel {
 
+    private MfDataModel() {
+        // Prevent instantiation
+    }
+
+    
     // Messages
 
     interface Message {}
@@ -32,19 +37,35 @@ public class MfDataModel {
     interface Declaration {}
 
     static class InputDeclaration implements Declaration {
-        String name;
-        VariableExpression value;
+        final String name;
+        final VariableExpression value;
+        public InputDeclaration(String name, VariableExpression value) {
+            super();
+            this.name = name;
+            this.value = value;
+        }
     }
 
     static class LocalDeclaration implements Declaration {
-        String name;
-        Expression value;
+        final String name;
+        final Expression value;
+        public LocalDeclaration(String name, Expression value) {
+            super();
+            this.name = name;
+            this.value = value;
+        }
     }
 
     static class UnsupportedStatement implements Declaration {
-        String keyword;
-        String body;
-        List<Expression> expressions;
+        final String keyword;
+        final String body;
+        final List<Expression> expressions;
+        public UnsupportedStatement(String keyword, String body, List<Expression> expressions) {
+            super();
+            this.keyword = keyword;
+            this.body = body;
+            this.expressions = expressions;
+        }
     }
 
     interface LiteralOrCatchallKey {}
@@ -90,10 +111,9 @@ public class MfDataModel {
 
     static class LiteralExpression implements Expression {
         final Literal arg;
-        final FunctionAnnotationOrUnsupportedAnnotation annotation;
+        final Annotation annotation;
         final List<Attribute> attributes;
-        public LiteralExpression(Literal arg, FunctionAnnotationOrUnsupportedAnnotation annotation,
-                List<Attribute> attributes) {
+        public LiteralExpression(Literal arg, Annotation annotation, List<Attribute> attributes) {
             this.arg = arg;
             this.annotation = annotation;
             this.attributes = attributes;
@@ -102,9 +122,9 @@ public class MfDataModel {
 
     static class VariableExpression implements Expression {
         final VariableRef arg;
-        final FunctionAnnotationOrUnsupportedAnnotation annotation;
+        final Annotation annotation;
         final List<Attribute> attributes;
-        public VariableExpression(VariableRef arg, FunctionAnnotationOrUnsupportedAnnotation annotation,
+        public VariableExpression(VariableRef arg, Annotation annotation,
                 List<Attribute> attributes) {
             this.arg = arg;
             this.annotation = annotation;
@@ -112,7 +132,7 @@ public class MfDataModel {
         }
     }
 
-    interface FunctionAnnotationOrUnsupportedAnnotation {}
+    interface Annotation {}
 
     static class FunctionExpression implements Expression {
         final FunctionAnnotation annotation;
@@ -169,7 +189,7 @@ public class MfDataModel {
         }
     }
 
-    static class FunctionAnnotation implements FunctionAnnotationOrUnsupportedAnnotation {
+    static class FunctionAnnotation implements Annotation {
         final String name;
         final List<Option> options;
         public FunctionAnnotation(String name, List<Option> options) {
@@ -187,7 +207,7 @@ public class MfDataModel {
         }
     }
 
-    static class UnsupportedAnnotation implements FunctionAnnotationOrUnsupportedAnnotation {
+    static class UnsupportedAnnotation implements Annotation {
         final int sigil;
         final String source;
         public UnsupportedAnnotation(int sigil, String source) {
@@ -198,13 +218,17 @@ public class MfDataModel {
 
     // Markup
 
-    static class Markup implements PatternPart {
-        enum Kind {
-            OPEN, CLOSE, STANDALONE;
+    static class Markup implements Expression {
+        enum Kind { OPEN, CLOSE, STANDALONE }
+        final Kind kind;
+        final String name;
+        final List<Option> options;
+        final List<Attribute> attributes;
+        public Markup(Kind kind, String name, List<Option> options, List<Attribute> attributes) {
+            this.kind = kind;
+            this.name = name;
+            this.options = options;
+            this.attributes = attributes;
         }
-        Kind kind;
-        String name;
-        List<Option> options;
-        List<Attribute> attributes;
     }
 }

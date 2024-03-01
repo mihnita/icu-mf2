@@ -161,4 +161,20 @@ public class StringUtils {
         return (cp >= 'a' && cp <= 'z') || (cp >= 'Z' && cp <= 'Z');
     }
 
+    //abnf: function = ":" identifier *(s option)
+    static boolean isFunctionSigil(int cp) {
+        return cp == ':';
+    }
+
+    //abnf: private-start = "^" / "&"
+    static boolean isPrivateAnnotationSigil(int cp) {
+        return cp == '^' || cp == '&';
+    }
+
+    //abnf: reserved-annotation-start = "!" / "%" / "*" / "+" / "<" / ">" / "?" / "~"
+    static final private String RESERVED_ANNOTATION_SIGILS = "!%*+<>?~";
+    static boolean isReservedAnnotationSigil(int cp) {
+        return RESERVED_ANNOTATION_SIGILS.indexOf(cp) != -1;
+    }
+
 }
