@@ -5,12 +5,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+ public class Utilities {
 
-@RunWith(JUnit4.class)
-public class Utilities {
-    static String str(String str) {
+    public static String str(String str) {
         if (str == null) {
             return "null";
         }
@@ -33,9 +30,9 @@ public class Utilities {
         return "\"" + result.toString() + "\"";
     }
 
-    static Path getTestFile(Class<?> cls, String fileName) throws URISyntaxException {
+    public static Path getTestFile(Class<?> cls, String fileName) throws URISyntaxException {
         URI getPath = cls.getClassLoader().getResource("").toURI();
-        Path filePath = Paths.get(getPath);	
+        Path filePath = Paths.get(getPath);
         System.out.println(getPath);
         System.out.println(filePath);
         Path json = Paths.get(fileName);

@@ -18,19 +18,22 @@ public class MessageFormatter {
     public String format(Map<String,Object> arguments) {
         return "";
     }
+
     public String formatToString(Map<String,Object> arguments) {
         return "";
     }
+
     public MfDataModel.Message getDataModel() {
         return message;
     }
+
     public Locale getLocale() {
         return locale;
     }
+
     public String getPattern() {
         return pattern;
     }
-
 
     public static class Builder {
         Locale locale;

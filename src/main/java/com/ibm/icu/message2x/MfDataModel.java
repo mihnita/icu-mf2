@@ -9,7 +9,6 @@ public class MfDataModel {
         // Prevent instantiation
     }
 
-    
     // Messages
 
     interface Message {}
@@ -91,8 +90,8 @@ public class MfDataModel {
     }
 
     interface PatternPart {}
-    
-    static class StringPart implements PatternPart {       
+
+    static class StringPart implements PatternPart {
         final String value;
 
         StringPart(String value) {

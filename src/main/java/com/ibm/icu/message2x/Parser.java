@@ -9,29 +9,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class Parser {
-    final InputSource input;
-    final RegExpTokenizer tokenizer;
+    private final InputSource input;
 
     private Parser(String text) {
         this.input = new InputSource(text);
-        this.tokenizer = new RegExpTokenizer(input);
     }
 
     static public MfDataModel.Message parse(String input) {
         return new Parser(input).parseImpl();
-    }
-    // abnf: message           = simple-message / complex-message
-
-    // visible for debugging
-    static List<Token<?>> tokenizeAll(String input) {
-        Parser parser = new Parser(input);
-        List<Token<?>> result = new ArrayList<>();
-        Token<?> token;
-        do {
-            token = parser.tokenizer.nextToken();	
-            result.add(token);
-        } while (token.kind != Token.Kind.EOF);
-        return result;
     }
 
     // Parser proper
@@ -60,16 +45,6 @@ public class Parser {
         }
         spy(true, "message", result);
         return result;
-    }
-
-    static class SimpleMessage {
-        final MfDataModel.Pattern parts;
-        public SimpleMessage(MfDataModel.Pattern parts) {
-            this.parts = parts;
-        }
-    }
-
-    static class ComplexMessage {
     }
 
     // abnf: simple-message    = [simple-start pattern]
@@ -146,7 +121,7 @@ public class Parser {
     //abnf: literal-expression    = "{" [s] literal [s annotation] *(s attribute) [s] "}"
     //abnf: variable-expression   = "{" [s] variable [s annotation] *(s attribute) [s] "}"
     //abnf: annotation-expression = "{" [s] annotation *(s attribute) [s] "}"
-    
+
     //abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s] ["/"] "}"  ; open and standalone
     //abnf:        / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}"  ; close
     private MfDataModel.Expression getPlaceholder() {
@@ -170,7 +145,7 @@ public class Parser {
         } else {
             result = getLiteralExpression();
         }
-        
+
         cp = input.readCodePoint(); // consume the '{'
         assertTrue(cp == '}', "Unclosed placeholder");
 
@@ -204,7 +179,7 @@ public class Parser {
                 // The sigil is part of the body.
                 // It is safe to cast, we know it is in the BMP
                 body = (char) (cp) + body;
-                // safe to cast, we already know if it one of the ACII symbols (^&?<>~ etc.) 
+                // safe to cast, we already know if it one of the ACII symbols (^&?<>~ etc.)
                 unsupportedAnnotation = new MfDataModel.UnsupportedAnnotation(body);
                 skipOptionalWhitespaces();
                 return unsupportedAnnotation;
@@ -244,7 +219,7 @@ public class Parser {
         return new MfDataModel.VariableExpression(variableRef, annotation, attributes);
     }
 
-    //abnf: annotation-expression = "{" [s]             annotation  *(s attribute) [s] "}" 
+    //abnf: annotation-expression = "{" [s]             annotation  *(s attribute) [s] "}"
     private MfDataModel.Expression getAnnotationExpression() {
         MfDataModel.FunctionAnnotation fa = null;
         MfDataModel.Annotation annotation = getAnnotationOrMarkup();
@@ -758,27 +733,25 @@ public class Parser {
         return null;
     }
 
-    final static Gson gson = new GsonBuilder()
-            //.setPrettyPrinting()
+    // Debug util, to remove
+
+    private final static Gson GSON = new GsonBuilder()
+          //.setPrettyPrinting()
+            .setDateFormat("yyyyMMdd'T'HHmmss")
             .create();
 
-    final static boolean DEBUG = true;
-    private void spy(String label, Object obj) {
+    private final static boolean DEBUG = true;
+
+    private static void spy(String label, Object obj) {
         spy(false, label, obj);
     }
 
-    private void spy(boolean force, String label, Object obj) {
+    private static void spy(boolean force, String label, Object obj) {
         if (DEBUG) {
             if (force)
-                System.out.printf("SPY: %s: %s%n", label, gson.toJson(obj));
+                System.out.printf("SPY: %s: %s%n", label, GSON.toJson(obj));
             else
-                System.out.printf("\033[90mSPY: %s: %s\033[m%n", label, gson.toJson(obj));
+                System.out.printf("\033[90mSPY: %s: %s\033[m%n", label, GSON.toJson(obj));
         }
-//        int position = input.getPosition();
-//        System.out.printf("%s: %s // [%d] '%s\u2191%s'%n", label, Objects.toString(obj),
-//                position,
-//                input.buffer.substring(0, position),
-//                input.buffer.substring(position)
-//                );
     }
 }

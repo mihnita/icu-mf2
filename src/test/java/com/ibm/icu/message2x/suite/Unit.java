@@ -1,8 +1,10 @@
-package com.ibm.icu.message2x;
+package com.ibm.icu.message2x.suite;
 
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+
+import com.ibm.icu.message2x.Utilities;
 
 class Unit {
     final String src;
@@ -11,7 +13,7 @@ class Unit {
     final Map<String, Object> params;
     final List<Part> parts;
 
-    public Unit(String src, String cleanSrc, Map<String, Object> params, String exp, List<Part> parts) {
+    Unit(String src, String cleanSrc, Map<String, Object> params, String exp, List<Part> parts) {
         super();
         this.src = src;
         this.cleanSrc = cleanSrc;

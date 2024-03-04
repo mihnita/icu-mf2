@@ -1,7 +1,9 @@
-package com.ibm.icu.message2x;
+package com.ibm.icu.message2x.suite;
 
 import java.util.Map;
 import java.util.StringJoiner;
+
+import com.ibm.icu.message2x.Utilities;
 
 class Part {
     private final String type;
@@ -10,7 +12,7 @@ class Part {
     private final String value;
     Map<String, Object> options;
 
-    public Part(String type, String kind, String name, String value, Map<String, Object> options) {
+    Part(String type, String kind, String name, String value, Map<String, Object> options) {
         super();
         this.type = type;
         this.kind = kind;

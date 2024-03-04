@@ -1,4 +1,4 @@
-package com.ibm.icu.message2x;
+package com.ibm.icu.message2x.suite;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,19 +13,22 @@ import org.junit.runners.JUnit4;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.ibm.icu.message2x.Utilities;
 
+@SuppressWarnings({ "javadoc" })
 @RunWith(JUnit4.class)
-public class SyntaxErrorsTest {
-    final Gson gson = new GsonBuilder().create();
-    final static private String JSON_FILE = "syntax-errors.json";
+public class MfCoreTest {
+    final static private String JSON_FILE = "test-core.json";
+    Gson gson = new GsonBuilder().create();
 
     @Test
     public void test() throws IOException, URISyntaxException {
         Path json = Utilities.getTestFile(this.getClass(), JSON_FILE);
         try (BufferedReader reader = Files.newBufferedReader(json, StandardCharsets.UTF_8)) {
-            String[] unitList = gson.fromJson(reader, String[].class); 
-            for (String unit : unitList) {
-                System.out.println(Utilities.str(unit));
+            Unit[] unitList = gson.fromJson(reader, Unit[].class);
+            for (Unit unit : unitList) {
+                System.out.println(unit);
+                // Object z = p.message(unit.src);
             }
         }
     }
