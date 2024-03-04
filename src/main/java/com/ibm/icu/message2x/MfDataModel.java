@@ -40,7 +40,6 @@ public class MfDataModel {
         final String name;
         final VariableExpression value;
         public InputDeclaration(String name, VariableExpression value) {
-            super();
             this.name = name;
             this.value = value;
         }
@@ -50,7 +49,6 @@ public class MfDataModel {
         final String name;
         final Expression value;
         public LocalDeclaration(String name, Expression value) {
-            super();
             this.name = name;
             this.value = value;
         }
@@ -61,7 +59,6 @@ public class MfDataModel {
         final String body;
         final List<Expression> expressions;
         public UnsupportedStatement(String keyword, String body, List<Expression> expressions) {
-            super();
             this.keyword = keyword;
             this.body = body;
             this.expressions = expressions;
@@ -71,8 +68,12 @@ public class MfDataModel {
     interface LiteralOrCatchallKey {}
 
     static class Variant implements LiteralOrCatchallKey {
-        List<LiteralOrCatchallKey> keys;
-        Pattern value;
+        final List<LiteralOrCatchallKey> keys;
+        final Pattern value;
+        public Variant(List<LiteralOrCatchallKey> keys, Pattern value) {
+            this.keys = keys;
+            this.value = value;
+        }
     }
 
     static class CatchallKey implements LiteralOrCatchallKey {
@@ -164,7 +165,7 @@ public class MfDataModel {
     // Expressions
 
     interface LiteralOrVariableRef {}
-    interface Literal extends LiteralOrVariableRef {}
+    interface Literal extends LiteralOrVariableRef, LiteralOrCatchallKey {}
 
     // Data model feedback: I think this should be StringLiteral
     static class StringLiteral implements Literal {
@@ -208,10 +209,8 @@ public class MfDataModel {
     }
 
     static class UnsupportedAnnotation implements Annotation {
-        final int sigil;
         final String source;
-        public UnsupportedAnnotation(int sigil, String source) {
-            this.sigil = sigil;
+        public UnsupportedAnnotation(String source) {
             this.source = source;
         }
     }

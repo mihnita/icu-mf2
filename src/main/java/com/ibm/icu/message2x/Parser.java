@@ -7,14 +7,6 @@ import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.ibm.icu.message2x.MfDataModel.Annotation;
-import com.ibm.icu.message2x.MfDataModel.Attribute;
-import com.ibm.icu.message2x.MfDataModel.Expression;
-import com.ibm.icu.message2x.MfDataModel.FunctionAnnotation;
-import com.ibm.icu.message2x.MfDataModel.LiteralOrVariableRef;
-import com.ibm.icu.message2x.MfDataModel.Markup;
-import com.ibm.icu.message2x.MfDataModel.VariableExpression;
-import com.ibm.icu.message2x.MfDataModel.VariableRef;
 
 public class Parser {
     final InputSource input;
@@ -43,26 +35,31 @@ public class Parser {
     }
 
     // Parser proper
-    public MfDataModel.Message parseImpl() {
+    private MfDataModel.Message parseImpl() {
+        MfDataModel.Message result;
         int cp = input.peakChar();
         if (cp == '.') { // declarations or .match
-            ComplexMessage complexMessage = getComplexMessage();
-            spy("complexMessage", complexMessage);
+            result = getComplexMessage();
+            spy("complexMessage", result);
         } else if (cp == '{') { // `{` or `{{`
             cp = input.readCodePoint();
             if (cp == '{') { // `{{`, complex body without declarations
                 input.backup(1); // let complexBody deal with the wrapping {{ and }}
-                ComplexMessage complexBody = getComplexBody();
-                spy("complexBody", complexBody);
+                MfDataModel.Pattern pattern = getQuotedPattern();
+                spy("simpleMessage wrapped in {{...}}", pattern);
+                result = new MfDataModel.PatternMessage(new ArrayList<>(), pattern);
             } else { // placeholder
-                SimpleMessage simpleMessage = getPattern();
-                spy("simpleMessage1", simpleMessage);
+                MfDataModel.Pattern pattern = getPattern();
+                spy("simpleMessage starting with a placeholder", pattern);
+                result = new MfDataModel.PatternMessage(new ArrayList<>(), pattern);
             }
         } else {
-            SimpleMessage simpleMessage = getPattern();
-            spy(true, "simpleMessage2", simpleMessage);
+            MfDataModel.Pattern pattern = getPattern();
+            spy("simpleMessage2", pattern);
+            result = new MfDataModel.PatternMessage(new ArrayList<>(), pattern);
         }
-        return null;
+        spy(true, "message", result);
+        return result;
     }
 
     static class SimpleMessage {
@@ -78,17 +75,17 @@ public class Parser {
     // abnf: simple-message    = [simple-start pattern]
     // abnf: simple-start      = simple-start-char / text-escape / placeholder
     // abnf: pattern           = *(text-char / text-escape / placeholder)
-    private SimpleMessage getPattern() {
-        MfDataModel.Pattern parts = new MfDataModel.Pattern();
+    private MfDataModel.Pattern getPattern() {
+        MfDataModel.Pattern pattern = new MfDataModel.Pattern();
         while (true) {
             MfDataModel.PatternPart part = getPatternPart();
             if (part == null) {
                 break;
             }
             spy("part", part);
-            parts.parts.add(part);
+            pattern.parts.add(part);
         }
-        return new SimpleMessage(parts);
+        return pattern;
     }
 
     private MfDataModel.PatternPart getPatternPart() {
@@ -153,7 +150,6 @@ public class Parser {
     //abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s] ["/"] "}"  ; open and standalone
     //abnf:        / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}"  ; close
     private MfDataModel.Expression getPlaceholder() {
-        int position = input.getPosition();
         int cp = input.peakChar();
         if (cp != '{') {
             return null;
@@ -181,7 +177,7 @@ public class Parser {
         return result;
     }
 
-    private Annotation getAnnotationOrMarkdown() {
+    private MfDataModel.Annotation getAnnotationOrMarkdown() {
         MfDataModel.FunctionAnnotation functionAnnotation = null;
         MfDataModel.UnsupportedAnnotation unsupportedAnnotation = null;
         int cp = input.readCodePoint();
@@ -205,21 +201,23 @@ public class Parser {
                 spy("identifier", identifier);
                 String body = getReservedBody();
                 spy("reserved-body", body);
+                // The sigil is part of the body.
+                // It is safe to cast, we know it is in the BMP
+                body = (char) (cp) + body;
                 // safe to cast, we already know if it one of the ACII symbols (^&?<>~ etc.) 
-                unsupportedAnnotation = new MfDataModel.UnsupportedAnnotation((char) cp, body);
+                unsupportedAnnotation = new MfDataModel.UnsupportedAnnotation(body);
                 skipOptionalWhitespaces();
                 return unsupportedAnnotation;
         }
     }
 
-    //AICI: literal expression
     //abnf: literal-expression    = "{" [s] literal  [s annotation] *(s attribute) [s] "}"
     private MfDataModel.Expression getLiteralExpression() {
         MfDataModel.Literal literal = getLiteral();
         spy("literal", literal);
         skipOptionalWhitespaces();
 
-        Annotation annotation = getAnnotationOrMarkdown();
+        MfDataModel.Annotation annotation = getAnnotationOrMarkdown();
 
         List<MfDataModel.Attribute> attributes = getAttributes();
 
@@ -231,61 +229,59 @@ public class Parser {
 
     //abnf: variable-expression   = "{" [s] variable [s annotation] *(s attribute) [s] "}"
     private MfDataModel.VariableExpression getVariableExpression() {
-        VariableRef variableRef = getVariableRef();
+        MfDataModel.VariableRef variableRef = getVariableRef();
         spy("variableRef", variableRef);
         skipOptionalWhitespaces();
 
-        Annotation annotation = getAnnotationOrMarkdown();
+        MfDataModel.Annotation annotation = getAnnotationOrMarkdown();
         spy("annotation", annotation);
         skipOptionalWhitespaces();
 
-        List<Attribute> attributes = getAttributes();
+        List<MfDataModel.Attribute> attributes = getAttributes();
         spy("attributes", attributes);
         skipOptionalWhitespaces();
         // Variable without a function, for example {$foo}
         return new MfDataModel.VariableExpression(variableRef, annotation, attributes);
     }
 
-    //AICI Annotation expression
     //abnf: annotation-expression = "{" [s]             annotation  *(s attribute) [s] "}" 
     private MfDataModel.Expression getAnnotationExpression() {
-        FunctionAnnotation fa = null;
-        Annotation annotation = getAnnotationOrMarkdown();
-        if (annotation instanceof FunctionAnnotation) {
-            fa = (FunctionAnnotation) annotation;
+        MfDataModel.FunctionAnnotation fa = null;
+        MfDataModel.Annotation annotation = getAnnotationOrMarkdown();
+        if (annotation instanceof MfDataModel.FunctionAnnotation) {
+            fa = (MfDataModel.FunctionAnnotation) annotation;
             skipOptionalWhitespaces();
         }
-        List<Attribute> attributes = getAttributes();
+        List<MfDataModel.Attribute> attributes = getAttributes();
         return new MfDataModel.FunctionExpression(fa, attributes);
     }
 
-    //AICI Markdown
+    //abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s] ["/"] "}"  ; open and standalone
+    //abnf:        / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}"  ; close
     private MfDataModel.Markup getMarkup() {
         int cp = input.readCodePoint();
         if (cp != '#' || cp != '/')
             error("Should not happen. Expecting a markup.");
 
-        Markup.Kind kind = cp == '/' ? Markup.Kind.CLOSE : Markup.Kind.OPEN;
+        MfDataModel.Markup.Kind kind = cp == '/' ? MfDataModel.Markup.Kind.CLOSE : MfDataModel.Markup.Kind.OPEN;
 
-        Annotation annotation = getAnnotationOrMarkdown();
-        List<Attribute> attributes = getAttributes();
+        MfDataModel.Annotation annotation = getAnnotationOrMarkdown();
+        List<MfDataModel.Attribute> attributes = getAttributes();
 
         cp = input.peakChar();
         if (cp == '/') {
-            kind = Markup.Kind.STANDALONE;
+            kind = MfDataModel.Markup.Kind.STANDALONE;
             input.readCodePoint();
         }
 
-        if (annotation instanceof FunctionAnnotation) {
-            FunctionAnnotation fa = (FunctionAnnotation) annotation;
+        if (annotation instanceof MfDataModel.FunctionAnnotation) {
+            MfDataModel.FunctionAnnotation fa = (MfDataModel.FunctionAnnotation) annotation;
             return new MfDataModel.Markup(kind, fa.name, fa.options, attributes);
         }
 
         return null;
     }
 
-    //AICI end refactoring
-    
     private List<MfDataModel.Attribute> getAttributes() {
         List<MfDataModel.Attribute> result = new ArrayList<>();
         while (true) {
@@ -524,26 +520,120 @@ public class Parser {
         }
     }
 
-    private ComplexMessage getComplexMessage() {
+    private MfDataModel.Message getComplexMessage() {
         List<MfDataModel.Declaration> declarations = new ArrayList<>();
+        boolean foundMatch = false;
         while (true) {
             MfDataModel.Declaration declaration = getDeclaration();
             if (declaration == null) {
                 break;
             }
+            if (declaration instanceof MatchDeclaration) {
+                foundMatch = true;
+                break;
+            }
             declarations.add(declaration);
         }
-        spy("declarations", declarations);
-        return null;
+        if (foundMatch) {
+            return getMatch(declarations);
+        } else { // Expect {{...}} or end of message
+            skipOptionalWhitespaces();
+            int cp = input.peakChar();
+            if (cp == -1) {
+                // Only declarations, no pattern
+                return new MfDataModel.PatternMessage(declarations, null);
+            } else {
+                MfDataModel.Pattern pattern = getQuotedPattern();
+                return new MfDataModel.PatternMessage(declarations, pattern);
+            }
+        }
     }
+
+    //abnf: matcher         = match-statement 1*([s] variant)
+    //abnf: match-statement = match 1*([s] selector)
+    //abnf: selector        = expression
+    //abnf: variant         = key *(s key) [s] quoted-pattern
+    //abnf: key             = literal / "*"
+    //abnf: match           = %s".match"
+    private MfDataModel.SelectMessage getMatch(List<MfDataModel.Declaration> declarations) {
+        // ".match" was already consumed by the caller
+        // Look for selectors
+        List<MfDataModel.Expression> expressions = new ArrayList<>();
+        while(true) {
+            skipMandatoryWhitespaces();
+            MfDataModel.Expression expression = getPlaceholder();
+            spy("selector expression", expression);
+            if (expression == null) {
+                break;
+            }
+            if (expression instanceof MfDataModel.Markup) {
+                error("Cannot do selection on markup");
+            }
+            expressions.add(expression);
+        }
+        if (expressions.isEmpty()) {
+            error("There should be at least one selector expression.");
+        }
+        // At this point we need to look for variants, which are key - value
+        List<MfDataModel.Variant> variants = new ArrayList<>();
+        while (true) {
+            MfDataModel.Variant variant = getVariant();
+            spy("variant", variant);
+            if (variant == null) {
+                break;
+            }
+            variants.add(variant);
+        }
+        return new MfDataModel.SelectMessage(declarations, expressions, variants);
+    }
+
+    //abnf: variant         = key *(s key) [s] quoted-pattern
+    //abnf: key             = literal / "*"
+    private MfDataModel.Variant getVariant() {
+        List<MfDataModel.LiteralOrCatchallKey> keys = new ArrayList<>();
+        while (true) {
+            MfDataModel.LiteralOrCatchallKey key = getKey();
+            spy("key", key);
+            if (key == null) {
+                break;
+            }
+            keys.add(key);
+        }
+        spy("keys", keys);
+        skipOptionalWhitespaces();
+        if (input.atEnd()) {
+            if (!keys.isEmpty()) {
+                error("After selector keys it is mandatory to have a pattern.");
+            }
+            return null;
+        }
+        MfDataModel.Pattern pattern = getQuotedPattern();
+        spy("quoted pattern", pattern);
+        return new MfDataModel.Variant(keys, pattern);
+    }
+
+    private MfDataModel.LiteralOrCatchallKey getKey() {
+        skipOptionalWhitespaces();
+        int cp = input.peakChar();
+        if (cp == '*') {
+            input.readCodePoint(); // consume the '*'
+            return new MfDataModel.CatchallKey();
+        }
+        return getLiteral();
+    }
+
+    static class MatchDeclaration implements MfDataModel.Declaration {}
 
     //abnf: input-declaration     = input [s] variable-expression
     //abnf: local-declaration     = local s variable [s] "=" [s] expression
     //abnf: reserved-statement    = reserved-keyword [s reserved-body] 1*([s] expression)
     //abnf: reserved-keyword      = "." name
     private MfDataModel.Declaration getDeclaration() {
+        int position = input.getPosition();
+        skipOptionalWhitespaces();
         int cp = input.readCodePoint();
         if (cp != '.') {
+            input.gotoPosition(position);
             return null;
         }
         String declName = getName();
@@ -551,57 +641,63 @@ public class Parser {
             error("Expected a declaration after the '.'");
             return null;
         }
+
+        MfDataModel.Expression expression;
         switch(declName) {
             case "input":
                 skipMandatoryWhitespaces();
-                Expression ph = getPlaceholder();
-                if (ph instanceof VariableExpression) {
-                    return new MfDataModel.InputDeclaration(declName, (VariableExpression) ph);
+                expression = getPlaceholder();
+                if (expression instanceof MfDataModel.VariableExpression) {
+                    return new MfDataModel.InputDeclaration(declName, (MfDataModel.VariableExpression) expression);
                 }
                 break;
             case "local":
                 //abnf: local-declaration = local s variable [s] "=" [s] expression
                 skipMandatoryWhitespaces();
-                LiteralOrVariableRef varName = getVariableRef();
+                MfDataModel.LiteralOrVariableRef varName = getVariableRef();
                 skipOptionalWhitespaces();
                 cp = input.readCodePoint();
                 assertTrue(cp == '=', declName);
                 skipOptionalWhitespaces();
-                Expression expression = getPlaceholder();
+                expression = getPlaceholder();
+                if (varName instanceof MfDataModel.VariableRef) {
+                    return new MfDataModel.LocalDeclaration(((MfDataModel.VariableRef) varName).name, expression);
+                }
                 break;
             case "match":
-                break;
-            default:
-                // reserved
+                return new MatchDeclaration();
+            default: //abnf: reserved-statement    = reserved-keyword [s reserved-body] 1*([s] expression)
+                skipOptionalWhitespaces();
+                String body = getReservedBody();
+                List <MfDataModel.Expression> expressions = new ArrayList<>();
+                while (true) {
+                    skipOptionalWhitespaces();
+                    expression = getPlaceholder();
+                    // This also covers != null
+                    if (expression instanceof MfDataModel.VariableExpression) {
+                        expressions.add(expression);
+                    } else {
+                        break;
+                    }
+                }
+                return new MfDataModel.UnsupportedStatement(declName, body, expressions);
         }
         return null;
     }
 
-    // complex-body      = quoted-pattern / matcher
     // quoted-pattern    = "{{" pattern "}}"
-    private ComplexMessage getComplexBody() { // {{ ... }}
+    private MfDataModel.Pattern getQuotedPattern() { // {{ ... }}
         int cp = input.readCodePoint();
         assertTrue(cp == '{', "Expected { for a complex body");
         cp = input.readCodePoint();
         assertTrue(cp == '{', "Expected second { for a complex body");
-        SimpleMessage pattern = getPattern();
-        spy(true, "pattern in complex body", pattern);
+        MfDataModel.Pattern pattern = getPattern();
+        spy("pattern in complex body", pattern);
         cp = input.readCodePoint();
         assertTrue(cp == '}', "Expected } to end a complex body");
         cp = input.readCodePoint();
         assertTrue(cp == '}', "Expected second } to end a complex body");
-        return null;
-    }
-
-    // abnf: input = %s".input"
-    // abnf: local = %s".local"
-    // abnf: match = %s".match"
-    // abnf: reserved-keyword   = "." name
-    private String getKeyword() {
-        int cp = input.readCodePoint();
-        if (cp != '.')
-            return null;
-        return "." + getName();
+        return pattern;
     }
 
     private String getName() {
