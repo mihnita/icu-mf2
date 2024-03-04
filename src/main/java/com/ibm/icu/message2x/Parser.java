@@ -177,7 +177,7 @@ public class Parser {
         return result;
     }
 
-    private MfDataModel.Annotation getAnnotationOrMarkdown() {
+    private MfDataModel.Annotation getAnnotationOrMarkup() {
         MfDataModel.FunctionAnnotation functionAnnotation = null;
         MfDataModel.UnsupportedAnnotation unsupportedAnnotation = null;
         int cp = input.readCodePoint();
@@ -217,7 +217,7 @@ public class Parser {
         spy("literal", literal);
         skipOptionalWhitespaces();
 
-        MfDataModel.Annotation annotation = getAnnotationOrMarkdown();
+        MfDataModel.Annotation annotation = getAnnotationOrMarkup();
 
         List<MfDataModel.Attribute> attributes = getAttributes();
 
@@ -233,7 +233,7 @@ public class Parser {
         spy("variableRef", variableRef);
         skipOptionalWhitespaces();
 
-        MfDataModel.Annotation annotation = getAnnotationOrMarkdown();
+        MfDataModel.Annotation annotation = getAnnotationOrMarkup();
         spy("annotation", annotation);
         skipOptionalWhitespaces();
 
@@ -247,7 +247,7 @@ public class Parser {
     //abnf: annotation-expression = "{" [s]             annotation  *(s attribute) [s] "}" 
     private MfDataModel.Expression getAnnotationExpression() {
         MfDataModel.FunctionAnnotation fa = null;
-        MfDataModel.Annotation annotation = getAnnotationOrMarkdown();
+        MfDataModel.Annotation annotation = getAnnotationOrMarkup();
         if (annotation instanceof MfDataModel.FunctionAnnotation) {
             fa = (MfDataModel.FunctionAnnotation) annotation;
             skipOptionalWhitespaces();
@@ -265,7 +265,7 @@ public class Parser {
 
         MfDataModel.Markup.Kind kind = cp == '/' ? MfDataModel.Markup.Kind.CLOSE : MfDataModel.Markup.Kind.OPEN;
 
-        MfDataModel.Annotation annotation = getAnnotationOrMarkdown();
+        MfDataModel.Annotation annotation = getAnnotationOrMarkup();
         List<MfDataModel.Attribute> attributes = getAttributes();
 
         cp = input.peakChar();
