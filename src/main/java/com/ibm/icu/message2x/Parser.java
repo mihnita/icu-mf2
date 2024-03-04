@@ -47,9 +47,9 @@ public class Parser {
         return result;
     }
 
-    // abnf: simple-message    = [simple-start pattern]
-    // abnf: simple-start      = simple-start-char / text-escape / placeholder
-    // abnf: pattern           = *(text-char / text-escape / placeholder)
+    // abnf: simple-message = [simple-start pattern]
+    // abnf: simple-start = simple-start-char / text-escape / placeholder
+    // abnf: pattern = *(text-char / text-escape / placeholder)
     private MfDataModel.Pattern getPattern() {
         MfDataModel.Pattern pattern = new MfDataModel.Pattern();
         while (true) {
@@ -91,7 +91,7 @@ public class Parser {
                     return result.toString();
                 case '\\':
                     cp = input.readCodePoint();
-                    if (cp == '\\' || cp == '{'|| cp == '|' | cp == '}') {
+                    if (cp == '\\' || cp == '{' || cp == '|' | cp == '}') {
                         result.appendCodePoint(cp);
                     } else { // TODO: Error, invalid escape
                         result.appendCodePoint('\\');
@@ -104,7 +104,7 @@ public class Parser {
                     result.appendCodePoint(cp);
                     break;
                 default:
-                    if (StringUtils.isContentChar(cp) || StringUtils.isWhitespace(cp) ) {
+                    if (StringUtils.isContentChar(cp) || StringUtils.isWhitespace(cp)) {
                         result.appendCodePoint(cp);
                     } else {
                         input.backup(1);
@@ -114,16 +114,19 @@ public class Parser {
         }
     }
 
-    //abnf: placeholder       = expression / markup
-    //abnf: expression            = literal-expression
-    //abnf:                       / variable-expression
-    //abnf:                       / annotation-expression
-    //abnf: literal-expression    = "{" [s] literal [s annotation] *(s attribute) [s] "}"
-    //abnf: variable-expression   = "{" [s] variable [s annotation] *(s attribute) [s] "}"
-    //abnf: annotation-expression = "{" [s] annotation *(s attribute) [s] "}"
+    // abnf: placeholder = expression / markup
+    // abnf: expression = literal-expression
+    // abnf: / variable-expression
+    // abnf: / annotation-expression
+    // abnf: literal-expression = "{" [s] literal [s annotation] *(s attribute)
+    // [s] "}"
+    // abnf: variable-expression = "{" [s] variable [s annotation] *(s
+    // attribute) [s] "}"
+    // abnf: annotation-expression = "{" [s] annotation *(s attribute) [s] "}"
 
-    //abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s] ["/"] "}"  ; open and standalone
-    //abnf:        / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}"  ; close
+    // abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s]
+    // ["/"] "}" ; open and standalone
+    // abnf: / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}" ; close
     private MfDataModel.Expression getPlaceholder() {
         int cp = input.peakChar();
         if (cp != '{') {
@@ -138,8 +141,7 @@ public class Parser {
             result = getMarkup();
         } else if (cp == '$') {
             result = getVariableExpression();
-        } else if (StringUtils.isFunctionSigil(cp)
-                || StringUtils.isPrivateAnnotationSigil(cp)
+        } else if (StringUtils.isFunctionSigil(cp) || StringUtils.isPrivateAnnotationSigil(cp)
                 || StringUtils.isReservedAnnotationSigil(cp)) {
             result = getAnnotationExpression();
         } else {
@@ -163,7 +165,7 @@ public class Parser {
             case '#':
             case '/':
             case ':': // annotation, function
-                //abnf: function       = ":" identifier *(s option)
+                // abnf: function = ":" identifier *(s option)
                 String identifier = getIdentifier();
                 spy("identifier", identifier);
                 List<MfDataModel.Option> options = getOptions();
@@ -179,14 +181,14 @@ public class Parser {
                 // The sigil is part of the body.
                 // It is safe to cast, we know it is in the BMP
                 body = (char) (cp) + body;
-                // safe to cast, we already know if it one of the ACII symbols (^&?<>~ etc.)
+                // Safe to cast, we already know if it one of the ACII symbols (^&?<>~ etc.)
                 unsupportedAnnotation = new MfDataModel.UnsupportedAnnotation(body);
                 skipOptionalWhitespaces();
                 return unsupportedAnnotation;
         }
     }
 
-    //abnf: literal-expression    = "{" [s] literal  [s annotation] *(s attribute) [s] "}"
+    // abnf: literal-expression = "{" [s] literal [s annotation] *(s attribute) [s] "}"
     private MfDataModel.Expression getLiteralExpression() {
         MfDataModel.Literal literal = getLiteral();
         spy("literal", literal);
@@ -202,7 +204,7 @@ public class Parser {
         return new MfDataModel.LiteralExpression(literal, annotation, attributes);
     }
 
-    //abnf: variable-expression   = "{" [s] variable [s annotation] *(s attribute) [s] "}"
+    // abnf: variable-expression = "{" [s] variable [s annotation] *(s attribute) [s] "}"
     private MfDataModel.VariableExpression getVariableExpression() {
         MfDataModel.VariableRef variableRef = getVariableRef();
         spy("variableRef", variableRef);
@@ -219,7 +221,7 @@ public class Parser {
         return new MfDataModel.VariableExpression(variableRef, annotation, attributes);
     }
 
-    //abnf: annotation-expression = "{" [s]             annotation  *(s attribute) [s] "}"
+    // abnf: annotation-expression = "{" [s] annotation *(s attribute) [s] "}"
     private MfDataModel.Expression getAnnotationExpression() {
         MfDataModel.FunctionAnnotation fa = null;
         MfDataModel.Annotation annotation = getAnnotationOrMarkup();
@@ -231,8 +233,8 @@ public class Parser {
         return new MfDataModel.FunctionExpression(fa, attributes);
     }
 
-    //abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s] ["/"] "}"  ; open and standalone
-    //abnf:        / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}"  ; close
+    // abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s] ["/"] "}" ; open and standalone
+    // abnf: / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}" ; close
     private MfDataModel.Markup getMarkup() {
         int cp = input.readCodePoint();
         if (cp != '#' || cp != '/')
@@ -270,7 +272,7 @@ public class Parser {
         return result;
     }
 
-    //abnf: attribute      = "@" identifier [[s] "=" [s] (literal / variable)]
+    // abnf: attribute = "@" identifier [[s] "=" [s] (literal / variable)]
     private MfDataModel.Attribute getAttribute() {
         int position = input.getPosition();
         skipOptionalWhitespaces();
@@ -295,14 +297,14 @@ public class Parser {
         return null;
     }
 
-    //abnf: reserved-body   = *([s] 1*(reserved-char / reserved-escape / quoted))
-    //abnf: reserved-escape = backslash ( backslash / "{" / "|" / "}" )
+    // abnf: reserved-body = *([s] 1*(reserved-char / reserved-escape / quoted))
+    // abnf: reserved-escape = backslash ( backslash / "{" / "|" / "}" )
     private String getReservedBody() {
         StringBuilder result = new StringBuilder();
         // TODO Auto-generated method stub
-        while(true) {
+        while (true) {
             int cp = input.readCodePoint();
-            //TODO: whitespace is problematic in the grammar
+            // TODO: whitespace is problematic in the grammar
             if (StringUtils.isReservedChar(cp) || StringUtils.isWhitespace(cp)) {
                 result.appendCodePoint(cp);
             } else if (cp == '\\') {
@@ -325,9 +327,9 @@ public class Parser {
         }
     }
 
-    //abnf: identifier = [namespace ":"] name
-    //abnf: namespace  = name
-    //abnf: name       = name-start *name-char
+    // abnf: identifier = [namespace ":"] name
+    // abnf: namespace = name
+    // abnf: name = name-start *name-char
     private String getIdentifier() {
         String namespace = getName();
         if (namespace == null) {
@@ -346,7 +348,7 @@ public class Parser {
         return namespace;
     }
 
-    //abnf helper: *(s option)
+    // abnf helper: *(s option)
     private List<MfDataModel.Option> getOptions() {
         List<MfDataModel.Option> options = new ArrayList<>();
         while (true) {
@@ -359,7 +361,7 @@ public class Parser {
         return options;
     }
 
-    //abnf: option         = identifier [s] "=" [s] (literal / variable)
+    // abnf: option = identifier [s] "=" [s] (literal / variable)
     private MfDataModel.Option getOption() {
         // TODO Auto-generated method stub
         skipOptionalWhitespaces();
@@ -385,17 +387,17 @@ public class Parser {
         return getLiteral();
     }
 
-    //abnf: literal        = quoted / unquoted
+    // abnf: literal = quoted / unquoted
     private MfDataModel.Literal getLiteral() {
         int cp = input.readCodePoint();
         switch (cp) {
             case '|': // quoted
-                //abnf: quoted         = "|" *(quoted-char / quoted-escape) "|"
+                // abnf: quoted = "|" *(quoted-char / quoted-escape) "|"
                 input.backup(1);
                 MfDataModel.Literal ql = getQuotedLiteral();
                 spy("QuotedLiteral", ql);
                 return ql;
-            default : // unquoted
+            default: // unquoted
                 input.backup(1);
                 MfDataModel.Literal unql = getUnQuotedLiteral();
                 spy("UnQuotedLiteral", unql);
@@ -409,7 +411,7 @@ public class Parser {
             assertTrue(cp == '$', "We can't get here");
         }
 
-        //abnf: variable       = "$" name
+        // abnf: variable = "$" name
         String name = getName();
         spy("varName", name);
         if (name == null) {
@@ -425,21 +427,21 @@ public class Parser {
             error("expected starting '|'");
         }
         while (true) {
+            cp = input.readCodePoint();
+            if (cp == -1) { // EOF
+                break;
+            } else if (StringUtils.isQuotedChar(cp)) {
+                result.appendCodePoint(cp);
+            } else if (cp == '\\') {
                 cp = input.readCodePoint();
-                if (cp == -1) { // EOF
-                    break;
-                } else if (StringUtils.isQuotedChar(cp)) {
-                    result.appendCodePoint(cp);
-                } else if (cp == '\\') {
-                    cp = input.readCodePoint();
-                    if (cp == '|') {
-                        result.appendCodePoint('|');
-                    } else {
-                        error("Invalid escape sequence, only \"\\|\" is valid here");
-                    }
+                if (cp == '|') {
+                    result.appendCodePoint('|');
                 } else {
-                    break;
+                    error("Invalid escape sequence, only \"\\|\" is valid here");
                 }
+            } else {
+                break;
+            }
         }
         if (cp != '|') {
             error("expected ending '|'");
@@ -455,9 +457,10 @@ public class Parser {
         return getNumberLiteral();
     }
 
-    //abnf: ; number-literal matches JSON number (https://www.rfc-editor.org/rfc/rfc8259#section-6)
-    //abnf: number-literal = ["-"] (%x30 / (%x31-39 *DIGIT)) ["." 1*DIGIT] [%i"e" ["-" / "+"] 1*DIGIT]
+    // abnf: ; number-literal matches JSON number (https://www.rfc-editor.org/rfc/rfc8259#section-6)
+    // abnf: number-literal = ["-"] (%x30 / (%x31-39 *DIGIT)) ["." 1*DIGIT] [%i"e" ["-" / "+"] 1*DIGIT]
     final static Pattern RE_NUMBER_LITERAL = Pattern.compile("^-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+\\-]?[0-9]+)?");
+
     private MfDataModel.NumberLiteral getNumberLiteral() {
         String numberString = peekWithRegExp(RE_NUMBER_LITERAL);
         if (numberString != null) {
@@ -476,13 +479,14 @@ public class Parser {
             error("Space expected");
         }
     }
+
     private void skipOptionalWhitespaces() {
         skipWhitespaces();
     }
 
     private int skipWhitespaces() {
         int skipCount = 0;
-        while(true) {
+        while (true) {
             int cp = input.readCodePoint();
             if (cp == -1) { // EOF
                 return skipCount;
@@ -524,17 +528,17 @@ public class Parser {
         }
     }
 
-    //abnf: matcher         = match-statement 1*([s] variant)
-    //abnf: match-statement = match 1*([s] selector)
-    //abnf: selector        = expression
-    //abnf: variant         = key *(s key) [s] quoted-pattern
-    //abnf: key             = literal / "*"
-    //abnf: match           = %s".match"
+    // abnf: matcher = match-statement 1*([s] variant)
+    // abnf: match-statement = match 1*([s] selector)
+    // abnf: selector = expression
+    // abnf: variant = key *(s key) [s] quoted-pattern
+    // abnf: key = literal / "*"
+    // abnf: match = %s".match"
     private MfDataModel.SelectMessage getMatch(List<MfDataModel.Declaration> declarations) {
         // ".match" was already consumed by the caller
         // Look for selectors
         List<MfDataModel.Expression> expressions = new ArrayList<>();
-        while(true) {
+        while (true) {
             skipMandatoryWhitespaces();
             MfDataModel.Expression expression = getPlaceholder();
             spy("selector expression", expression);
@@ -562,8 +566,8 @@ public class Parser {
         return new MfDataModel.SelectMessage(declarations, expressions, variants);
     }
 
-    //abnf: variant         = key *(s key) [s] quoted-pattern
-    //abnf: key             = literal / "*"
+    // abnf: variant = key *(s key) [s] quoted-pattern
+    // abnf: key = literal / "*"
     private MfDataModel.Variant getVariant() {
         List<MfDataModel.LiteralOrCatchallKey> keys = new ArrayList<>();
         while (true) {
@@ -597,12 +601,13 @@ public class Parser {
         return getLiteral();
     }
 
-    static class MatchDeclaration implements MfDataModel.Declaration {}
+    static class MatchDeclaration implements MfDataModel.Declaration {
+    }
 
-    //abnf: input-declaration     = input [s] variable-expression
-    //abnf: local-declaration     = local s variable [s] "=" [s] expression
-    //abnf: reserved-statement    = reserved-keyword [s reserved-body] 1*([s] expression)
-    //abnf: reserved-keyword      = "." name
+    // abnf: input-declaration = input [s] variable-expression
+    // abnf: local-declaration = local s variable [s] "=" [s] expression
+    // abnf: reserved-statement = reserved-keyword [s reserved-body] 1*([s] expression)
+    // abnf: reserved-keyword = "." name
     private MfDataModel.Declaration getDeclaration() {
         int position = input.getPosition();
         skipOptionalWhitespaces();
@@ -618,7 +623,7 @@ public class Parser {
         }
 
         MfDataModel.Expression expression;
-        switch(declName) {
+        switch (declName) {
             case "input":
                 skipMandatoryWhitespaces();
                 expression = getPlaceholder();
@@ -627,7 +632,7 @@ public class Parser {
                 }
                 break;
             case "local":
-                //abnf: local-declaration = local s variable [s] "=" [s] expression
+                // abnf: local-declaration = local s variable [s] "=" [s] expression
                 skipMandatoryWhitespaces();
                 MfDataModel.LiteralOrVariableRef varName = getVariableRef();
                 skipOptionalWhitespaces();
@@ -641,10 +646,10 @@ public class Parser {
                 break;
             case "match":
                 return new MatchDeclaration();
-            default: //abnf: reserved-statement    = reserved-keyword [s reserved-body] 1*([s] expression)
+            default: // abnf: reserved-statement = reserved-keyword [s reserved-body] 1*([s] expression)
                 skipOptionalWhitespaces();
                 String body = getReservedBody();
-                List <MfDataModel.Expression> expressions = new ArrayList<>();
+                List<MfDataModel.Expression> expressions = new ArrayList<>();
                 while (true) {
                     skipOptionalWhitespaces();
                     expression = getPlaceholder();
@@ -660,7 +665,7 @@ public class Parser {
         return null;
     }
 
-    // quoted-pattern    = "{{" pattern "}}"
+    // quoted-pattern = "{{" pattern "}}"
     private MfDataModel.Pattern getQuotedPattern() { // {{ ... }}
         int cp = input.readCodePoint();
         assertTrue(cp == '{', "Expected { for a complex body");
@@ -736,9 +741,8 @@ public class Parser {
     // Debug util, to remove
 
     private final static Gson GSON = new GsonBuilder()
-          //.setPrettyPrinting()
-            .setDateFormat("yyyyMMdd'T'HHmmss")
-            .create();
+            // .setPrettyPrinting()
+            .setDateFormat("yyyyMMdd'T'HHmmss").create();
 
     private final static boolean DEBUG = true;
 

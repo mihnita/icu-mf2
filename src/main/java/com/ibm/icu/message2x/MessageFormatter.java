@@ -15,11 +15,11 @@ public class MessageFormatter {
         this.pattern = pattern;
     }
 
-    public String format(Map<String,Object> arguments) {
+    public String format(Map<String, Object> arguments) {
         return "";
     }
 
-    public String formatToString(Map<String,Object> arguments) {
+    public String formatToString(Map<String, Object> arguments) {
         return "";
     }
 
@@ -43,12 +43,13 @@ public class MessageFormatter {
             MfDataModel.Message dataModel = Parser.parse(pattern);
             return new MessageFormatter(dataModel, locale, pattern);
         }
-        //		Builder setDataModel(Mf2DataModel dataModel) {
-        //			
-        //		}
-        //		Builder setFunctionRegistry(Mf2FunctionRegistry functionRegistry) {
-        //			
-        //		}
+
+        // Builder setDataModel(Mf2DataModel dataModel) {
+        //
+        // }
+        // Builder setFunctionRegistry(Mf2FunctionRegistry functionRegistry) {
+        //
+        // }
         Builder setLocale(Locale locale) {
             this.locale = locale;
             return this;

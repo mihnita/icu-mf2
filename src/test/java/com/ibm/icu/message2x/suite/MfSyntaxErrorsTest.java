@@ -26,7 +26,7 @@ public class MfSyntaxErrorsTest {
     public void test() throws IOException, URISyntaxException {
         Path json = Utilities.getTestFile(this.getClass(), JSON_FILE);
         try (BufferedReader reader = Files.newBufferedReader(json, StandardCharsets.UTF_8)) {
-            String[] unitList = gson.fromJson(reader, String[].class); 
+            String[] unitList = gson.fromJson(reader, String[].class);
             for (String unit : unitList) {
                 System.out.println(Utilities.str(unit));
             }

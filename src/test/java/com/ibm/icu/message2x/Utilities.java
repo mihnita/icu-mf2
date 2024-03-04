@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
- public class Utilities {
+public class Utilities {
 
     public static String str(String str) {
         if (str == null) {
@@ -15,10 +15,18 @@ import java.nio.file.Paths;
         StringBuilder result = new StringBuilder();
         str.chars().forEach(c -> {
             switch (c) {
-                case '\\': result.append("\\\\"); break;
-                case '\t': result.append("\\t"); break;
-                case '\n': result.append("\\n"); break;
-                case '\r': result.append("\\r"); break;
+                case '\\':
+                    result.append("\\\\");
+                    break;
+                case '\t':
+                    result.append("\\t");
+                    break;
+                case '\n':
+                    result.append("\\n");
+                    break;
+                case '\r':
+                    result.append("\\r");
+                    break;
                 default:
                     if (c < 0x0020 || (c >= 0x3000 && c <= 3020)) {
                         result.append(String.format("\\u%04X", c));

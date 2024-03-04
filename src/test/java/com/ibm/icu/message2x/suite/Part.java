@@ -25,10 +25,18 @@ class Part {
     public String toString() {
         StringJoiner result = new StringJoiner(", ", "Part {", "}");
         result.add("type=" + Utilities.str(type));
-        if (kind != null) result.add("kind=" + Utilities.str(kind));
-        if (name != null) result.add("kind=" + Utilities.str(name));
-        if (value != null) result.add("kind=" + Utilities.str(value));
-        if (options != null) result.add("options=" + options);
+        if (kind != null) {
+            result.add("kind=" + Utilities.str(kind));
+        }
+        if (name != null) {
+            result.add("kind=" + Utilities.str(name));
+        }
+        if (value != null) {
+            result.add("kind=" + Utilities.str(value));
+        }
+        if (options != null) {
+            result.add("options=" + options);
+        }
         return result.toString();
     }
 }

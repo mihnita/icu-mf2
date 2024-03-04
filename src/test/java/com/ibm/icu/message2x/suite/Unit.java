@@ -26,10 +26,18 @@ class Unit {
     public String toString() {
         StringJoiner result = new StringJoiner(", ", "UnitTest {", "}");
         result.add("src=" + Utilities.str(src));
-        if (cleanSrc != null) result.add("cleanSrc=" + Utilities.str(cleanSrc));
-        if (params != null) result.add("params=" + params);
-        if (exp != null) result.add("exp=" + Utilities.str(exp));
-        if (parts != null) result.add("parts=" + parts);
+        if (cleanSrc != null) {
+            result.add("cleanSrc=" + Utilities.str(cleanSrc));
+        }
+        if (params != null) {
+            result.add("params=" + params);
+        }
+        if (exp != null) {
+            result.add("exp=" + Utilities.str(exp));
+        }
+        if (parts != null) {
+            result.add("parts=" + parts);
+        }
         return result.toString();
     }
 

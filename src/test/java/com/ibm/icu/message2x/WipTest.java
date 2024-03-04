@@ -61,7 +61,7 @@ public class WipTest {
                 "Hello world {$exp @valid @attr=a @attrb=123 @atrn=|foo bar|}",
                 "Hello world {$exp :date @valid @attr=aaaa @attrb=123 @atrn=|foo bar|}",
                 "Hello world {$exp :date year=numeric month=long day=numeric int=12 @valid @attr=a @attrb=123 @atrn=|foo bar|}",
-                 // Reserved
+                // Reserved
                 "Reserved {$exp &foo something more protected} and more", // private
                 "Reserved {$exp %foo something |quoted \\| inside| more protected} and more", // reserved
                 "{{.starting with dot is OK here}}",
@@ -84,10 +84,10 @@ public class WipTest {
                         + ".input {$a :date}\n"
                         + ".local $exp = {$a :date style=full}\n"
                         + "{{Your card expires on {$exp}!}}",
-                // Selectors
+                        // Selectors
                 ".match {$count :number}\n"
-                + "  1 {{You deleted one file}}\n"
-                + "  * {{You deleted {$count} files}}   ",
+                        + "  1 {{You deleted one file}}\n"
+                        + "  * {{You deleted {$count} files}}   ",
         };
         for (String test : someTests) {
             System.out.println("======================");

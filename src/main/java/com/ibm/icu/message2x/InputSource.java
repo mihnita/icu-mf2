@@ -3,7 +3,10 @@ package com.ibm.icu.message2x;
 class InputSource {
     final String buffer;
     final private int length;
+
     private int cursor;
+    private int lastReadCursor = -1;
+    private int lastReadCount = 0;
 
     InputSource(String input) {
         if (input == null) {
@@ -25,8 +28,6 @@ class InputSource {
         return buffer.charAt(cursor);
     }
 
-    private int lastReadCursor = -1;
-    private int lastReadCount = 0;
     public int readCodePoint() {
         // TODO: REMOVE
         // START Detect possible infinite loop
@@ -62,12 +63,12 @@ class InputSource {
 
     // Backup a number of characters.
     public void backup(int amount) {
-        //TODO: validate
+        // TODO: validate
         cursor -= amount;
     }
 
     public String suffix(int len) {
-        //TODO: validate
+        // TODO: validate
         return buffer.substring(cursor, cursor + len);
     }
 
@@ -76,12 +77,12 @@ class InputSource {
     }
 
     public void skip(int amount) {
-        //TODO: validate
+        // TODO: validate
         cursor += amount;
     }
 
     public void gotoPosition(int position) {
-        //TODO: validate
+        // TODO: validate
         cursor = position;
     }
 }

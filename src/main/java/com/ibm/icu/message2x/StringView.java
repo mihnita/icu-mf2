@@ -27,7 +27,7 @@ class StringView implements CharSequence {
     public CharSequence subSequence(int start, int end) {
         return text.subSequence(start + offset, end + offset);
     }
-    
+
     @Override
     public String toString() {
         return text.substring(offset);

@@ -6,9 +6,11 @@ public class MfException extends RuntimeException {
     public MfException(String message) {
         super(message);
     }
+
     public MfException(Throwable cause) {
         super(cause);
     }
+
     public MfException(String message, Throwable cause) {
         super(message, cause);
     }
