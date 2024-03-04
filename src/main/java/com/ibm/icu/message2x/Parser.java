@@ -15,7 +15,7 @@ public class Parser {
         this.input = new InputSource(text);
     }
 
-    static public MfDataModel.Message parse(String input) {
+    public static MfDataModel.Message parse(String input) {
         return new Parser(input).parseImpl();
     }
 
@@ -237,10 +237,13 @@ public class Parser {
     // abnf: / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}" ; close
     private MfDataModel.Markup getMarkup() {
         int cp = input.readCodePoint();
-        if (cp != '#' || cp != '/')
+        if (cp != '#' || cp != '/') {
             error("Should not happen. Expecting a markup.");
+        }
 
-        MfDataModel.Markup.Kind kind = cp == '/' ? MfDataModel.Markup.Kind.CLOSE : MfDataModel.Markup.Kind.OPEN;
+        MfDataModel.Markup.Kind kind = cp == '/'
+                ? MfDataModel.Markup.Kind.CLOSE
+                : MfDataModel.Markup.Kind.OPEN;
 
         MfDataModel.Annotation annotation = getAnnotationOrMarkup();
         List<MfDataModel.Attribute> attributes = getAttributes();
@@ -382,8 +385,9 @@ public class Parser {
 
     private MfDataModel.LiteralOrVariableRef getLiteralOrVariableRef() {
         int cp = input.peakChar();
-        if (cp == '$')
+        if (cp == '$') {
             return getVariableRef();
+        }
         return getLiteral();
     }
 
@@ -459,7 +463,7 @@ public class Parser {
 
     // abnf: ; number-literal matches JSON number (https://www.rfc-editor.org/rfc/rfc8259#section-6)
     // abnf: number-literal = ["-"] (%x30 / (%x31-39 *DIGIT)) ["." 1*DIGIT] [%i"e" ["-" / "+"] 1*DIGIT]
-    final static Pattern RE_NUMBER_LITERAL = Pattern.compile("^-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+\\-]?[0-9]+)?");
+    private static final Pattern RE_NUMBER_LITERAL = Pattern.compile("^-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+\\-]?[0-9]+)?");
 
     private MfDataModel.NumberLiteral getNumberLiteral() {
         String numberString = peekWithRegExp(RE_NUMBER_LITERAL);
@@ -740,11 +744,11 @@ public class Parser {
 
     // Debug util, to remove
 
-    private final static Gson GSON = new GsonBuilder()
+    private static final Gson GSON = new GsonBuilder()
             // .setPrettyPrinting()
             .setDateFormat("yyyyMMdd'T'HHmmss").create();
 
-    private final static boolean DEBUG = true;
+    private static final boolean DEBUG = true;
 
     private static void spy(String label, Object obj) {
         spy(false, label, obj);
@@ -752,10 +756,11 @@ public class Parser {
 
     private static void spy(boolean force, String label, Object obj) {
         if (DEBUG) {
-            if (force)
+            if (force) {
                 System.out.printf("SPY: %s: %s%n", label, GSON.toJson(obj));
-            else
+            } else {
                 System.out.printf("\033[90mSPY: %s: %s\033[m%n", label, GSON.toJson(obj));
+            }
         }
     }
 }
