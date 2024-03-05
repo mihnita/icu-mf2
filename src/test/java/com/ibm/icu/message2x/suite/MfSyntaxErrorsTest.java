@@ -1,6 +1,6 @@
 package com.ibm.icu.message2x.suite;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
@@ -29,6 +29,7 @@ public class MfSyntaxErrorsTest {
     @Test
     public void test() throws IOException, URISyntaxException {
         Path json = Utilities.getTestFile(this.getClass(), JSON_FILE);
+        int errorCount = 0;
         try (BufferedReader reader = Files.newBufferedReader(json, StandardCharsets.UTF_8)) {
             String[] unitList = GSON.fromJson(reader, String[].class);
             for (String unit : unitList) {
@@ -37,11 +38,12 @@ public class MfSyntaxErrorsTest {
                 try {
                     Parser.parse(unit);
                     System.out.println("ERROR : " + unit);
+                    errorCount++;
 //                    fail("ERROR, we should never get here: '" + unit + "'");
                 } catch (MfException e) {
-                    
                 }
             }
         }
+        assertEquals("Total undetected errors", 0, errorCount);
     }
 }

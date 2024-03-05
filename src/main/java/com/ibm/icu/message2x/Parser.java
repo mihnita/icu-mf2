@@ -36,6 +36,7 @@ public class Parser {
                 spy("simpleMessage wrapped in {{...}}", pattern);
                 result = new MfDataModel.PatternMessage(new ArrayList<>(), pattern);
             } else { // placeholder
+                input.backup(1); // We want the '{' present, to detect the part as placeholder.
                 MfDataModel.Pattern pattern = getPattern();
                 spy("simpleMessage starting with a placeholder", pattern);
                 result = new MfDataModel.PatternMessage(new ArrayList<>(), pattern);
@@ -62,6 +63,9 @@ public class Parser {
             spy("part", part);
             pattern.parts.add(part);
         }
+//        if (pattern.parts.isEmpty()) {
+//            error("Empty pattern");
+//        }
         return pattern;
     }
 
@@ -238,8 +242,8 @@ public class Parser {
     // abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s] ["/"] "}" ; open and standalone
     // abnf: / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}" ; close
     private MfDataModel.Markup getMarkup() {
-        int cp = input.readCodePoint();
-        if (cp != '#' || cp != '/') {
+        int cp = input.readCodePoint(); // consume the '{'
+        if (cp != '#' && cp != '/') {
             error("Should not happen. Expecting a markup.");
         }
 
@@ -692,6 +696,9 @@ public class Parser {
     private String getName() {
         StringBuilder result = new StringBuilder();
         int cp = input.readCodePoint();
+        if (cp == EOF) {
+            error("Expected name or namespace.");
+        }
         if (!StringUtils.isNameStart(cp)) {
             input.backup(1);
             return null;
@@ -757,17 +764,19 @@ public class Parser {
 
     private static final boolean DEBUG = true;
 
-    private static void spy(String label, Object obj) {
+    private void spy(String label, Object obj) {
         spy(false, label, obj);
     }
     
-    private static void spy(boolean force, String label, Object obj) {
+    private void spy(boolean force, String label, Object obj) {
         if (DEBUG) {
             if (force) {
                 System.out.printf("SPY: %s: %s%n", label, GSON.toJson(obj));
             } else {
                 System.out.printf("\033[90mSPY: %s: %s\033[m%n", label, GSON.toJson(obj));
             }
+            int position = input.getPosition();
+            System.out.printf("%s\u2191\u2191\u2191%s%n", input.buffer.substring(0, position), input.buffer.substring(position));
         }
     }
 }
