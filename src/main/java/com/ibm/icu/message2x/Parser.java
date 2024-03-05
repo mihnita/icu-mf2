@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class Parser {
+    private static final int EOF = -1;
     private final InputSource input;
 
     private Parser(String text) {
@@ -28,6 +29,7 @@ public class Parser {
             spy("complexMessage", result);
         } else if (cp == '{') { // `{` or `{{`
             cp = input.readCodePoint();
+            cp = input.peakChar();
             if (cp == '{') { // `{{`, complex body without declarations
                 input.backup(1); // let complexBody deal with the wrapping {{ and }}
                 MfDataModel.Pattern pattern = getQuotedPattern();
@@ -66,7 +68,7 @@ public class Parser {
     private MfDataModel.PatternPart getPatternPart() {
         int cp = input.peakChar();
         switch (cp) {
-            case -1: // EOF
+            case EOF:
                 return null;
             case '}': // This is the end, otherwise it would be escaped
                 return null;
@@ -87,7 +89,7 @@ public class Parser {
         while (true) {
             int cp = input.readCodePoint();
             switch (cp) {
-                case -1: // EOF
+                case EOF:
                     return result.toString();
                 case '\\':
                     cp = input.readCodePoint();
@@ -321,7 +323,7 @@ public class Parser {
                 input.backup(1);
                 MfDataModel.StringLiteral quoted = (MfDataModel.StringLiteral) getQuotedLiteral();
                 result.append(quoted.value);
-            } else if (cp == -1) {
+            } else if (cp == EOF) {
                 return result.toString();
             } else {
                 input.backup(1);
@@ -432,7 +434,7 @@ public class Parser {
         }
         while (true) {
             cp = input.readCodePoint();
-            if (cp == -1) { // EOF
+            if (cp == EOF) {
                 break;
             } else if (StringUtils.isQuotedChar(cp)) {
                 result.appendCodePoint(cp);
@@ -492,7 +494,7 @@ public class Parser {
         int skipCount = 0;
         while (true) {
             int cp = input.readCodePoint();
-            if (cp == -1) { // EOF
+            if (cp == EOF) {
                 return skipCount;
             }
             if (!StringUtils.isWhitespace(cp)) {
@@ -522,7 +524,7 @@ public class Parser {
         } else { // Expect {{...}} or end of message
             skipOptionalWhitespaces();
             int cp = input.peakChar();
-            if (cp == -1) {
+            if (cp == EOF) {
                 // Only declarations, no pattern
                 return new MfDataModel.PatternMessage(declarations, null);
             } else {
@@ -601,6 +603,9 @@ public class Parser {
         if (cp == '*') {
             input.readCodePoint(); // consume the '*'
             return new MfDataModel.CatchallKey();
+        }
+        if (cp == EOF) {
+            return null;
         }
         return getLiteral();
     }
@@ -696,6 +701,8 @@ public class Parser {
             cp = input.readCodePoint();
             if (StringUtils.isNameChar(cp)) {
                 result.appendCodePoint(cp);
+            } else if (cp == EOF) {
+                break;
             } else {
                 input.backup(1);
                 break;
@@ -720,7 +727,7 @@ public class Parser {
             finalMsg.append("Parse error [" + input.getPosition() + "]: ");
             finalMsg.append(message);
             finalMsg.append("\n");
-            if (position != -1) {
+            if (position != EOF) {
                 finalMsg.append(input.buffer.substring(0, position));
                 finalMsg.append("^^^");
                 finalMsg.append(input.buffer.substring(position));
@@ -728,7 +735,7 @@ public class Parser {
                 finalMsg.append(input.buffer);
             }
         }
-        throw new RuntimeException(finalMsg.toString());
+        throw new MfException(finalMsg.toString());
     }
 
     private String peekWithRegExp(Pattern pattern) {
@@ -753,7 +760,7 @@ public class Parser {
     private static void spy(String label, Object obj) {
         spy(false, label, obj);
     }
-
+    
     private static void spy(boolean force, String label, Object obj) {
         if (DEBUG) {
             if (force) {

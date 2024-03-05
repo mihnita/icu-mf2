@@ -1,6 +1,6 @@
 package com.ibm.icu.message2x;
 
-public class StringUtils {
+class StringUtils {
 
     /**
      * abnf: content-char = %x0000-0008        ; omit HTAB (%x09) and LF (%x0A)
@@ -14,18 +14,15 @@ public class StringUtils {
      * abnf:              / %xE000-10FFFF
      */
     static boolean isContentChar(int cp) {
-        return cp != '\t'
-                && cp != '\r'
-                && cp != '\n'
-                && cp != ' '
-                && cp != '.'
-                && cp != '@'
-                && cp != '\\'
-                && cp != '{'
-                && cp != '|'
-                && cp != '}'
-                // && !Character.isSurrogate(c)
-                ;
+        return (cp >= 0x0000 && cp <= 0x0008) // omit HTAB (%x09) and LF (%x0A)
+                || (cp >= 0x000B && cp <= 0x000C) // omit CR (%x0D)
+                || (cp >= 0x000E && cp <= 0x0019) // omit SP (%x20)
+                || (cp >= 0x0021 && cp <= 0x002D) // omit . (%x2E)
+                || (cp >= 0x002F && cp <= 0x003F) // omit @ (%x40)
+                || (cp >= 0x0041 && cp <= 0x005B) // omit \ (%x5C)
+                || (cp >= 0x005D && cp <= 0x007A) // omit { | } (%x7B-7D)
+                || (cp >= 0x007E && cp <= 0xD7FF) // omit surrogates
+                || (cp >= 0xE000 && cp <= 0x10FFFF);
     }
 
     /*
@@ -152,13 +149,13 @@ public class StringUtils {
     // ALPHA is predefined in ABNF as plain ASCII, A-Z and a-z
     // See https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_form
     static boolean isAlpha(int cp) {
-        return (cp >= 'a' && cp <= 'z') || (cp >= 'Z' && cp <= 'Z');
+        return (cp >= 'a' && cp <= 'z') || (cp >= 'A' && cp <= 'Z');
     }
 
     // DIGIT is predefined in ABNF as plain ASCII, 0-9
     // See https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_form
     static boolean isDigit(int cp) {
-        return (cp >= 'a' && cp <= 'z') || (cp >= 'Z' && cp <= 'Z');
+        return cp >= '0' && cp <= '9';
     }
 
     //abnf: function = ":" identifier *(s option)

@@ -11,10 +11,10 @@ public class MfDataModel {
 
     // Messages
 
-    interface Message {
+    public interface Message {
     }
 
-    static class PatternMessage implements Message {
+    static public class PatternMessage implements Message {
         final List<Declaration> declarations;
         final Pattern pattern;
 
@@ -24,7 +24,7 @@ public class MfDataModel {
         }
     }
 
-    static class SelectMessage implements Message {
+    static public class SelectMessage implements Message {
         final List<Declaration> declarations;
         final List<Expression> selectors;
         final List<Variant> variants;
@@ -39,7 +39,7 @@ public class MfDataModel {
     interface Declaration {
     }
 
-    static class InputDeclaration implements Declaration {
+    static public class InputDeclaration implements Declaration {
         final String name;
         final VariableExpression value;
 
@@ -49,7 +49,7 @@ public class MfDataModel {
         }
     }
 
-    static class LocalDeclaration implements Declaration {
+    static public class LocalDeclaration implements Declaration {
         final String name;
         final Expression value;
 
@@ -59,7 +59,7 @@ public class MfDataModel {
         }
     }
 
-    static class UnsupportedStatement implements Declaration {
+    static public class UnsupportedStatement implements Declaration {
         final String keyword;
         final String body;
         final List<Expression> expressions;
@@ -74,7 +74,7 @@ public class MfDataModel {
     interface LiteralOrCatchallKey {
     }
 
-    static class Variant implements LiteralOrCatchallKey {
+    static public class Variant implements LiteralOrCatchallKey {
         final List<LiteralOrCatchallKey> keys;
         final Pattern value;
 
@@ -84,14 +84,14 @@ public class MfDataModel {
         }
     }
 
-    static class CatchallKey implements LiteralOrCatchallKey {
+    static public class CatchallKey implements LiteralOrCatchallKey {
         // String value; // Always '*' in MF2
     }
 
     // Patterns
 
     // type Pattern = Array<string | Expression | Markup>;
-    static class Pattern {
+    static public class Pattern {
         final List<PatternPart> parts;
 
         Pattern() {
@@ -102,7 +102,7 @@ public class MfDataModel {
     interface PatternPart {
     }
 
-    static class StringPart implements PatternPart {
+    static public class StringPart implements PatternPart {
         final String value;
 
         StringPart(String value) {
@@ -121,7 +121,7 @@ public class MfDataModel {
     interface Expression extends PatternPart {
     }
 
-    static class LiteralExpression implements Expression {
+    static public class LiteralExpression implements Expression {
         final Literal arg;
         final Annotation annotation;
         final List<Attribute> attributes;
@@ -133,7 +133,7 @@ public class MfDataModel {
         }
     }
 
-    static class VariableExpression implements Expression {
+    static public class VariableExpression implements Expression {
         final VariableRef arg;
         final Annotation annotation;
         final List<Attribute> attributes;
@@ -148,7 +148,7 @@ public class MfDataModel {
     interface Annotation {
     }
 
-    static class FunctionExpression implements Expression {
+    static public class FunctionExpression implements Expression {
         final FunctionAnnotation annotation;
         final List<Attribute> attributes;
 
@@ -158,7 +158,7 @@ public class MfDataModel {
         }
     }
 
-    static class UnsupportedExpression implements Expression {
+    static public class UnsupportedExpression implements Expression {
         final UnsupportedAnnotation annotation;
         final List<Attribute> attributes;
 
@@ -168,7 +168,7 @@ public class MfDataModel {
         }
     }
 
-    static class Attribute {
+    static public class Attribute {
         final String name;
         final LiteralOrVariableRef value;
 
@@ -187,7 +187,7 @@ public class MfDataModel {
     }
 
     // Data model feedback: I think this should be StringLiteral
-    static class StringLiteral implements Literal {
+    static public class StringLiteral implements Literal {
         final String value;
 
         public StringLiteral(String value) {
@@ -196,7 +196,7 @@ public class MfDataModel {
     }
 
     // Not in the official data model
-    static class NumberLiteral implements Literal {
+    static public class NumberLiteral implements Literal {
         final Number value;
 
         public NumberLiteral(Number value) {
@@ -204,7 +204,7 @@ public class MfDataModel {
         }
     }
 
-    static class VariableRef implements LiteralOrVariableRef {
+    static public class VariableRef implements LiteralOrVariableRef {
         final String name;
 
         public VariableRef(String name) {
@@ -212,7 +212,7 @@ public class MfDataModel {
         }
     }
 
-    static class FunctionAnnotation implements Annotation {
+    static public class FunctionAnnotation implements Annotation {
         final String name;
         final List<Option> options;
 
@@ -222,7 +222,7 @@ public class MfDataModel {
         }
     }
 
-    static class Option {
+    static public class Option {
         final String name;
         final LiteralOrVariableRef value;
 
@@ -232,7 +232,7 @@ public class MfDataModel {
         }
     }
 
-    static class UnsupportedAnnotation implements Annotation {
+    static public class UnsupportedAnnotation implements Annotation {
         final String source;
 
         public UnsupportedAnnotation(String source) {
@@ -242,7 +242,7 @@ public class MfDataModel {
 
     // Markup
 
-    static class Markup implements Expression {
+    static public class Markup implements Expression {
         enum Kind {
             OPEN, CLOSE, STANDALONE
         }

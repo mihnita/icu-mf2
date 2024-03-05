@@ -17,24 +17,30 @@ import org.junit.runners.JUnit4;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.ibm.icu.message2x.MfDataModel;
+import com.ibm.icu.message2x.Parser;
 import com.ibm.icu.message2x.Utilities;
 
 @SuppressWarnings({ "javadoc" })
 @RunWith(JUnit4.class)
 public class MfFunctionsTest {
+    final static private Gson GSON = new GsonBuilder().setDateFormat("yyyyMMdd'T'HHmmss").create();
     final static private String JSON_FILE = "test-functions.json";
-    Gson gson = new GsonBuilder().create();
 
     @Test
     public void test() throws IOException, URISyntaxException {
         Path json = Utilities.getTestFile(this.getClass(), JSON_FILE);
         try (BufferedReader reader = Files.newBufferedReader(json, StandardCharsets.UTF_8)) {
             Type mapType = new TypeToken<Map<String, Unit[]>>(){}.getType();
-            Map<String, Unit[]> unitList = gson.fromJson(reader, mapType);
+            Map<String, Unit[]> unitList = GSON.fromJson(reader, mapType);
             for (Entry<String, Unit[]> testGroup : unitList.entrySet()) {
+                System.out.println("================================");
                 System.out.println(testGroup.getKey());
                 for (Unit unit : testGroup.getValue()) {
-                    System.out.println("    " + unit);
+                    System.out.println("    ----------------------------");
+                    System.out.println("    " + unit.src);
+                    MfDataModel.Message message = Parser.parse(unit.src);
+                    System.out.println(message);
                 }
             }
         }
