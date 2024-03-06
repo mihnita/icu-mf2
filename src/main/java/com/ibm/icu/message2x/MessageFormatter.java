@@ -1,5 +1,5 @@
 // © 2022 and later: Unicode, Inc. and others.
-// License & terms of use: http://www.unicode.org/copyright.html
+// License & terms of use: https://www.unicode.org/copyright.html
 
 package com.ibm.icu.message2x;
 
@@ -227,9 +227,10 @@ public class MessageFormatter {
             this.pattern = builder.pattern;
             MfSerializer tree = new MfSerializer();
             try {
+                @SuppressWarnings("unused") // TODO: use this to format
                 Message result = MfParser.parse(pattern);
                 dataModel = tree.build();
-            } catch (MfException pe) {
+            } catch (MfParseException pe) {
                 throw new IllegalArgumentException(
                         "Parse error:\n"
                         + "Message: <<" + pattern + ">>\n"

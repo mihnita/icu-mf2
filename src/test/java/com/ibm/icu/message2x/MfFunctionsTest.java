@@ -1,4 +1,7 @@
-package com.ibm.icu.message2x.suite;
+// © 2024 and later: Unicode, Inc. and others.
+// License & terms of use: https://www.unicode.org/copyright.html
+
+package com.ibm.icu.message2x;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,9 +20,6 @@ import org.junit.runners.JUnit4;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.ibm.icu.message2x.MfDataModel;
-import com.ibm.icu.message2x.MfParser;
-import com.ibm.icu.message2x.Utilities;
 
 @SuppressWarnings({ "javadoc" })
 @RunWith(JUnit4.class)
@@ -31,7 +31,7 @@ public class MfFunctionsTest {
     public void test() throws IOException, URISyntaxException {
         Path json = Utilities.getTestFile(this.getClass(), JSON_FILE);
         try (BufferedReader reader = Files.newBufferedReader(json, StandardCharsets.UTF_8)) {
-            Type mapType = new TypeToken<Map<String, Unit[]>>(){}.getType();
+            Type mapType = new TypeToken<Map<String, Unit[]>>(){/* not code */}.getType();
             Map<String, Unit[]> unitList = GSON.fromJson(reader, mapType);
             for (Entry<String, Unit[]> testGroup : unitList.entrySet()) {
                 System.out.println("================================");

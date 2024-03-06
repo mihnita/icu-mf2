@@ -1,3 +1,6 @@
+// © 2024 and later: Unicode, Inc. and others.
+// License & terms of use: https://www.unicode.org/copyright.html
+
 package com.ibm.icu.message2x;
 
 class StringUtils {
@@ -117,34 +120,6 @@ class StringUtils {
                 || cp == '@'
                 || cp == '|';
     }
-
-    /* Other literals to encode:
-     * "{{"
-     * "}}"
-     * "="
-     * "*"
-     * "{"
-     * "}"
-     * "/"
-     * "#"
-     * ":"
-     * "@"
-     * "$"
-     * "|"
-     * "."
-     * reserved-annotation-start
-     * "!" | "%" | "*" | "+" | "<" | ">" | "?" | "~"
-     *
-     * "-" => for number-literal
-     * "." => for number-literal
-     * "e" => for number-literal
-     * "-" => for number-literal
-     * "+" => for number-literal
-     *
-     * ".input"
-     * ".local"
-     * ".match" 
-     */
 
     // ALPHA is predefined in ABNF as plain ASCII, A-Z and a-z
     // See https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_form

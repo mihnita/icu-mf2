@@ -1,5 +1,5 @@
 // © 2022 and later: Unicode, Inc. and others.
-// License & terms of use: http://www.unicode.org/copyright.html
+// License & terms of use: https://www.unicode.org/copyright.html
 
 package com.ibm.icu.message2x;
 
@@ -15,6 +15,7 @@ class MfDataModelFormatter {
 
     @SuppressWarnings("unused")
     MfDataModelFormatter(MfDataModel dm, Locale locale, MfFunctionRegistry customFunctionRegistry) {
+        // For now only to keep it compatible with the previous release.
     }
 
     public String format(Map<String, Object> arguments) {

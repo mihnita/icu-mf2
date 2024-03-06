@@ -1,3 +1,6 @@
+// © 2022 and later: Unicode, Inc. and others.
+// License & terms of use: https://www.unicode.org/copyright.html
+
 package com.ibm.icu.message2x;
 
 import java.util.ArrayList;
@@ -8,7 +11,7 @@ import java.util.regex.Pattern;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class MfParser {
+class MfParser {
     private static final int EOF = -1;
     private final InputSource input;
 
@@ -612,6 +615,7 @@ public class MfParser {
     }
 
     static class MatchDeclaration implements MfDataModel.Declaration {
+        // Provides a common type for XXX
     }
 
     // abnf: input-declaration = input [s] variable-expression
@@ -715,13 +719,13 @@ public class MfParser {
         return result.toString();
     }
 
-    private void assertTrue(boolean condition, String message) throws MfException {
+    private void assertTrue(boolean condition, String message) throws MfParseException {
         if (!condition) {
             error(message);
         }
     }
 
-    private void error(String message) throws MfException {
+    private void error(String message) throws MfParseException {
         StringBuilder finalMsg = new StringBuilder();
         if (input == null) {
             finalMsg.append("Parse error: ");
@@ -740,7 +744,7 @@ public class MfParser {
                 finalMsg.append("^^^");
             }
         }
-        throw new MfException(finalMsg.toString());
+        throw new MfParseException(finalMsg.toString());
     }
 
     private String peekWithRegExp(Pattern pattern) {

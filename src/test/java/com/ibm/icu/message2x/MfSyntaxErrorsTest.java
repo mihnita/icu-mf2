@@ -1,4 +1,7 @@
-package com.ibm.icu.message2x.suite;
+// © 2024 and later: Unicode, Inc. and others.
+// License & terms of use: https://www.unicode.org/copyright.html
+
+package com.ibm.icu.message2x;
 
 import static org.junit.Assert.fail;
 
@@ -15,9 +18,6 @@ import org.junit.runners.JUnit4;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.ibm.icu.message2x.MfException;
-import com.ibm.icu.message2x.MfParser;
-import com.ibm.icu.message2x.Utilities;
 
 @SuppressWarnings("javadoc")
 @RunWith(JUnit4.class)
@@ -40,7 +40,7 @@ public class MfSyntaxErrorsTest {
                     MfParser.parse(unit);
                     System.out.println("UNDETECTED (BAD) : " + unit);
                     errors.add(unit);
-                } catch (MfException e) {
+                } catch (MfParseException e) {
                     System.out.println("DETECTED (GOOD)  : " + e.getMessage());
                 }
             }

@@ -1,10 +1,11 @@
-package com.ibm.icu.message2x.suite;
+// © 2022 and later: Unicode, Inc. and others.
+// License & terms of use: https://www.unicode.org/copyright.html
+
+package com.ibm.icu.message2x;
 
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
-
-import com.ibm.icu.message2x.Utilities;
 
 class Unit {
     final String src;
