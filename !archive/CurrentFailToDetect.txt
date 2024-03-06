@@ -1,0 +1,75 @@
+FAILURE: {|foo| #markup}
+	=> markup should have no arguments
+
+FAILURE: {/tag foo=bar}
+	=> this is actually correct. Closing markup can have options now.
+
+FAILURE: bad {:placeholder option=x option=x}
+	=> Semantic. option used twice.
+
+FAILURE: bad {:placeholder ns:option=x ns:option=y}
+	=> Semantic. ns:option used twice.
+
+FAILURE: bad {:placeholder option=}
+	=> option with no value
+
+=== Declarations ===
+
+FAILURE: .input {$foo} .input {$foo} {{_}}
+	=> Declarations: $foo declared twice.
+
+FAILURE: .input {$foo} .local $foo = {42} {{_}}
+	=> Declarations: $foo declared twice.
+
+FAILURE: .local $foo = {42} .input {$foo} {{_}}
+	=> Declarations: $foo declared twice.
+
+FAILURE: .local $foo = {:unknown} .local $foo = {42} {{_}}
+	=> Declarations: $foo declared twice.
+
+FAILURE: .local $foo = {$bar} .local $bar = {42} {{_}}
+	=> Declarations: $bar used, then declared.
+
+FAILURE: .local $foo = {$foo} {{_}}
+	=> Declarations: $bar used, then declared.
+
+FAILURE: .local $foo = {$bar} .local $bar = {$baz} {{_}}
+	=> Declarations: $bar used, then declared.
+
+FAILURE: .local $foo = {$bar :func} .local $bar = {$baz} {{_}}
+	=> Declarations: $bar used, then declared.
+
+FAILURE: .local $foo = {42 :func opt=$foo} {{_}}
+	=> Declarations: $foo declared and used, circular.
+
+FAILURE: .local $foo = {42 :func opt=$bar} .local $bar = {42} {{_}}
+	=> Declarations: $bar used, then declared.
+
+=== Match keys? ===
+
+FAILURE: .match {|foo| :x} {|bar| :x} ** {{foo}}
+	=> ??? ** without spaces?
+
+FAILURE: .match {:foo} 1 {{_}}
+	=> * missing
+
+FAILURE: .match {:foo} other {{_}}
+	=> * missing (other is not *)
+
+FAILURE: .match {:foo} {:bar} * 1 {{_}} 1 * {{_}}
+	=> 2 conditions, 1 key
+
+FAILURE: .match {$foo :x} * * {{foo}}
+	=> 1 condition, 2 keys
+
+FAILURE: .match {$foo :x} {$bar :x} * {{foo}}
+	=> 2 conditions, 1 key
+
+FAILURE: .match {$foo} one {{one}} * {{other}}
+	=> condition without a function (functions are mandatory, direct or from declarations
+
+FAILURE: .input {$foo} .match {$foo} one {{one}} * {{other}}
+	=> condition without a function (functions are mandatory, direct or from declarations
+
+FAILURE: .local $foo = {$bar} .match {$foo} one {{one}} * {{other}}
+	=> condition without a function (functions are mandatory, direct or from declarations
