@@ -3,18 +3,18 @@ package com.ibm.icu.message2x;
 class StringUtils {
 
     /**
-     * abnf: content-char = %x0000-0008        ; omit HTAB (%x09) and LF (%x0A)
-     * abnf:              / %x000B-000C        ; omit CR (%x0D)
-     * abnf:              / %x000E-0019        ; omit SP (%x20)
-     * abnf:              / %x0021-002D        ; omit . (%x2E)
-     * abnf:              / %x002F-003F        ; omit @ (%x40)
-     * abnf:              / %x0041-005B        ; omit \ (%x5C)
-     * abnf:              / %x005D-007A        ; omit { | } (%x7B-7D)
-     * abnf:              / %x007E-D7FF        ; omit surrogates
+     * abnf: content-char = %x01-08        ; omit NULL (%x00), HTAB (%x09) and LF (%x0A)
+     * abnf:              / %x0B-0C        ; omit CR (%x0D)
+     * abnf:              / %x0E-1F        ; omit SP (%x20)
+     * abnf:              / %x21-2D        ; omit . (%x2E)
+     * abnf:              / %x2F-3F        ; omit @ (%x40)
+     * abnf:              / %x41-5B        ; omit \ (%x5C)
+     * abnf:              / %x5D-7A        ; omit { | } (%x7B-7D)
+     * abnf:              / %x7E-D7FF      ; omit surrogates
      * abnf:              / %xE000-10FFFF
      */
     static boolean isContentChar(int cp) {
-        return (cp >= 0x0000 && cp <= 0x0008) // omit HTAB (%x09) and LF (%x0A)
+        return (cp >= 0x0001 && cp <= 0x0008) // omit HTAB (%x09) and LF (%x0A)
                 || (cp >= 0x000B && cp <= 0x000C) // omit CR (%x0D)
                 || (cp >= 0x000E && cp <= 0x0019) // omit SP (%x20)
                 || (cp >= 0x0021 && cp <= 0x002D) // omit . (%x2E)
