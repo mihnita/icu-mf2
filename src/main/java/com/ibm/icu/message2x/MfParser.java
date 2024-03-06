@@ -49,6 +49,8 @@ class MfParser {
             spy("simpleMessage2", pattern);
             result = new MfDataModel.PatternMessage(new ArrayList<>(), pattern);
         }
+        skipOptionalWhitespaces();
+        assertTrue(input.atEnd(), "Content detected after the end of the message.");
         spy(true, "message", result);
         return result;
     }
@@ -179,6 +181,7 @@ class MfParser {
                 input.readCodePoint(); // Consume the sigil
                 String identifier = getIdentifier();
                 spy("identifier", identifier);
+                assertTrue(identifier != null, "Annotation / function name missing");
                 List<MfDataModel.Option> options = getOptions();
                 spy("options", options);
                 return new MfDataModel.FunctionAnnotation(identifier, options);
