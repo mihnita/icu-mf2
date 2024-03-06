@@ -26,13 +26,13 @@ class MfParser {
     // Parser proper
     private MfDataModel.Message parseImpl() {
         MfDataModel.Message result;
-        int cp = input.peakChar();
+        int cp = input.peekChar();
         if (cp == '.') { // declarations or .match
             result = getComplexMessage();
             spy("complexMessage", result);
         } else if (cp == '{') { // `{` or `{{`
             cp = input.readCodePoint();
-            cp = input.peakChar();
+            cp = input.peekChar();
             if (cp == '{') { // `{{`, complex body without declarations
                 input.backup(1); // let complexBody deal with the wrapping {{ and }}
                 MfDataModel.Pattern pattern = getQuotedPattern();
@@ -50,7 +50,7 @@ class MfParser {
             result = new MfDataModel.PatternMessage(new ArrayList<>(), pattern);
         }
         skipOptionalWhitespaces();
-        assertTrue(input.atEnd(), "Content detected after the end of the message.");
+        checkCondition(input.atEnd(), "Content detected after the end of the message.");
         spy(true, "message", result);
         return result;
     }
@@ -68,14 +68,12 @@ class MfParser {
             spy("part", part);
             pattern.parts.add(part);
         }
-//        if (pattern.parts.isEmpty()) {
-//            error("Empty pattern");
-//        }
+//        checkCondition(!pattern.parts.isEmpty(), "Empty pattern");
         return pattern;
     }
 
     private MfDataModel.PatternPart getPatternPart() {
-        int cp = input.peakChar();
+        int cp = input.peekChar();
         switch (cp) {
             case EOF:
                 return null;
@@ -139,13 +137,13 @@ class MfParser {
     // ["/"] "}" ; open and standalone
     // abnf: / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}" ; close
     private MfDataModel.Expression getPlaceholder() {
-        int cp = input.peakChar();
+        int cp = input.peekChar();
         if (cp != '{') {
             return null;
         }
         input.readCodePoint(); // consume the '{'
         skipOptionalWhitespaces();
-        cp = input.peakChar();
+        cp = input.peekChar();
 
         MfDataModel.Expression result;
         if (cp == '#' || cp == '/') {
@@ -161,7 +159,7 @@ class MfParser {
 
         skipOptionalWhitespaces();
         cp = input.readCodePoint(); // consume the '}'
-        assertTrue(cp == '}', "Unclosed placeholder");
+        checkCondition(cp == '}', "Unclosed placeholder");
 
         return result;
     }
@@ -170,7 +168,7 @@ class MfParser {
         int position = input.getPosition();
         skipOptionalWhitespaces();
 
-        int cp = input.peakChar();
+        int cp = input.peekChar();
         switch (cp) {
             case '}':
                 return null;
@@ -181,7 +179,7 @@ class MfParser {
                 input.readCodePoint(); // Consume the sigil
                 String identifier = getIdentifier();
                 spy("identifier", identifier);
-                assertTrue(identifier != null, "Annotation / function name missing");
+                checkCondition(identifier != null, "Annotation / function name missing");
                 List<MfDataModel.Option> options = getOptions();
                 spy("options", options);
                 return new MfDataModel.FunctionAnnotation(identifier, options);
@@ -206,9 +204,7 @@ class MfParser {
     private MfDataModel.Expression getLiteralExpression() {
         MfDataModel.Literal literal = getLiteral();
         spy("literal", literal);
-        if (literal == null) {
-            error("Literal expression expected.");
-        }
+        checkCondition(literal != null, "Literal expression expected.");
 
         MfDataModel.Annotation annotation = null;
         int wsCount = skipWhitespaces();
@@ -261,10 +257,8 @@ class MfParser {
     // abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s] ["/"] "}" ; open and standalone
     // abnf: / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}" ; close
     private MfDataModel.Markup getMarkup() {
-        int cp = input.peakChar(); // consume the '{'
-        if (cp != '#' && cp != '/') {
-            error("Should not happen. Expecting a markup.");
-        }
+        int cp = input.peekChar(); // consume the '{'
+        checkCondition(cp == '#' || cp == '/', "Should not happen. Expecting a markup.");
 
         MfDataModel.Markup.Kind kind = cp == '/'
                 ? MfDataModel.Markup.Kind.CLOSE
@@ -273,7 +267,7 @@ class MfParser {
         MfDataModel.Annotation annotation = getAnnotationOrMarkup();
         List<MfDataModel.Attribute> attributes = getAttributes();
 
-        cp = input.peakChar();
+        cp = input.peekChar();
         if (cp == '/') {
             kind = MfDataModel.Markup.Kind.STANDALONE;
             input.readCodePoint();
@@ -307,20 +301,18 @@ class MfParser {
             input.gotoPosition(position);
             return null;
         }
-        int cp = input.peakChar();
+        int cp = input.peekChar();
         if (cp == '@') {
             input.readCodePoint(); // consume the '@'
             String id = getIdentifier();
             int wsCount = skipWhitespaces();
-            cp = input.peakChar();
+            cp = input.peekChar();
             MfDataModel.LiteralOrVariableRef literalOrVariable = null;
             if (cp == '=') {
                 input.readCodePoint();
                 skipOptionalWhitespaces();
                 literalOrVariable = getLiteralOrVariableRef();
-                if (literalOrVariable == null) {
-                    error("Attributes must have a value after `=`");
-                }
+                checkCondition(literalOrVariable != null, "Attributes must have a value after `=`");
             } else {
                 // was not equal, attribute without a value, put the "spaces" back.
                 input.backup(wsCount);
@@ -344,11 +336,9 @@ class MfParser {
                 result.appendCodePoint(cp);
             } else if (cp == '\\') {
                 cp = input.readCodePoint();
-                if (cp == '{' || cp == '|' || cp == '}') {
-                    result.append(cp);
-                } else {
-                    error("Invalid escape sequence. Only \\{, \\| and \\} are valid here.");
-                }
+                checkCondition(cp == '{' || cp == '|' || cp == '}',
+                        "Invalid escape sequence. Only \\{, \\| and \\} are valid here.");
+                result.append(cp);
             } else if (cp == '|') {
                 input.backup(1);
                 MfDataModel.Literal quoted = getQuotedLiteral();
@@ -373,9 +363,7 @@ class MfParser {
         int cp = input.readCodePoint();
         if (cp == ':') { // the previous name was namespace
             String name = getName();
-            if (name == null) {
-                error("Expected name after namespace '" + namespace + "'");
-            }
+            checkCondition(name != null, "Expected name after namespace '" + namespace + "'");
             return namespace + ":" + name;
         } else {
             input.backup(1);
@@ -407,17 +395,14 @@ class MfParser {
         }
         skipOptionalWhitespaces();
         int cp = input.readCodePoint();
-        if (cp != '=') {
-            error("Expected '='");
-            return null;
-        }
+        checkCondition(cp == '=', "Expected '='");
 //        skipOptionalWhitespaces();
         MfDataModel.LiteralOrVariableRef litOrVar = getLiteralOrVariableRef();
         return new MfDataModel.Option(identifier, litOrVar);
     }
 
     private MfDataModel.LiteralOrVariableRef getLiteralOrVariableRef() {
-        int cp = input.peakChar();
+        int cp = input.peekChar();
         if (cp == '$') {
             return getVariableRef();
         }
@@ -445,24 +430,20 @@ class MfParser {
     private MfDataModel.VariableRef getVariableRef() {
         int cp = input.readCodePoint();
         if (cp != '$') {
-            assertTrue(cp == '$', "We can't get here");
+            checkCondition(cp == '$', "We can't get here");
         }
 
         // abnf: variable = "$" name
         String name = getName();
         spy("varName", name);
-        if (name == null) {
-            error("Invalid variable reference following $");
-        }
+        checkCondition(name != null, "Invalid variable reference following $");
         return new MfDataModel.VariableRef(name);
     }
 
     private MfDataModel.Literal getQuotedLiteral() {
         StringBuilder result = new StringBuilder();
         int cp = input.readCodePoint();
-        if (cp != '|') {
-            error("expected starting '|'");
-        }
+        checkCondition(cp == '|', "expected starting '|'");
         while (true) {
             cp = input.readCodePoint();
             if (cp == EOF) {
@@ -471,18 +452,15 @@ class MfParser {
                 result.appendCodePoint(cp);
             } else if (cp == '\\') {
                 cp = input.readCodePoint();
-                if (cp == '|') {
-                    result.appendCodePoint('|');
-                } else {
-                    error("Invalid escape sequence, only \"\\|\" is valid here");
-                }
+                checkCondition(cp == '|', "Invalid escape sequence, only \"\\|\" is valid here");
+                result.appendCodePoint('|');
             } else {
                 break;
             }
         }
-        if (cp != '|') {
-            error("expected ending '|'");
-        }
+
+        checkCondition(cp == '|', "expected ending '|'");
+
         return new MfDataModel.Literal(result.toString());
     }
 
@@ -509,9 +487,7 @@ class MfParser {
 
     private void skipMandatoryWhitespaces() {
         int count = skipWhitespaces();
-        if (count <= 0) {
-            error("Space expected");
-        }
+        checkCondition(count > 0, "Space expected");
     }
 
     private void skipOptionalWhitespaces() {
@@ -551,7 +527,7 @@ class MfParser {
             return getMatch(declarations);
         } else { // Expect {{...}} or end of message
             skipOptionalWhitespaces();
-            int cp = input.peakChar();
+            int cp = input.peekChar();
             if (cp == EOF) {
                 // Only declarations, no pattern
                 return new MfDataModel.PatternMessage(declarations, null);
@@ -579,14 +555,12 @@ class MfParser {
             if (expression == null) {
                 break;
             }
-            if (expression instanceof MfDataModel.Markup) {
-                error("Cannot do selection on markup");
-            }
+            checkCondition(! (expression instanceof MfDataModel.Markup), "Cannot do selection on markup");
             expressions.add(expression);
         }
-        if (expressions.isEmpty()) {
-            error("There should be at least one selector expression.");
-        }
+
+        checkCondition(!expressions.isEmpty(), "There should be at least one selector expression.");
+
         // At this point we need to look for variants, which are key - value
         List<MfDataModel.Variant> variants = new ArrayList<>();
         while (true) {
@@ -615,9 +589,7 @@ class MfParser {
         spy("keys", keys);
         skipOptionalWhitespaces();
         if (input.atEnd()) {
-            if (!keys.isEmpty()) {
-                error("After selector keys it is mandatory to have a pattern.");
-            }
+            checkCondition(keys.isEmpty(), "After selector keys it is mandatory to have a pattern.");
             return null;
         }
         MfDataModel.Pattern pattern = getQuotedPattern();
@@ -627,7 +599,7 @@ class MfParser {
 
     private MfDataModel.LiteralOrCatchallKey getKey() {
         skipOptionalWhitespaces();
-        int cp = input.peakChar();
+        int cp = input.peekChar();
         if (cp == '*') {
             input.readCodePoint(); // consume the '*'
             return new MfDataModel.CatchallKey();
@@ -638,7 +610,7 @@ class MfParser {
         return getLiteral();
     }
 
-    static class MatchDeclaration implements MfDataModel.Declaration {
+    private static class MatchDeclaration implements MfDataModel.Declaration {
         // Provides a common type for XXX
     }
 
@@ -655,10 +627,7 @@ class MfParser {
             return null;
         }
         String declName = getName();
-        if (declName == null) {
-            error("Expected a declaration after the '.'");
-            return null;
-        }
+        checkCondition(declName != null, "Expected a declaration after the '.'");
 
         MfDataModel.Expression expression;
         switch (declName) {
@@ -675,7 +644,7 @@ class MfParser {
                 MfDataModel.LiteralOrVariableRef varName = getVariableRef();
                 skipOptionalWhitespaces();
                 cp = input.readCodePoint();
-                assertTrue(cp == '=', declName);
+                checkCondition(cp == '=', declName);
                 skipOptionalWhitespaces();
                 expression = getPlaceholder();
                 if (varName instanceof MfDataModel.VariableRef) {
@@ -706,24 +675,22 @@ class MfParser {
     // quoted-pattern = "{{" pattern "}}"
     private MfDataModel.Pattern getQuotedPattern() { // {{ ... }}
         int cp = input.readCodePoint();
-        assertTrue(cp == '{', "Expected { for a complex body");
+        checkCondition(cp == '{', "Expected { for a complex body");
         cp = input.readCodePoint();
-        assertTrue(cp == '{', "Expected second { for a complex body");
+        checkCondition(cp == '{', "Expected second { for a complex body");
         MfDataModel.Pattern pattern = getPattern();
         spy("pattern in complex body", pattern);
         cp = input.readCodePoint();
-        assertTrue(cp == '}', "Expected } to end a complex body");
+        checkCondition(cp == '}', "Expected } to end a complex body");
         cp = input.readCodePoint();
-        assertTrue(cp == '}', "Expected second } to end a complex body");
+        checkCondition(cp == '}', "Expected second } to end a complex body");
         return pattern;
     }
 
     private String getName() {
         StringBuilder result = new StringBuilder();
         int cp = input.readCodePoint();
-        if (cp == EOF) {
-            error("Expected name or namespace.");
-        }
+        checkCondition(cp != EOF, "Expected name or namespace.");
         if (!StringUtils.isNameStart(cp)) {
             input.backup(1);
             return null;
@@ -743,7 +710,7 @@ class MfParser {
         return result.toString();
     }
 
-    private void assertTrue(boolean condition, String message) throws MfParseException {
+    private void checkCondition(boolean condition, String message) throws MfParseException {
         if (!condition) {
             error(message);
         }
@@ -782,7 +749,7 @@ class MfParser {
         return null;
     }
 
-    // Debug util, to remove
+    // TODO: Debug utilities, to remove
 
     private static final Gson GSON = new GsonBuilder()
             // .setPrettyPrinting()
@@ -793,7 +760,7 @@ class MfParser {
     private void spy(String label, Object obj) {
         spy(false, label, obj);
     }
-    
+
     private void spy(boolean force, String label, Object obj) {
         if (debug) {
             int position = input.getPosition();

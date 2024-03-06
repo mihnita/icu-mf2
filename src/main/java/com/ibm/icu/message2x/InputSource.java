@@ -5,7 +5,6 @@ package com.ibm.icu.message2x;
 
 class InputSource {
     final String buffer;
-    final private int length;
 
     private int cursor;
     private int lastReadCursor = -1;
@@ -16,22 +15,21 @@ class InputSource {
             throw new IllegalArgumentException("Input string should not be null");
         }
         this.buffer = input;
-        length = buffer.length();
         this.cursor = 0;
     }
 
-    public boolean atEnd() {
-        return cursor >= length;
+    boolean atEnd() {
+        return cursor >= buffer.length();
     }
 
-    public int peakChar() {
+    int peekChar() {
         if (atEnd()) {
             return -1;
         }
         return buffer.charAt(cursor);
     }
 
-    public int readCodePoint() {
+    int readCodePoint() {
         // TODO: REMOVE
         // START Detect possible infinite loop
         if (lastReadCursor != cursor) {
@@ -65,26 +63,21 @@ class InputSource {
     }
 
     // Backup a number of characters.
-    public void backup(int amount) {
+    void backup(int amount) {
         // TODO: validate
         cursor -= amount;
     }
 
-    public String suffix(int len) {
-        // TODO: validate
-        return buffer.substring(cursor, cursor + len);
-    }
-
-    public int getPosition() {
+    int getPosition() {
         return cursor;
     }
 
-    public void skip(int amount) {
+    void skip(int amount) {
         // TODO: validate
         cursor += amount;
     }
 
-    public void gotoPosition(int position) {
+    void gotoPosition(int position) {
         // TODO: validate
         cursor = position;
     }
