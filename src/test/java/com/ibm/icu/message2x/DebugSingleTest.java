@@ -12,7 +12,7 @@ import org.junit.runners.JUnit4;
 public class DebugSingleTest {
     @Test
     public void test() {
-        String test = "Hello";
+        String test = "Reserved {$exp &foo something more protected} and more";
         System.out.println(Utilities.str(test));
         MfParser.parse(test);
     }

@@ -157,44 +157,46 @@ class MfParser {
             result = getLiteralExpression();
         }
 
-        cp = input.readCodePoint(); // consume the '{'
+        skipOptionalWhitespaces();
+        cp = input.readCodePoint(); // consume the '}'
         assertTrue(cp == '}', "Unclosed placeholder");
 
         return result;
     }
 
     private MfDataModel.Annotation getAnnotationOrMarkup() {
-        MfDataModel.FunctionAnnotation functionAnnotation = null;
-        MfDataModel.UnsupportedAnnotation unsupportedAnnotation = null;
-        int cp = input.readCodePoint();
+        int position = input.getPosition();
+        skipOptionalWhitespaces();
+
+        int cp = input.peakChar();
         switch (cp) {
             case '}':
-                input.backup(1);
                 return null;
             case '#':
             case '/':
             case ':': // annotation, function
                 // abnf: function = ":" identifier *(s option)
+                input.readCodePoint(); // Consume the sigil
                 String identifier = getIdentifier();
                 spy("identifier", identifier);
                 List<MfDataModel.Option> options = getOptions();
                 spy("options", options);
-                functionAnnotation = new MfDataModel.FunctionAnnotation(identifier, options);
-                skipOptionalWhitespaces();
-                return functionAnnotation;
+                return new MfDataModel.FunctionAnnotation(identifier, options);
             default: // reserved && private
-                identifier = getIdentifier();
-                spy("identifier", identifier);
-                String body = getReservedBody();
-                spy("reserved-body", body);
-                // The sigil is part of the body.
-                // It is safe to cast, we know it is in the BMP
-                body = (char) (cp) + body;
-                // Safe to cast, we already know if it one of the ACII symbols (^&?<>~ etc.)
-                unsupportedAnnotation = new MfDataModel.UnsupportedAnnotation(body);
-                skipOptionalWhitespaces();
-                return unsupportedAnnotation;
+                if (StringUtils.isReservedAnnotationSigil(cp) || StringUtils.isPrivateAnnotationSigil(cp)) {
+                    identifier = getIdentifier();
+                    spy("identifier", identifier);
+                    String body = getReservedBody();
+                    spy("reserved-body", body);
+                    // The sigil is part of the body.
+                    // It is safe to cast, we know it is in the BMP
+                    body = (char) (cp) + body;
+                    // Safe to cast, we already know if it one of the ACII symbols (^&?<>~ etc.)
+                    return new MfDataModel.UnsupportedAnnotation(body);
+                }
         }
+        input.gotoPosition(position);
+        return null;
     }
 
     // abnf: literal-expression = "{" [s] literal [s annotation] *(s attribute) [s] "}"
@@ -204,13 +206,21 @@ class MfParser {
         if (literal == null) {
             error("Literal expression expected.");
         }
-        skipOptionalWhitespaces();
 
-        MfDataModel.Annotation annotation = getAnnotationOrMarkup();
+        MfDataModel.Annotation annotation = null;
+        int wsCount = skipWhitespaces();
+        if (wsCount > 0) { // we might have an annotation
+            annotation = getAnnotationOrMarkup();
+            if (annotation == null) {
+                // We had some spaces, but no annotation.
+                // So we put (some) back for the possible attributes.
+                input.backup(1);
+            }
+        }
 
         List<MfDataModel.Attribute> attributes = getAttributes();
 
-        skipOptionalWhitespaces();
+        // skipOptionalWhitespaces();
 
         // Literal without a function, for example {|hello|} or {123}
         return new MfDataModel.LiteralExpression(literal, annotation, attributes);
@@ -220,15 +230,15 @@ class MfParser {
     private MfDataModel.VariableExpression getVariableExpression() {
         MfDataModel.VariableRef variableRef = getVariableRef();
         spy("variableRef", variableRef);
-        skipOptionalWhitespaces();
+//        skipOptionalWhitespaces();
 
         MfDataModel.Annotation annotation = getAnnotationOrMarkup();
         spy("annotation", annotation);
-        skipOptionalWhitespaces();
+//        skipOptionalWhitespaces();
 
         List<MfDataModel.Attribute> attributes = getAttributes();
         spy("attributes", attributes);
-        skipOptionalWhitespaces();
+//        skipOptionalWhitespaces();
         // Variable without a function, for example {$foo}
         return new MfDataModel.VariableExpression(variableRef, annotation, attributes);
     }
@@ -248,7 +258,7 @@ class MfParser {
     // abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s] ["/"] "}" ; open and standalone
     // abnf: / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}" ; close
     private MfDataModel.Markup getMarkup() {
-        int cp = input.readCodePoint(); // consume the '{'
+        int cp = input.peakChar(); // consume the '{'
         if (cp != '#' && cp != '/') {
             error("Should not happen. Expecting a markup.");
         }
@@ -290,20 +300,27 @@ class MfParser {
     // abnf: attribute = "@" identifier [[s] "=" [s] (literal / variable)]
     private MfDataModel.Attribute getAttribute() {
         int position = input.getPosition();
-        skipOptionalWhitespaces();
+        if (skipWhitespaces() == 0) {
+            input.gotoPosition(position);
+            return null;
+        }
         int cp = input.peakChar();
         if (cp == '@') {
             input.readCodePoint(); // consume the '@'
             String id = getIdentifier();
-            skipOptionalWhitespaces();
-            cp = input.readCodePoint();
+            int wsCount = skipWhitespaces();
+            cp = input.peakChar();
             MfDataModel.LiteralOrVariableRef literalOrVariable = null;
             if (cp == '=') {
+                input.readCodePoint();
                 skipOptionalWhitespaces();
                 literalOrVariable = getLiteralOrVariableRef();
+                if (literalOrVariable == null) {
+                    error("Attributes must have a value after `=`");
+                }
             } else {
-                // was not equal, attribute without a value
-                input.backup(1);
+                // was not equal, attribute without a value, put the "spaces" back.
+                input.backup(wsCount);
             }
             return new MfDataModel.Attribute(id, literalOrVariable);
         } else {
@@ -378,10 +395,11 @@ class MfParser {
 
     // abnf: option = identifier [s] "=" [s] (literal / variable)
     private MfDataModel.Option getOption() {
-        // TODO Auto-generated method stub
+        int position = input.getPosition();
         skipOptionalWhitespaces();
         String identifier = getIdentifier();
         if (identifier == null) {
+            input.gotoPosition(position);
             return null;
         }
         skipOptionalWhitespaces();
@@ -390,7 +408,7 @@ class MfParser {
             error("Expected '='");
             return null;
         }
-        skipOptionalWhitespaces();
+//        skipOptionalWhitespaces();
         MfDataModel.LiteralOrVariableRef litOrVar = getLiteralOrVariableRef();
         return new MfDataModel.Option(identifier, litOrVar);
     }
