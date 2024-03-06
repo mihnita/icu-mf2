@@ -8,16 +8,16 @@ import java.util.regex.Pattern;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class Parser {
+public class MfParser {
     private static final int EOF = -1;
     private final InputSource input;
 
-    private Parser(String text) {
+    MfParser(String text) {
         this.input = new InputSource(text);
     }
 
     public static MfDataModel.Message parse(String input) {
-        return new Parser(input).parseImpl();
+        return new MfParser(input).parseImpl();
     }
 
     // Parser proper
@@ -325,7 +325,7 @@ public class Parser {
                 }
             } else if (cp == '|') {
                 input.backup(1);
-                MfDataModel.Literal quoted = (MfDataModel.Literal) getQuotedLiteral();
+                MfDataModel.Literal quoted = getQuotedLiteral();
                 result.append(quoted.value);
             } else if (cp == EOF) {
                 return result.toString();

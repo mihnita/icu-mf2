@@ -11,6 +11,6 @@ public class DebugSingleTest {
     public void test() {
         String test = "Hello";
         System.out.println(Utilities.str(test));
-        Parser.parse(test);
+        MfParser.parse(test);
     }
 }

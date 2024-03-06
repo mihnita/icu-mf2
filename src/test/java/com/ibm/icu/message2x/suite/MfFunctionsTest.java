@@ -18,7 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.ibm.icu.message2x.MfDataModel;
-import com.ibm.icu.message2x.Parser;
+import com.ibm.icu.message2x.MfParser;
 import com.ibm.icu.message2x.Utilities;
 
 @SuppressWarnings({ "javadoc" })
@@ -39,7 +39,7 @@ public class MfFunctionsTest {
                 for (Unit unit : testGroup.getValue()) {
                     System.out.println("    ----------------------------");
                     System.out.println("    " + unit.src);
-                    MfDataModel.Message message = Parser.parse(unit.src);
+                    MfDataModel.Message message = MfParser.parse(unit.src);
                     System.out.println(message);
                 }
             }

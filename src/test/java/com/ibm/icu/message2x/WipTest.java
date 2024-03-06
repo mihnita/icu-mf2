@@ -10,7 +10,7 @@ public class WipTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullInput() {
-        Parser.parse(null);
+        MfParser.parse(null);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class WipTest {
         for (String test : someTests) {
             System.out.println("======================");
             System.out.println(Utilities.str(test));
-            MfDataModel.Message z = Parser.parse(test);
+            MfDataModel.Message z = MfParser.parse(test);
             System.out.println("======================");
             System.out.println(z);
         }

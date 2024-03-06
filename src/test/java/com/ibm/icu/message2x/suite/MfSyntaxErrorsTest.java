@@ -16,7 +16,7 @@ import org.junit.runners.JUnit4;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ibm.icu.message2x.MfException;
-import com.ibm.icu.message2x.Parser;
+import com.ibm.icu.message2x.MfParser;
 import com.ibm.icu.message2x.Utilities;
 
 @SuppressWarnings("javadoc")
@@ -37,7 +37,7 @@ public class MfSyntaxErrorsTest {
                 System.out.println("================================");
                 System.out.println(Utilities.str(unit));
                 try {
-                    Parser.parse(unit);
+                    MfParser.parse(unit);
                     System.out.println("UNDETECTED (BAD) : " + unit);
                     errors.add(unit);
                 } catch (MfException e) {
@@ -50,7 +50,7 @@ public class MfSyntaxErrorsTest {
             System.out.println("===== FAILURES =====");
             for (String error : errors) {
                 System.out.println("FAILURE: " + error);
-                Parser.parse(error);
+                MfParser.parse(error);
             }
             fail("Undetected errors: " + errors.size() + " / " + totalTests);
         }
