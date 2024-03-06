@@ -8,9 +8,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class Utilities {
+class Utilities {
 
-    public static String str(String str) {
+    static String str(String str) {
         if (str == null) {
             return "null";
         }
@@ -41,7 +41,7 @@ public class Utilities {
         return "\"" + result.toString() + "\"";
     }
 
-    public static Path getTestFile(Class<?> cls, String fileName) throws URISyntaxException {
+    static Path getTestFile(Class<?> cls, String fileName) throws URISyntaxException {
         URI getPath = cls.getClassLoader().getResource("").toURI();
         Path filePath = Paths.get(getPath);
         System.out.println(getPath);
