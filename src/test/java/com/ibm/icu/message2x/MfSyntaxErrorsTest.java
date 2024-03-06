@@ -47,6 +47,7 @@ public class MfSyntaxErrorsTest {
         }
 
         if (!errors.isEmpty()) {
+            MfParser.debug = false;
             System.out.println("===== FAILURES =====");
             for (String error : errors) {
                 System.out.println("FAILURE: " + error);

@@ -201,6 +201,9 @@ class MfParser {
     private MfDataModel.Expression getLiteralExpression() {
         MfDataModel.Literal literal = getLiteral();
         spy("literal", literal);
+        if (literal == null) {
+            error("Literal expression expected.");
+        }
         skipOptionalWhitespaces();
 
         MfDataModel.Annotation annotation = getAnnotationOrMarkup();
@@ -764,14 +767,14 @@ class MfParser {
             // .setPrettyPrinting()
             .setDateFormat("yyyyMMdd'T'HHmmss").create();
 
-    private static final boolean DEBUG = true;
+    static boolean debug = true;
 
     private void spy(String label, Object obj) {
         spy(false, label, obj);
     }
     
     private void spy(boolean force, String label, Object obj) {
-        if (DEBUG) {
+        if (debug) {
             int position = input.getPosition();
             if (force) {
                 System.out.printf("SPY: %s: %s%n", label, GSON.toJson(obj));
