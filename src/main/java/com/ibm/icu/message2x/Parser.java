@@ -740,6 +740,7 @@ public class Parser {
                 finalMsg.append(input.buffer.substring(position));
             } else {
                 finalMsg.append(input.buffer);
+                finalMsg.append("^^^");
             }
         }
         throw new MfException(finalMsg.toString());
@@ -770,13 +771,14 @@ public class Parser {
     
     private void spy(boolean force, String label, Object obj) {
         if (DEBUG) {
+            int position = input.getPosition();
             if (force) {
                 System.out.printf("SPY: %s: %s%n", label, GSON.toJson(obj));
+                System.out.printf("%s\u2191\u2191\u2191%s%n", input.buffer.substring(0, position), input.buffer.substring(position));
             } else {
                 System.out.printf("\033[90mSPY: %s: %s\033[m%n", label, GSON.toJson(obj));
+                System.out.printf("\033[90m%s\u2191\u2191\u2191%s\033[m%n", input.buffer.substring(0, position), input.buffer.substring(position));
             }
-            int position = input.getPosition();
-            System.out.printf("%s\u2191\u2191\u2191%s%n", input.buffer.substring(0, position), input.buffer.substring(position));
         }
     }
 }

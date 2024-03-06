@@ -10,11 +10,6 @@ import org.junit.runners.JUnit4;
 @SuppressWarnings({ "static-method", "javadoc" })
 public class WipTest {
 
-    static final boolean IGNORE_OK = false;
-
-    @Rule
-    public ErrorCollector collector = new ErrorCollector();
-
     @Test(expected = IllegalArgumentException.class)
     public void testNullInput() {
         Parser.parse(null);
