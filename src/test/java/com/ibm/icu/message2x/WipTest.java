@@ -1,8 +1,6 @@
 package com.ibm.icu.message2x;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ErrorCollector;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 

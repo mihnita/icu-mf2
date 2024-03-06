@@ -183,26 +183,14 @@ public class MfDataModel {
     interface LiteralOrVariableRef {
     }
 
-    interface Literal extends LiteralOrVariableRef, LiteralOrCatchallKey {
-    }
-
-    // Data model feedback: I think this should be StringLiteral
-    static public class StringLiteral implements Literal {
+    static public class Literal implements LiteralOrVariableRef, LiteralOrCatchallKey {
         final String value;
 
-        public StringLiteral(String value) {
+        public Literal(String value) {
             this.value = value;
         }
     }
 
-    // Not in the official data model
-    static public class NumberLiteral implements Literal {
-        final Number value;
-
-        public NumberLiteral(Number value) {
-            this.value = value;
-        }
-    }
 
     static public class VariableRef implements LiteralOrVariableRef {
         final String name;

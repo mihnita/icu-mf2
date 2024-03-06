@@ -325,7 +325,7 @@ public class Parser {
                 }
             } else if (cp == '|') {
                 input.backup(1);
-                MfDataModel.StringLiteral quoted = (MfDataModel.StringLiteral) getQuotedLiteral();
+                MfDataModel.Literal quoted = (MfDataModel.Literal) getQuotedLiteral();
                 result.append(quoted.value);
             } else if (cp == EOF) {
                 return result.toString();
@@ -456,13 +456,13 @@ public class Parser {
         if (cp != '|') {
             error("expected ending '|'");
         }
-        return new MfDataModel.StringLiteral(result.toString());
+        return new MfDataModel.Literal(result.toString());
     }
 
     private MfDataModel.Literal getUnQuotedLiteral() {
         String name = getName();
         if (name != null) {
-            return new MfDataModel.StringLiteral(name);
+            return new MfDataModel.Literal(name);
         }
         return getNumberLiteral();
     }
@@ -471,14 +471,11 @@ public class Parser {
     // abnf: number-literal = ["-"] (%x30 / (%x31-39 *DIGIT)) ["." 1*DIGIT] [%i"e" ["-" / "+"] 1*DIGIT]
     private static final Pattern RE_NUMBER_LITERAL = Pattern.compile("^-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+\\-]?[0-9]+)?");
 
-    private MfDataModel.NumberLiteral getNumberLiteral() {
+    private MfDataModel.Literal getNumberLiteral() {
         String numberString = peekWithRegExp(RE_NUMBER_LITERAL);
         if (numberString != null) {
             spy("numberString", numberString);
-            // TODO: be smarter about it? Integer / Long / Double / BigNumber?
-            double value = Double.parseDouble(numberString);
-            spy("numberDouble", numberString);
-            return new MfDataModel.NumberLiteral(value);
+            return new MfDataModel.Literal(numberString);
         }
         return null;
     }
