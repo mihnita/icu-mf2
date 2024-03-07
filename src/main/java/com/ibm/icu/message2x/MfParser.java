@@ -68,7 +68,7 @@ class MfParser {
             spy("part", part);
             pattern.parts.add(part);
         }
-//        checkCondition(!pattern.parts.isEmpty(), "Empty pattern");
+        // checkCondition(!pattern.parts.isEmpty(), "Empty pattern");
         return pattern;
     }
 
@@ -229,15 +229,15 @@ class MfParser {
     private MfDataModel.VariableExpression getVariableExpression() {
         MfDataModel.VariableRef variableRef = getVariableRef();
         spy("variableRef", variableRef);
-//        skipOptionalWhitespaces();
+        // skipOptionalWhitespaces();
 
         MfDataModel.Annotation annotation = getAnnotationOrMarkup();
         spy("annotation", annotation);
-//        skipOptionalWhitespaces();
+        // skipOptionalWhitespaces();
 
         List<MfDataModel.Attribute> attributes = getAttributes();
         spy("attributes", attributes);
-//        skipOptionalWhitespaces();
+        // skipOptionalWhitespaces();
         // Variable without a function, for example {$foo}
         return new MfDataModel.VariableExpression(variableRef, annotation, attributes);
     }
@@ -396,7 +396,7 @@ class MfParser {
         skipOptionalWhitespaces();
         int cp = input.readCodePoint();
         checkCondition(cp == '=', "Expected '='");
-//        skipOptionalWhitespaces();
+        // skipOptionalWhitespaces();
         MfDataModel.LiteralOrVariableRef litOrVar = getLiteralOrVariableRef();
         return new MfDataModel.Option(identifier, litOrVar);
     }

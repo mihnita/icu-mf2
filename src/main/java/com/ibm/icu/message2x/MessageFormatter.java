@@ -209,7 +209,7 @@ public class MessageFormatter {
     private final Locale locale;
     private final String pattern;
     private final MfFunctionRegistry functionRegistry;
-    private final MfDataModel dataModel;
+    private final MfDataModel.Message dataModel;
     private final MfDataModelFormatter modelFormatter;
 
     private MessageFormatter(Builder builder) {
@@ -222,14 +222,12 @@ public class MessageFormatter {
 
         if (builder.dataModel != null) {
             this.dataModel = builder.dataModel;
-            this.pattern = MfSerializer.dataModelToString(this.dataModel);
+            // this.pattern = MfSerializer.dataModelToString(this.dataModel);
+            this.pattern = "TODO!";
         } else {
             this.pattern = builder.pattern;
-            MfSerializer tree = new MfSerializer();
             try {
-                @SuppressWarnings("unused") // TODO: use this to format
-                Message result = MfParser.parse(pattern);
-                dataModel = tree.build();
+                this.dataModel = MfParser.parse(pattern);
             } catch (MfParseException pe) {
                 throw new IllegalArgumentException(
                         "Parse error:\n"
@@ -299,7 +297,7 @@ public class MessageFormatter {
      * @deprecated This API is for technology preview only.
      */
     @Deprecated
-    public MfDataModel getDataModel() {
+    public MfDataModel.Message getDataModel() {
         return dataModel;
     }
 
@@ -347,7 +345,7 @@ public class MessageFormatter {
         private Locale locale = Locale.getDefault(Locale.Category.FORMAT);
         private String pattern = null;
         private MfFunctionRegistry functionRegistry = MfFunctionRegistry.builder().build();
-        private MfDataModel dataModel = null;
+        private MfDataModel.Message dataModel = null;
 
         // Prevent direct creation
         private Builder() {
@@ -417,7 +415,7 @@ public class MessageFormatter {
          * @deprecated This API is for technology preview only.
          */
         @Deprecated
-        public Builder setDataModel(MfDataModel dataModel) {
+        public Builder setDataModel(MfDataModel.Message dataModel) {
             this.dataModel = dataModel;
             this.pattern = null;
             return this;
