@@ -27,6 +27,6 @@ public class SingleFormatTest {
         Map<String, Object> args = new HashMap<>();
         String result = mf.formatToString(args);
         System.out.println("RESULT: " + result);
-//        MfParser.parse(test);
+        // MFParser.parse(test);
     }
 }

@@ -6,18 +6,18 @@ package com.ibm.icu.message2x;
 /**
  * Used to report errors in {@link MessageFormatter} (parsing and validation).   
  */
-public class MfParseException extends RuntimeException {
+public class MFParseException extends RuntimeException {
     private static final long serialVersionUID = -7634219305388292407L;
 
-    MfParseException(String message) {
+    MFParseException(String message) {
         super(message);
     }
 
-    MfParseException(Throwable cause) {
+    MFParseException(Throwable cause) {
         super(cause);
     }
 
-    MfParseException(String message, Throwable cause) {
+    MFParseException(String message, Throwable cause) {
         super(message, cause);
     }
 }

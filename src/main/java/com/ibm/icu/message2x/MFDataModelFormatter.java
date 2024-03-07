@@ -8,32 +8,31 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.ibm.icu.message2x.MfDataModel.Annotation;
-import com.ibm.icu.message2x.MfDataModel.PatternPart;
-import com.ibm.icu.message2x.MfDataModel.StringPart;
-import com.ibm.icu.message2x.MfDataModel.VariableRef;
+import com.ibm.icu.message2x.MFDataModel.Annotation;
+import com.ibm.icu.message2x.MFDataModel.StringPart;
+import com.ibm.icu.message2x.MFDataModel.VariableRef;
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.CurrencyAmount;
 
 /**
- * Takes an {@link MfDataModel} and formats it to a {@link String}
+ * Takes an {@link MFDataModel} and formats it to a {@link String}
  * (and later on we will also implement formatting to a {@code FormattedMessage}).
  */
 // TODO: move this in the MessageFormatter
-class MfDataModelFormatter {
+class MFDataModelFormatter {
     private final Locale locale;
-    private final MfDataModel.Message dm;
+    private final MFDataModel.Message dm;
 
-    final MfFunctionRegistry standardFunctions;
-    final MfFunctionRegistry customFunctions;
-    private static final MfFunctionRegistry EMPTY_REGISTY = MfFunctionRegistry.builder().build();
+    final MFFunctionRegistry standardFunctions;
+    final MFFunctionRegistry customFunctions;
+    private static final MFFunctionRegistry EMPTY_REGISTY = MFFunctionRegistry.builder().build();
 
-    MfDataModelFormatter(MfDataModel.Message dm, Locale locale, MfFunctionRegistry customFunctionRegistry) {
+    MFDataModelFormatter(MFDataModel.Message dm, Locale locale, MFFunctionRegistry customFunctionRegistry) {
         this.locale = locale;
         this.dm = dm;
         this.customFunctions = customFunctionRegistry == null ? EMPTY_REGISTY : customFunctionRegistry;
 
-        standardFunctions = MfFunctionRegistry.builder()
+        standardFunctions = MFFunctionRegistry.builder()
                 // Date/time formatting
                 .setFormatter("datetime", new DateTimeFormatterFactory())
                 .setDefaultFormatterNameForType(Date.class, "datetime")
@@ -61,15 +60,15 @@ class MfDataModelFormatter {
     }
 
     String format(Map<String, Object> arguments) {
-        MfDataModel.Pattern patternToRender = null;
-        List<MfDataModel.Declaration> declarations = null;
+        MFDataModel.Pattern patternToRender = null;
+        List<MFDataModel.Declaration> declarations = null;
 
-        if (dm instanceof MfDataModel.PatternMessage) {
-            MfDataModel.PatternMessage pm = (MfDataModel.PatternMessage) dm;
+        if (dm instanceof MFDataModel.PatternMessage) {
+            MFDataModel.PatternMessage pm = (MFDataModel.PatternMessage) dm;
             patternToRender = pm.pattern;
             declarations = pm.declarations;
-        } else if (dm instanceof MfDataModel.SelectMessage) {
-            MfDataModel.SelectMessage sm = (MfDataModel.SelectMessage) dm;
+        } else if (dm instanceof MFDataModel.SelectMessage) {
+            MFDataModel.SelectMessage sm = (MFDataModel.SelectMessage) dm;
 //            findBestMatchingPattern(selectors, arguments);
 //            sm.declarations;
 //            sm.selectors;
@@ -86,13 +85,13 @@ class MfDataModelFormatter {
 //                : findBestMatchingPattern(selectors, arguments);
 //
         StringBuilder result = new StringBuilder();
-        for (MfDataModel.PatternPart part : patternToRender.parts) {
+        for (MFDataModel.PatternPart part : patternToRender.parts) {
             System.out.println(part);
-            if (part instanceof MfDataModel.StringPart) {
-                MfDataModel.StringPart sPart = (StringPart) part;
+            if (part instanceof MFDataModel.StringPart) {
+                MFDataModel.StringPart sPart = (StringPart) part;
                 result.append(sPart.value);
-            } else if (part instanceof MfDataModel.VariableExpression) {
-                MfDataModel.VariableExpression varPart = (MfDataModel.VariableExpression) part;
+            } else if (part instanceof MFDataModel.VariableExpression) {
+                MFDataModel.VariableExpression varPart = (MFDataModel.VariableExpression) part;
                 Annotation annot = varPart.annotation; // function name
                 VariableRef arg = varPart.arg; // argument
 //                FormattedPlaceholder fp = formatPlaceholder((Expression) part, arguments, false);

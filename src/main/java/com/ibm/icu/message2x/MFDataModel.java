@@ -18,9 +18,9 @@ import java.util.List;
  */
 @Deprecated
 @SuppressWarnings("javadoc")
-public class MfDataModel {
+public class MFDataModel {
 
-    private MfDataModel() {
+    private MFDataModel() {
         // Prevent instantiation
     }
 
@@ -221,7 +221,7 @@ public class MfDataModel {
 
         StringPart(String value) {
             if (value == null) {
-                throw new MfParseException("StringPart initialized with null");
+                throw new MFParseException("StringPart initialized with null");
             }
             this.value = value;
         }

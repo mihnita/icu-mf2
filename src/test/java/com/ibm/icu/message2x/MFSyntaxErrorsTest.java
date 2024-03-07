@@ -21,7 +21,7 @@ import com.google.gson.GsonBuilder;
 
 @SuppressWarnings("javadoc")
 @RunWith(JUnit4.class)
-public class MfSyntaxErrorsTest {
+public class MFSyntaxErrorsTest {
     final static private Gson GSON = new GsonBuilder().setDateFormat("yyyyMMdd'T'HHmmss").create();
     final static private String JSON_FILE = "syntax-errors.json";
 
@@ -37,21 +37,21 @@ public class MfSyntaxErrorsTest {
                 System.out.println("================================");
                 System.out.println(Utilities.str(unit));
                 try {
-                    MfParser.parse(unit);
+                    MFParser.parse(unit);
                     System.out.println("UNDETECTED (BAD) : " + unit);
                     errors.add(unit);
-                } catch (MfParseException e) {
+                } catch (MFParseException e) {
                     System.out.println("DETECTED (GOOD)  : " + e.getMessage());
                 }
             }
         }
 
         if (!errors.isEmpty()) {
-            MfParser.debug = false;
+            MFParser.debug = false;
             System.out.println("===== FAILURES =====");
             for (String error : errors) {
                 System.out.println("FAILURE: " + error);
-                MfParser.parse(error);
+                MFParser.parse(error);
             }
             fail("Undetected errors: " + errors.size() + " / " + totalTests);
         }

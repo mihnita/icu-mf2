@@ -6,8 +6,6 @@ package com.ibm.icu.message2x;
 import java.util.Locale;
 import java.util.Map;
 
-import com.ibm.icu.message2x.MfDataModel.Message;
-
 /**
  * <h3>Overview of {@code MessageFormatter}</h3>
  * 
@@ -51,7 +49,7 @@ import com.ibm.icu.message2x.MfDataModel.Message;
  * import com.ibm.icu.message2.MessageFormatter;
  *
  * &#064;Test
- * public void testMf() {
+ * public void test() {
  *     final Locale enGb = Locale.forLanguageTag("en-GB");
  *     Map<String, Object> arguments = new HashMap<>();
  *     arguments.put("name", "John");
@@ -97,7 +95,7 @@ import com.ibm.icu.message2x.MfDataModel.Message;
  * 
  * <blockquote><pre>
  * &#064;Test
- * public void testMfSelection() {
+ * public void testSelection() {
  *    final String message = "match {$count :plural}\n"
  *            + " when one {You have one notification.}\n"
  *            + " when * {You have {$count} notifications.}\n";
@@ -208,9 +206,9 @@ import com.ibm.icu.message2x.MfDataModel.Message;
 public class MessageFormatter {
     private final Locale locale;
     private final String pattern;
-    private final MfFunctionRegistry functionRegistry;
-    private final MfDataModel.Message dataModel;
-    private final MfDataModelFormatter modelFormatter;
+    private final MFFunctionRegistry functionRegistry;
+    private final MFDataModel.Message dataModel;
+    private final MFDataModelFormatter modelFormatter;
 
     private MessageFormatter(Builder builder) {
         this.locale = builder.locale;
@@ -222,20 +220,20 @@ public class MessageFormatter {
 
         if (builder.dataModel != null) {
             this.dataModel = builder.dataModel;
-            // this.pattern = MfSerializer.dataModelToString(this.dataModel);
+            // this.pattern = MFSerializer.dataModelToString(this.dataModel);
             this.pattern = "TODO!";
         } else {
             this.pattern = builder.pattern;
             try {
-                this.dataModel = MfParser.parse(pattern);
-            } catch (MfParseException pe) {
+                this.dataModel = MFParser.parse(pattern);
+            } catch (MFParseException pe) {
                 throw new IllegalArgumentException(
                         "Parse error:\n"
                         + "Message: <<" + pattern + ">>\n"
                         + "Error:" + pe.getMessage() + "\n");
             }
         }
-        modelFormatter = new MfDataModelFormatter(dataModel, locale, functionRegistry);
+        modelFormatter = new MFDataModelFormatter(dataModel, locale, functionRegistry);
     }
 
     /**
@@ -269,7 +267,7 @@ public class MessageFormatter {
      * Get the pattern (the serialized message in MessageFormat 2 syntax) of
      * the current {@code MessageFormatter}.
      *
-     * <p>If the {@code MessageFormatter} was created from an {@link MfDataModel}
+     * <p>If the {@code MessageFormatter} was created from an {@link MFDataModel}
      * the this string is generated from that model.</p>
      *
      * @return the pattern.
@@ -297,7 +295,7 @@ public class MessageFormatter {
      * @deprecated This API is for technology preview only.
      */
     @Deprecated
-    public MfDataModel.Message getDataModel() {
+    public MFDataModel.Message getDataModel() {
         return dataModel;
     }
 
@@ -344,8 +342,8 @@ public class MessageFormatter {
     public static class Builder {
         private Locale locale = Locale.getDefault(Locale.Category.FORMAT);
         private String pattern = null;
-        private MfFunctionRegistry functionRegistry = MfFunctionRegistry.builder().build();
-        private MfDataModel.Message dataModel = null;
+        private MFFunctionRegistry functionRegistry = MFFunctionRegistry.builder().build();
+        private MFDataModel.Message dataModel = null;
 
         // Prevent direct creation
         private Builder() {
@@ -384,7 +382,7 @@ public class MessageFormatter {
         }
 
         /**
-         * Sets an instance of {@link MfFunctionRegistry} that should register any
+         * Sets an instance of {@link MFFunctionRegistry} that should register any
          * custom functions used by the message.
          *
          * <p>There is no need to do this in order to use standard functions
@@ -399,7 +397,7 @@ public class MessageFormatter {
          * @deprecated This API is for technology preview only.
          */
         @Deprecated
-        public Builder setFunctionRegistry(MfFunctionRegistry functionRegistry) {
+        public Builder setFunctionRegistry(MFFunctionRegistry functionRegistry) {
             this.functionRegistry = functionRegistry;
             return this;
         }
@@ -415,7 +413,7 @@ public class MessageFormatter {
          * @deprecated This API is for technology preview only.
          */
         @Deprecated
-        public Builder setDataModel(MfDataModel.Message dataModel) {
+        public Builder setDataModel(MFDataModel.Message dataModel) {
             this.dataModel = dataModel;
             this.pattern = null;
             return this;

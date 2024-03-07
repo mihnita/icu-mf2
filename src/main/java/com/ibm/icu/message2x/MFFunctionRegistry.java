@@ -30,12 +30,12 @@ import java.util.Set;
  * @deprecated This API is for technology preview only.
  */
 @Deprecated
-public class MfFunctionRegistry {
+public class MFFunctionRegistry {
     private final Map<String, FormatterFactory> formattersMap;
     private final Map<String, SelectorFactory> selectorsMap;
     private final Map<Class<?>, String> classToFormatter;
 
-    private MfFunctionRegistry(Builder builder) {
+    private MFFunctionRegistry(Builder builder) {
         this.formattersMap = new HashMap<>(builder.formattersMap);
         this.selectorsMap = new HashMap<>(builder.selectorsMap);
         this.classToFormatter = new HashMap<>(builder.classToFormatter);
@@ -164,7 +164,7 @@ public class MfFunctionRegistry {
     }
 
     /**
-     * A {@code Builder} used to build instances of {@link MfFunctionRegistry}.
+     * A {@code Builder} used to build instances of {@link MFFunctionRegistry}.
      *
      * @internal ICU 72 technology preview
      * @deprecated This API is for technology preview only.
@@ -189,7 +189,7 @@ public class MfFunctionRegistry {
          * @deprecated This API is for technology preview only.
          */
         @Deprecated
-        public Builder addAll(MfFunctionRegistry functionRegistry) {
+        public Builder addAll(MFFunctionRegistry functionRegistry) {
             formattersMap.putAll(functionRegistry.formattersMap);
             selectorsMap.putAll(functionRegistry.selectorsMap);
             classToFormatter.putAll(functionRegistry.classToFormatter);
@@ -332,7 +332,7 @@ public class MfFunctionRegistry {
         }
 
         /**
-         * Builds an instance of {@link MfFunctionRegistry}.
+         * Builds an instance of {@link MFFunctionRegistry}.
          *
          * @return the function registry created.
          *
@@ -340,8 +340,8 @@ public class MfFunctionRegistry {
          * @deprecated This API is for technology preview only.
          */
         @Deprecated
-        public MfFunctionRegistry build() {
-            return new MfFunctionRegistry(this);
+        public MFFunctionRegistry build() {
+            return new MFFunctionRegistry(this);
         }
     }
 }

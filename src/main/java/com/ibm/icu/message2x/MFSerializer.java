@@ -4,13 +4,13 @@
 package com.ibm.icu.message2x;
 
 // TODO: find a better name for this class
-class MfSerializer {
+class MFSerializer {
 
-    public static String dataModelToString(MfDataModel dataModel) {
+    public static String dataModelToString(MFDataModel dataModel) {
         return null;
     }
 
-    public MfDataModel build() {
+    public MFDataModel build() {
         return null;
     }
 }
