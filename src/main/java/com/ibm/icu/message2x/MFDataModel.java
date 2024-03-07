@@ -220,9 +220,6 @@ public class MFDataModel {
         final String value;
 
         StringPart(String value) {
-            if (value == null) {
-                throw new MFParseException("StringPart initialized with null");
-            }
             this.value = value;
         }
     }

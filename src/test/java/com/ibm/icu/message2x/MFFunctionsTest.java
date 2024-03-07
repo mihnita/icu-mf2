@@ -28,7 +28,7 @@ public class MFFunctionsTest {
     final static private String JSON_FILE = "test-functions.json";
 
     @Test
-    public void test() throws IOException, URISyntaxException {
+    public void test() throws Exception {
         Path json = Utilities.getTestFile(this.getClass(), JSON_FILE);
         try (BufferedReader reader = Files.newBufferedReader(json, StandardCharsets.UTF_8)) {
             Type mapType = new TypeToken<Map<String, Unit[]>>(){/* not code */}.getType();

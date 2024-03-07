@@ -8,12 +8,12 @@ import java.util.Map;
 
 /**
  * <h3>Overview of {@code MessageFormatter}</h3>
- * 
+ *
  * <p>In ICU4J, the {@code MessageFormatter} class is the next iteration of {@link com.ibm.icu.text.MessageFormat}.
  * This new version will build on the lessons learned from using MessageFormat for 25 years
  * in various environments, when used directly or as a base for other public APIs.</p>
  *
- * 
+ *
  * <p>The effort to design a succesor to {@code MessageFormat} will result in a specification
  * referred to as MessageFormat 2.0.
  * The reasoning for this effort is shared in the
@@ -36,9 +36,9 @@ import java.util.Map;
  * but the final set of functions and the parameters accepted by those functions is not yet finalized.</p>
  *
  * <h3>Examples</h3>
- * 
+ *
  * <h4>Basic usage</h4>
- * 
+ *
  * <blockquote><pre>
  * import static org.junit.Assert.assertEquals;
  * import java.util.Date;
@@ -65,9 +65,9 @@ import java.util.Map;
  *         mf2.formatToString(arguments));
  * }
  * </pre></blockquote>
- * 
+ *
  * <h4>Placeholder examples</h4>
- * 
+ *
  * <table border="1">
  *   <tr>
  *     <th>Code to set runtime value for placeholder</th>
@@ -90,9 +90,9 @@ import java.util.Map;
  *     <td>{@code &#125;(123456789.531) :number&#126;}</td>
  *   </tr>
  * </table>
- * 
+ *
  * <h4>Plural selection message</h4>
- * 
+ *
  * <blockquote><pre>
  * &#064;Test
  * public void testSelection() {
@@ -118,22 +118,22 @@ import java.util.Map;
  *        mf2.formatToString(arguments));
  * }
  * </pre></blockquote>
- * 
+ *
  * <h4>Built-in formatter functions</h4>
- * 
- * <p>The tech preview implementation comes with formatters for numbers ({@code number}), 
- * date / time ({@code datetime}), 
+ *
+ * <p>The tech preview implementation comes with formatters for numbers ({@code number}),
+ * date / time ({@code datetime}),
  * plural selectors ({@code plural} and {@code selectordinal}),
- * and general selector ({@code select}), 
+ * and general selector ({@code select}),
  * very similar to what MessageFormat offers.</p>
- * 
+ *
  * <p>The <a target="github" href="https://github.com/unicode-org/icu/tree/main/icu4j/main/core/src/test/java/com/ibm/icu/dev/test/message2">ICU test code</a>
  * covers most features, and has examples of how to make custom placeholder formatters;
  * you can look for classes that implement {@code com.ibm.icu.message2.FormatterFactory}
  * (they are named {@code Custom*Test.java}).</p>
- * 
+ *
  * <h3>Functions currently implemented</h3>
- * 
+ *
  * <p>These are the functions interpreted right now:</p>
  *
  * <table border="1">

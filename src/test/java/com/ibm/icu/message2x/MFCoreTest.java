@@ -24,7 +24,7 @@ public class MFCoreTest {
     final static private String JSON_FILE = "test-core.json";
 
     @Test
-    public void test() throws IOException, URISyntaxException {
+    public void test() throws Exception {
         Path json = Utilities.getTestFile(this.getClass(), JSON_FILE);
         try (BufferedReader reader = Files.newBufferedReader(json, StandardCharsets.UTF_8)) {
             Unit[] unitList = GSON.fromJson(reader, Unit[].class);

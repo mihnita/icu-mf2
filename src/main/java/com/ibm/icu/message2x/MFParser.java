@@ -19,12 +19,12 @@ class MFParser {
         this.input = new InputSource(text);
     }
 
-    public static MFDataModel.Message parse(String input) {
+    public static MFDataModel.Message parse(String input) throws MFParseException {
         return new MFParser(input).parseImpl();
     }
 
     // Parser proper
-    private MFDataModel.Message parseImpl() {
+    private MFDataModel.Message parseImpl() throws MFParseException {
         MFDataModel.Message result;
         int cp = input.peekChar();
         if (cp == '.') { // declarations or .match
@@ -58,7 +58,7 @@ class MFParser {
     // abnf: simple-message = [simple-start pattern]
     // abnf: simple-start = simple-start-char / text-escape / placeholder
     // abnf: pattern = *(text-char / text-escape / placeholder)
-    private MFDataModel.Pattern getPattern() {
+    private MFDataModel.Pattern getPattern() throws MFParseException {
         MFDataModel.Pattern pattern = new MFDataModel.Pattern();
         while (true) {
             MFDataModel.PatternPart part = getPatternPart();
@@ -72,7 +72,7 @@ class MFParser {
         return pattern;
     }
 
-    private MFDataModel.PatternPart getPatternPart() {
+    private MFDataModel.PatternPart getPatternPart() throws MFParseException {
         int cp = input.peekChar();
         switch (cp) {
             case EOF:
@@ -136,7 +136,7 @@ class MFParser {
     // abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s]
     // ["/"] "}" ; open and standalone
     // abnf: / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}" ; close
-    private MFDataModel.Expression getPlaceholder() {
+    private MFDataModel.Expression getPlaceholder() throws MFParseException {
         int cp = input.peekChar();
         if (cp != '{') {
             return null;
@@ -164,7 +164,7 @@ class MFParser {
         return result;
     }
 
-    private MFDataModel.Annotation getAnnotationOrMarkup() {
+    private MFDataModel.Annotation getAnnotationOrMarkup() throws MFParseException {
         int position = input.getPosition();
         skipOptionalWhitespaces();
 
@@ -201,7 +201,7 @@ class MFParser {
     }
 
     // abnf: literal-expression = "{" [s] literal [s annotation] *(s attribute) [s] "}"
-    private MFDataModel.Expression getLiteralExpression() {
+    private MFDataModel.Expression getLiteralExpression() throws MFParseException {
         MFDataModel.Literal literal = getLiteral();
         spy("literal", literal);
         checkCondition(literal != null, "Literal expression expected.");
@@ -226,7 +226,7 @@ class MFParser {
     }
 
     // abnf: variable-expression = "{" [s] variable [s annotation] *(s attribute) [s] "}"
-    private MFDataModel.VariableExpression getVariableExpression() {
+    private MFDataModel.VariableExpression getVariableExpression() throws MFParseException {
         MFDataModel.VariableRef variableRef = getVariableRef();
         spy("variableRef", variableRef);
         // skipOptionalWhitespaces();
@@ -243,7 +243,7 @@ class MFParser {
     }
 
     // abnf: annotation-expression = "{" [s] annotation *(s attribute) [s] "}"
-    private MFDataModel.Expression getAnnotationExpression() {
+    private MFDataModel.Expression getAnnotationExpression() throws MFParseException {
         MFDataModel.FunctionAnnotation fa = null;
         MFDataModel.Annotation annotation = getAnnotationOrMarkup();
         if (annotation instanceof MFDataModel.FunctionAnnotation) {
@@ -256,7 +256,7 @@ class MFParser {
 
     // abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s] ["/"] "}" ; open and standalone
     // abnf: / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}" ; close
-    private MFDataModel.Markup getMarkup() {
+    private MFDataModel.Markup getMarkup() throws MFParseException {
         int cp = input.peekChar(); // consume the '{'
         checkCondition(cp == '#' || cp == '/', "Should not happen. Expecting a markup.");
 
@@ -281,7 +281,7 @@ class MFParser {
         return null;
     }
 
-    private List<MFDataModel.Attribute> getAttributes() {
+    private List<MFDataModel.Attribute> getAttributes() throws MFParseException {
         List<MFDataModel.Attribute> result = new ArrayList<>();
         while (true) {
             MFDataModel.Attribute attribute = getAttribute();
@@ -295,7 +295,7 @@ class MFParser {
     }
 
     // abnf: attribute = "@" identifier [[s] "=" [s] (literal / variable)]
-    private MFDataModel.Attribute getAttribute() {
+    private MFDataModel.Attribute getAttribute() throws MFParseException {
         int position = input.getPosition();
         if (skipWhitespaces() == 0) {
             input.gotoPosition(position);
@@ -326,7 +326,7 @@ class MFParser {
 
     // abnf: reserved-body = *([s] 1*(reserved-char / reserved-escape / quoted))
     // abnf: reserved-escape = backslash ( backslash / "{" / "|" / "}" )
-    private String getReservedBody() {
+    private String getReservedBody() throws MFParseException {
         StringBuilder result = new StringBuilder();
         // TODO Auto-generated method stub
         while (true) {
@@ -355,7 +355,7 @@ class MFParser {
     // abnf: identifier = [namespace ":"] name
     // abnf: namespace = name
     // abnf: name = name-start *name-char
-    private String getIdentifier() {
+    private String getIdentifier() throws MFParseException {
         String namespace = getName();
         if (namespace == null) {
             return null;
@@ -372,7 +372,7 @@ class MFParser {
     }
 
     // abnf helper: *(s option)
-    private List<MFDataModel.Option> getOptions() {
+    private List<MFDataModel.Option> getOptions() throws MFParseException {
         List<MFDataModel.Option> options = new ArrayList<>();
         while (true) {
             MFDataModel.Option option = getOption();
@@ -385,7 +385,7 @@ class MFParser {
     }
 
     // abnf: option = identifier [s] "=" [s] (literal / variable)
-    private MFDataModel.Option getOption() {
+    private MFDataModel.Option getOption() throws MFParseException {
         int position = input.getPosition();
         skipOptionalWhitespaces();
         String identifier = getIdentifier();
@@ -401,7 +401,7 @@ class MFParser {
         return new MFDataModel.Option(identifier, litOrVar);
     }
 
-    private MFDataModel.LiteralOrVariableRef getLiteralOrVariableRef() {
+    private MFDataModel.LiteralOrVariableRef getLiteralOrVariableRef() throws MFParseException {
         int cp = input.peekChar();
         if (cp == '$') {
             return getVariableRef();
@@ -410,7 +410,7 @@ class MFParser {
     }
 
     // abnf: literal = quoted / unquoted
-    private MFDataModel.Literal getLiteral() {
+    private MFDataModel.Literal getLiteral() throws MFParseException {
         int cp = input.readCodePoint();
         switch (cp) {
             case '|': // quoted
@@ -427,7 +427,7 @@ class MFParser {
         }
     }
 
-    private MFDataModel.VariableRef getVariableRef() {
+    private MFDataModel.VariableRef getVariableRef() throws MFParseException {
         int cp = input.readCodePoint();
         if (cp != '$') {
             checkCondition(cp == '$', "We can't get here");
@@ -440,7 +440,7 @@ class MFParser {
         return new MFDataModel.VariableRef(name);
     }
 
-    private MFDataModel.Literal getQuotedLiteral() {
+    private MFDataModel.Literal getQuotedLiteral() throws MFParseException {
         StringBuilder result = new StringBuilder();
         int cp = input.readCodePoint();
         checkCondition(cp == '|', "expected starting '|'");
@@ -464,7 +464,7 @@ class MFParser {
         return new MFDataModel.Literal(result.toString());
     }
 
-    private MFDataModel.Literal getUnQuotedLiteral() {
+    private MFDataModel.Literal getUnQuotedLiteral() throws MFParseException {
         String name = getName();
         if (name != null) {
             return new MFDataModel.Literal(name);
@@ -485,7 +485,7 @@ class MFParser {
         return null;
     }
 
-    private void skipMandatoryWhitespaces() {
+    private void skipMandatoryWhitespaces() throws MFParseException {
         int count = skipWhitespaces();
         checkCondition(count > 0, "Space expected");
     }
@@ -509,7 +509,7 @@ class MFParser {
         }
     }
 
-    private MFDataModel.Message getComplexMessage() {
+    private MFDataModel.Message getComplexMessage() throws MFParseException {
         List<MFDataModel.Declaration> declarations = new ArrayList<>();
         boolean foundMatch = false;
         while (true) {
@@ -544,7 +544,7 @@ class MFParser {
     // abnf: variant = key *(s key) [s] quoted-pattern
     // abnf: key = literal / "*"
     // abnf: match = %s".match"
-    private MFDataModel.SelectMessage getMatch(List<MFDataModel.Declaration> declarations) {
+    private MFDataModel.SelectMessage getMatch(List<MFDataModel.Declaration> declarations) throws MFParseException {
         // ".match" was already consumed by the caller
         // Look for selectors
         List<MFDataModel.Expression> expressions = new ArrayList<>();
@@ -576,7 +576,7 @@ class MFParser {
 
     // abnf: variant = key *(s key) [s] quoted-pattern
     // abnf: key = literal / "*"
-    private MFDataModel.Variant getVariant() {
+    private MFDataModel.Variant getVariant() throws MFParseException {
         List<MFDataModel.LiteralOrCatchallKey> keys = new ArrayList<>();
         while (true) {
             MFDataModel.LiteralOrCatchallKey key = getKey();
@@ -597,7 +597,7 @@ class MFParser {
         return new MFDataModel.Variant(keys, pattern);
     }
 
-    private MFDataModel.LiteralOrCatchallKey getKey() {
+    private MFDataModel.LiteralOrCatchallKey getKey() throws MFParseException {
         skipOptionalWhitespaces();
         int cp = input.peekChar();
         if (cp == '*') {
@@ -618,7 +618,7 @@ class MFParser {
     // abnf: local-declaration = local s variable [s] "=" [s] expression
     // abnf: reserved-statement = reserved-keyword [s reserved-body] 1*([s] expression)
     // abnf: reserved-keyword = "." name
-    private MFDataModel.Declaration getDeclaration() {
+    private MFDataModel.Declaration getDeclaration() throws MFParseException {
         int position = input.getPosition();
         skipOptionalWhitespaces();
         int cp = input.readCodePoint();
@@ -673,7 +673,7 @@ class MFParser {
     }
 
     // quoted-pattern = "{{" pattern "}}"
-    private MFDataModel.Pattern getQuotedPattern() { // {{ ... }}
+    private MFDataModel.Pattern getQuotedPattern() throws MFParseException { // {{ ... }}
         int cp = input.readCodePoint();
         checkCondition(cp == '{', "Expected { for a complex body");
         cp = input.readCodePoint();
@@ -687,7 +687,7 @@ class MFParser {
         return pattern;
     }
 
-    private String getName() {
+    private String getName() throws MFParseException {
         StringBuilder result = new StringBuilder();
         int cp = input.readCodePoint();
         checkCondition(cp != EOF, "Expected name or namespace.");
@@ -735,7 +735,7 @@ class MFParser {
                 finalMsg.append("^^^");
             }
         }
-        throw new MFParseException(finalMsg.toString());
+        throw new MFParseException(finalMsg.toString(), input.getPosition());
     }
 
     private String peekWithRegExp(Pattern pattern) {

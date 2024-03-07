@@ -12,12 +12,12 @@ import org.junit.runners.JUnit4;
 public class WipTest {
 
     @Test(expected = IllegalArgumentException.class)
-    public void testNullInput() {
+    public void testNullInput() throws Exception {
         MFParser.parse(null);
     }
 
     @Test
-    public void test() {
+    public void test() throws Exception {
         String [] someTests = {
                 // Simple messages
                 "",

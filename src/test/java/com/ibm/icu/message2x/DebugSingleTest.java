@@ -11,7 +11,7 @@ import org.junit.runners.JUnit4;
 @SuppressWarnings({ "static-method", "javadoc" })
 public class DebugSingleTest {
     @Test
-    public void test() {
+    public void test() throws Exception {
         String test = "Hello";
         System.out.println(Utilities.str(test));
         MFParser.parse(test);
