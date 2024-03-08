@@ -200,9 +200,9 @@ import java.util.Map;
  * </table>
  *
  * @internal ICU 72 technology preview
- * @deprecated This API is for technology preview only.
+ TzuAt deprecated This API is for technology preview only.
  */
-@Deprecated
+// TZUAT Deprecated
 public class MessageFormatter {
     private final Locale locale;
     private final String pattern;
@@ -242,9 +242,9 @@ public class MessageFormatter {
      * @return the Builder.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public static Builder builder() {
         return new Builder();
     }
@@ -256,9 +256,9 @@ public class MessageFormatter {
      * @return the locale.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public Locale getLocale() {
         return locale;
     }
@@ -273,9 +273,9 @@ public class MessageFormatter {
      * @return the pattern.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public String getPattern() {
         return pattern;
     }
@@ -292,9 +292,9 @@ public class MessageFormatter {
      * @return the data model.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public MFDataModel.Message getDataModel() {
         return dataModel;
     }
@@ -310,9 +310,9 @@ public class MessageFormatter {
      *         (for example wrong argument type, or null arguments, etc.)
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public String formatToString(Map<String, Object> arguments) {
         return modelFormatter.format(arguments);
     }
@@ -325,9 +325,9 @@ public class MessageFormatter {
      * @return the {@link FormattedMessage} class representing the message with parameters replaced.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public FormattedMessage format(Map<String, Object> arguments) {
         throw new RuntimeException("Not yet implemented.");
     }
@@ -336,9 +336,9 @@ public class MessageFormatter {
      * A {@code Builder} used to build instances of {@link MessageFormatter}.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public static class Builder {
         private Locale locale = Locale.getDefault(Locale.Category.FORMAT);
         private String pattern = null;
@@ -356,9 +356,9 @@ public class MessageFormatter {
          * @return the builder, for fluent use.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public Builder setLocale(Locale locale) {
             this.locale = locale;
             return this;
@@ -372,9 +372,9 @@ public class MessageFormatter {
          * @return the builder, for fluent use.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public Builder setPattern(String pattern) {
             this.pattern = pattern;
             this.dataModel = null;
@@ -394,9 +394,9 @@ public class MessageFormatter {
          * @return the builder, for fluent use.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public Builder setFunctionRegistry(MFFunctionRegistry functionRegistry) {
             this.functionRegistry = functionRegistry;
             return this;
@@ -410,9 +410,9 @@ public class MessageFormatter {
          * @return the builder, for fluent use.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public Builder setDataModel(MFDataModel.Message dataModel) {
             this.dataModel = dataModel;
             this.pattern = null;
@@ -425,9 +425,9 @@ public class MessageFormatter {
          * @return the {@link MessageFormatter} created.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public MessageFormatter build() {
             return new MessageFormatter(this);
         }
