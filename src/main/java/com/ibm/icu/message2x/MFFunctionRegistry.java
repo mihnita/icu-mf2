@@ -27,9 +27,9 @@ import java.util.Set;
  * </ul>
  *
  * @internal ICU 72 technology preview
- * @deprecated This API is for technology preview only.
+ * TzuAt deprecated This API is for technology preview only.
  */
-@Deprecated
+// TZUAT Deprecated
 public class MFFunctionRegistry {
     private final Map<String, FormatterFactory> formattersMap;
     private final Map<String, SelectorFactory> selectorsMap;
@@ -47,9 +47,9 @@ public class MFFunctionRegistry {
      * @return the Builder.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     * TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public static Builder builder() {
         return new Builder();
     }
@@ -71,9 +71,9 @@ public class MFFunctionRegistry {
      * @return the factory creating formatters for {@code name}. Returns {@code null} if none is registered.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     * TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public FormatterFactory getFormatter(String formatterName) {
         return formattersMap.get(formatterName);
     }
@@ -84,9 +84,9 @@ public class MFFunctionRegistry {
      * @return a set of all the known formatter names.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     * TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public Set<String> getFormatterNames() {
         return formattersMap.keySet();
     }
@@ -98,9 +98,9 @@ public class MFFunctionRegistry {
      * @return the name of the formatter class, if registered. Returns {@code null} otherwise.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     * TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public String getDefaultFormatterNameForType(Class<?> clazz) {
         // Search for the class "as is", to save time.
         // If we don't find it then we iterate the registered classes and check
@@ -125,9 +125,9 @@ public class MFFunctionRegistry {
      * @return a set of all the known classes that have mapping to function names.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     * TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public Set<Class<?>> getDefaultFormatterTypes() {
         return classToFormatter.keySet();
     }
@@ -143,9 +143,9 @@ public class MFFunctionRegistry {
      * @see #getFormatter(String)
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     * TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public SelectorFactory getSelector(String selectorName) {
         return selectorsMap.get(selectorName);
     }
@@ -156,9 +156,9 @@ public class MFFunctionRegistry {
      * @return a set of all the known selector names.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     * TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public Set<String> getSelectorNames() {
         return selectorsMap.keySet();
     }
@@ -167,9 +167,9 @@ public class MFFunctionRegistry {
      * A {@code Builder} used to build instances of {@link MFFunctionRegistry}.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     * TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public static class Builder {
         private final Map<String, FormatterFactory> formattersMap = new HashMap<>();
         private final Map<String, SelectorFactory> selectorsMap = new HashMap<>();
@@ -186,9 +186,9 @@ public class MFFunctionRegistry {
          * @return the builder, for fluent use.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         * TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public Builder addAll(MFFunctionRegistry functionRegistry) {
             formattersMap.putAll(functionRegistry.formattersMap);
             selectorsMap.putAll(functionRegistry.selectorsMap);
@@ -204,9 +204,9 @@ public class MFFunctionRegistry {
          * @return the builder, for fluent use.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         * TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public Builder setFormatter(String formatterName, FormatterFactory formatterFactory) {
             formattersMap.put(formatterName, formatterFactory);
             return this;
@@ -219,9 +219,9 @@ public class MFFunctionRegistry {
          * @return the builder, for fluent use.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         * TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public Builder removeFormatter(String formatterName) {
             formattersMap.remove(formatterName);
             return this;
@@ -233,9 +233,9 @@ public class MFFunctionRegistry {
          * @return the builder, for fluent use.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         * TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public Builder clearFormatters() {
             formattersMap.clear();
             return this;
@@ -249,9 +249,9 @@ public class MFFunctionRegistry {
          * @return the builder, for fluent use.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         * TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public Builder setDefaultFormatterNameForType(Class<?> clazz, String formatterName) {
             classToFormatter.put(clazz, formatterName);
             return this;
@@ -264,9 +264,9 @@ public class MFFunctionRegistry {
          * @return the builder, for fluent use.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         * TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public Builder removeDefaultFormatterNameForType(Class<?> clazz) {
             classToFormatter.remove(clazz);
             return this;
@@ -278,9 +278,9 @@ public class MFFunctionRegistry {
          * @return the builder, for fluent use.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         * TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public Builder clearDefaultFormatterNames() {
             classToFormatter.clear();
             return this;
@@ -294,9 +294,9 @@ public class MFFunctionRegistry {
          * @return the builder, for fluent use.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         * TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public Builder setSelector(String selectorName, SelectorFactory selectorFactory) {
             selectorsMap.put(selectorName, selectorFactory);
             return this;
@@ -309,9 +309,9 @@ public class MFFunctionRegistry {
          * @return the builder, for fluent use.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         * TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public Builder removeSelector(String selectorName) {
             selectorsMap.remove(selectorName);
             return this;
@@ -323,9 +323,9 @@ public class MFFunctionRegistry {
          * @return the builder, for fluent use.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         * TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public Builder clearSelectors() {
             selectorsMap.clear();
             return this;
@@ -337,9 +337,9 @@ public class MFFunctionRegistry {
          * @return the function registry created.
          *
          * @internal ICU 72 technology preview
-         * @deprecated This API is for technology preview only.
+         * TzuAt deprecated This API is for technology preview only.
          */
-        @Deprecated
+        // TZUAT Deprecated
         public MFFunctionRegistry build() {
             return new MFFunctionRegistry(this);
         }

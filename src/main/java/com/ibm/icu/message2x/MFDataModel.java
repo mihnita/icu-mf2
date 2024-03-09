@@ -289,7 +289,7 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TZUAT deprecated This API is for technology preview only.
+     * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
     static public class FunctionExpression implements Expression {

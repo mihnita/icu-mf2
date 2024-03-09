@@ -17,18 +17,18 @@ import com.ibm.icu.text.FormattedValue;
  * including a {@link String}, {@link AttributedCharacterIterator}, more (TBD).</p>
  *
  * @internal ICU 72 technology preview
- * @deprecated This API is for ICU internal use only.
+ * TzuAt deprecated This API is for ICU internal use only.
  */
-@Deprecated
+// TZUAT Deprecated
 public class FormattedMessage implements FormattedValue {
 
     /**
      * Not yet implemented.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for ICU internal use only.
+     * TzuAt deprecated This API is for ICU internal use only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public FormattedMessage() {
         throw new RuntimeException("Not yet implemented.");
     }
@@ -39,9 +39,9 @@ public class FormattedMessage implements FormattedValue {
      * {@inheritDoc}
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for ICU internal use only.
+     * TzuAt deprecated This API is for ICU internal use only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     @Override
     public int length() {
         throw new RuntimeException("Not yet implemented.");
@@ -53,9 +53,9 @@ public class FormattedMessage implements FormattedValue {
      * {@inheritDoc}
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for ICU internal use only.
+     * TzuAt deprecated This API is for ICU internal use only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     @Override
     public char charAt(int index) {
         throw new RuntimeException("Not yet implemented.");
@@ -67,9 +67,9 @@ public class FormattedMessage implements FormattedValue {
      * {@inheritDoc}
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for ICU internal use only.
+     * TzuAt deprecated This API is for ICU internal use only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     @Override
     public CharSequence subSequence(int start, int end) {
         throw new RuntimeException("Not yet implemented.");
@@ -81,9 +81,9 @@ public class FormattedMessage implements FormattedValue {
      * {@inheritDoc}
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for ICU internal use only.
+     * TzuAt deprecated This API is for ICU internal use only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     @Override
     public <A extends Appendable> A appendTo(A appendable) {
         throw new RuntimeException("Not yet implemented.");
@@ -95,9 +95,9 @@ public class FormattedMessage implements FormattedValue {
      * {@inheritDoc}
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for ICU internal use only.
+     * TzuAt deprecated This API is for ICU internal use only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     @Override
     public boolean nextPosition(ConstrainedFieldPosition cfpos) {
         throw new RuntimeException("Not yet implemented.");
@@ -109,9 +109,9 @@ public class FormattedMessage implements FormattedValue {
      * {@inheritDoc}
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for ICU internal use only.
+     * TzuAt deprecated This API is for ICU internal use only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     @Override
     public AttributedCharacterIterator toCharacterIterator() {
         throw new RuntimeException("Not yet implemented.");

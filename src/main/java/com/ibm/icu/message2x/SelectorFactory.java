@@ -13,9 +13,9 @@ import java.util.Map;
  * <p>The we use it to create and cache various selectors with various options.</p>
  *
  * @internal ICU 72 technology preview
- * @deprecated This API is for technology preview only.
+ * TzuAt deprecated This API is for technology preview only.
  */
-@Deprecated
+// TZUAT Deprecated
 public interface SelectorFactory {
     /**
      * The method that is called to create a selector.
@@ -25,8 +25,8 @@ public interface SelectorFactory {
      * @return The Selector.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     * TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     Selector createSelector(Locale locale, Map<String, Object> fixedOptions);
 }

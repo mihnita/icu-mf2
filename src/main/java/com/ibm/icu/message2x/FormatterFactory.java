@@ -13,9 +13,9 @@ import java.util.Map;
  * <p>We use it to create and cache various formatters with various options.</p>
  *
  * @internal ICU 72 technology preview
- * @deprecated This API is for technology preview only.
+ * TzuAt deprecated This API is for technology preview only.
  */
-@Deprecated
+// TZUAT Deprecated
 public interface FormatterFactory {
     /**
      * The method that is called to create a formatter.
@@ -26,8 +26,8 @@ public interface FormatterFactory {
      * @throws IllegalArgumentException
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     * TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     Formatter createFormatter(Locale locale, Map<String, Object> fixedOptions);
 }

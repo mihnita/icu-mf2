@@ -10,9 +10,9 @@ import java.util.Map;
  * that can be used from {@link MessageFormatter}.
  *
  * @internal ICU 72 technology preview
- * @deprecated This API is for technology preview only.
+ * TzuAt deprecated This API is for technology preview only.
  */
-@Deprecated
+// TZUAT Deprecated
 public interface Formatter {
     /**
      * A method that takes the object to format and returns
@@ -23,9 +23,9 @@ public interface Formatter {
      * @return the formatted string.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     * TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     String formatToString(Object toFormat, Map<String, Object> variableOptions);
 
     /**
@@ -37,8 +37,8 @@ public interface Formatter {
      * @return the formatted placeholder.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for technology preview only.
+     * TzuAt deprecated This API is for technology preview only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     FormattedPlaceholder format(Object toFormat, Map<String, Object> variableOptions);
 }

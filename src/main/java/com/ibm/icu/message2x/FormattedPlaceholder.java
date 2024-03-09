@@ -11,9 +11,9 @@ import com.ibm.icu.text.FormattedValue;
  * Very preliminary.
  *
  * @internal ICU 72 technology preview
- * @deprecated This API is for ICU internal use only.
+ * TzuAt deprecated This API is for ICU internal use only.
  */
-@Deprecated
+// TZUAT Deprecated
 public class FormattedPlaceholder {
     private final FormattedValue formattedValue;
     private final Object inputValue;
@@ -25,9 +25,9 @@ public class FormattedPlaceholder {
      * @param formattedValue the result of formatting the placeholder.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for ICU internal use only.
+     * TzuAt deprecated This API is for ICU internal use only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public FormattedPlaceholder(Object inputValue, FormattedValue formattedValue) {
         if (formattedValue == null) {
             throw new IllegalAccessError("Should not try to wrap a null formatted value");
@@ -42,9 +42,9 @@ public class FormattedPlaceholder {
      * @return the original value to be formatted.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for ICU internal use only.
+     * TzuAt deprecated This API is for ICU internal use only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public Object getInput() {
         return inputValue;
     }
@@ -55,9 +55,9 @@ public class FormattedPlaceholder {
      * @return the result of formatting the placeholder.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for ICU internal use only.
+     * TzuAt deprecated This API is for ICU internal use only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     public FormattedValue getFormattedValue() {
         return formattedValue;
     }
@@ -69,9 +69,9 @@ public class FormattedPlaceholder {
      * @return a string representation of the object.
      *
      * @internal ICU 72 technology preview
-     * @deprecated This API is for ICU internal use only.
+     * TzuAt deprecated This API is for ICU internal use only.
      */
-    @Deprecated
+    // TZUAT Deprecated
     @Override
     public String toString() {
         return formattedValue.toString();
