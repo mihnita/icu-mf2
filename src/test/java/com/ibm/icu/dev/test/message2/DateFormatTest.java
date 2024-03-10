@@ -1,7 +1,7 @@
 // © 2024 and later: Unicode, Inc. and others.
 // License & terms of use: https://www.unicode.org/copyright.html
 
-package com.ibm.icu.message2x;
+package com.ibm.icu.dev.test.message2;
 
 import static org.junit.Assert.assertEquals;
 
@@ -13,6 +13,8 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import com.ibm.icu.message2x.MessageFormatter;
 
 @RunWith(JUnit4.class)
 @SuppressWarnings({ "static-method", "javadoc" })

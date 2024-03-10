@@ -1,12 +1,15 @@
 // © 2022 and later: Unicode, Inc. and others.
 // License & terms of use: http://www.unicode.org/copyright.html
 
-package com.ibm.icu.message2x;
+package com.ibm.icu.dev.test.message2;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.junit.Ignore;
+
+import com.ibm.icu.message2x.MFFunctionRegistry;
+import com.ibm.icu.message2x.MessageFormatter;
 
 //import com.ibm.icu.message2x.MessageFormatter;
 //import com.ibm.icu.message2x.MFFunctionRegistry;

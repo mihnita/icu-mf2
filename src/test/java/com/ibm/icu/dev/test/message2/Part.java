@@ -1,7 +1,7 @@
 // © 2024 and later: Unicode, Inc. and others.
 // License & terms of use: https://www.unicode.org/copyright.html
 
-package com.ibm.icu.message2x;
+package com.ibm.icu.dev.test.message2;
 
 import java.util.Map;
 import java.util.StringJoiner;

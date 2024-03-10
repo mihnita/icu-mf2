@@ -1,7 +1,7 @@
 // © 2024 and later: Unicode, Inc. and others.
 // License & terms of use: https://www.unicode.org/copyright.html
 
-package com.ibm.icu.message2x;
+package com.ibm.icu.dev.test.message2;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -11,6 +11,8 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import com.ibm.icu.message2x.MessageFormatter;
 
 @RunWith(JUnit4.class)
 @SuppressWarnings({ "static-method", "javadoc" })
@@ -25,7 +27,6 @@ public class SingleFormatTest {
     @Test
     public void test() {
         String[] testStrings = {
-                
                 ""
                         + ".input {$exp :datetime dateStyle=medium timeStyle=short}\n"
                         + ".input {$user :string}\n"
@@ -42,7 +43,6 @@ public class SingleFormatTest {
         System.out.println("========================");
         System.out.println(Utilities.str(pattern));
 
-        MFParser.debug = false;
         MessageFormatter mf = MessageFormatter.builder()
                 .setLocale(Locale.US)
                 .setPattern(pattern)

@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import com.ibm.icu.message2x.MFDataModel.VariableExpression;
 
-class MFParser {
+public class MFParser {
     private static final int EOF = -1;
     private final InputSource input;
 
@@ -754,7 +754,7 @@ class MFParser {
 
     // TODO: Debug utilities, to remove
 
-    static boolean debug = true;
+    public static boolean debug = true;
 
     private void spy(String label, Object obj) {
         spy(false, label, obj);

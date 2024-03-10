@@ -1,7 +1,7 @@
 // © 2024 and later: Unicode, Inc. and others.
 // License & terms of use: https://www.unicode.org/copyright.html
 
-package com.ibm.icu.message2x;
+package com.ibm.icu.dev.test.message2;
 
 import java.io.BufferedReader;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +14,8 @@ import org.junit.runners.JUnit4;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.ibm.icu.message2x.MFDataModel;
+import com.ibm.icu.message2x.MFParser;
 
 @SuppressWarnings({ "javadoc" })
 @RunWith(JUnit4.class)
