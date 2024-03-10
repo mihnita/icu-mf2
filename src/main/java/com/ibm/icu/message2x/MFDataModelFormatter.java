@@ -15,12 +15,15 @@ import com.ibm.icu.message2x.MFDataModel.Declaration;
 import com.ibm.icu.message2x.MFDataModel.Expression;
 import com.ibm.icu.message2x.MFDataModel.FunctionAnnotation;
 import com.ibm.icu.message2x.MFDataModel.FunctionExpression;
+import com.ibm.icu.message2x.MFDataModel.InputDeclaration;
 import com.ibm.icu.message2x.MFDataModel.Literal;
 import com.ibm.icu.message2x.MFDataModel.LiteralExpression;
 import com.ibm.icu.message2x.MFDataModel.LiteralOrVariableRef;
+import com.ibm.icu.message2x.MFDataModel.LocalDeclaration;
 import com.ibm.icu.message2x.MFDataModel.Option;
 import com.ibm.icu.message2x.MFDataModel.StringPart;
 import com.ibm.icu.message2x.MFDataModel.VariableRef;
+import com.ibm.icu.text.FormattedValue;
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.CurrencyAmount;
 
@@ -82,6 +85,7 @@ class MFDataModelFormatter {
             declarations = pm.declarations;
         } else if (dm instanceof MFDataModel.SelectMessage) {
             MFDataModel.SelectMessage sm = (MFDataModel.SelectMessage) dm;
+            declarations = sm.declarations;
 //            findBestMatchingPattern(selectors, arguments);
 //            sm.declarations;
 //            sm.selectors;
@@ -92,8 +96,7 @@ class MFDataModelFormatter {
             return "ERROR!";
         }
 
-        Map<String, Object> variables = new HashMap<>();
-        
+        Map<String, Object> variables = resolveDeclarations(declarations, arguments);
 
         StringBuilder result = new StringBuilder();
         for (MFDataModel.PatternPart part : patternToRender.parts) {
@@ -229,6 +232,15 @@ class MFDataModelFormatter {
             options = new HashMap<>();
         }
 
+        // AICI!!!
+        if (toFormat instanceof FormattedPlaceholder) { // chaining
+            FormattedValue formattedValue = ((FormattedPlaceholder) toFormat).getFormattedValue();
+            Object prevInput = ((FormattedPlaceholder) toFormat).getInput();
+            DbgUtil.spy("formattedValue", formattedValue);
+            DbgUtil.spy("prevInput", prevInput);
+        }
+
+        DbgUtil.spy("toFormat", toFormat);
         FormatterFactory funcFactory = getFormattingFunctionFactoryByName(toFormat, functionName);
         Formatter ff = funcFactory.createFormatter(locale, options);
         String res = ff.formatToString(toFormat, arguments);
@@ -236,10 +248,27 @@ class MFDataModelFormatter {
         return new FormattedPlaceholder(expression, new PlainStringFormattedValue(res));
     }
 
-    private void resolveDeclarations(List<MFDataModel.Declaration> declarations, Map<String, Object> arguments) {
+    private Map<String, Object> resolveDeclarations(List<MFDataModel.Declaration> declarations, Map<String, Object> arguments) {
         Map<String, Object> variables = new HashMap<>();
-        for (Declaration declaration : declarations) {
-            // WIP
+        String name;
+        Expression value;
+        if (declarations != null) {
+            for (Declaration declaration : declarations) {
+                if (declaration instanceof InputDeclaration) {
+                    name = ((InputDeclaration) declaration).name;
+                    value = ((InputDeclaration) declaration).value;
+                } else if (declaration instanceof LocalDeclaration) {
+                    name = ((LocalDeclaration) declaration).name;
+                    value = ((LocalDeclaration) declaration).value;
+                } else {
+                    continue; 
+                }
+                FormattedPlaceholder fmt = formatExpression(value, variables, arguments);
+                variables.put(name, fmt);
+//                DbgUtil.spy("declaration", declaration);
+            }
         }
+        DbgUtil.spy("variables", variables);
+        return variables;
     }
 }

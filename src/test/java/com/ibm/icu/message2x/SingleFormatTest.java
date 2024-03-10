@@ -25,19 +25,19 @@ public class SingleFormatTest {
     @Test
     public void test() {
         String[] testStrings = {
-//                "Hello World!!!",
-//                "Hello {$name}!!!",
-//                "You have {$count} files left.",
-                "You have {$count :number} files left.",
-                "Expires on {$exp}!!!",
-                "Expires on {$exp :datetime}!!!",
-                "Expires on {$exp :datetime skeleton=yMMMMd}!!!",
+                
+                ""
+                        + ".input {$exp :datetime dateStyle=medium timeStyle=short}\n"
+                        + ".input {$user :string}\n"
+                        + ".local $longExp = {$exp :datetime dateStyle=full}"
+                        + "{{Hello {$user}, you want '{$exp}' or '{$longExp}'?}}"
+                // "Hello John, you want 'Aug 15, 2024, 12:00 AM' or 'Thursday, August 15, 2024 at 12:00 AM'?"
         };
         for (String test : testStrings) {
             checkOneString(test);
         }
     }
-    
+
     void checkOneString(String pattern) {
         System.out.println("========================");
         System.out.println(Utilities.str(pattern));

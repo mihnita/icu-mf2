@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.ibm.icu.message2x.MFDataModel.VariableExpression;
 
 class MFParser {
     private static final int EOF = -1;
@@ -634,8 +633,12 @@ class MFParser {
             case "input":
                 skipMandatoryWhitespaces();
                 expression = getPlaceholder();
+                String inputVarName = null;
+                if (expression instanceof VariableExpression) {
+                    inputVarName = ((VariableExpression) expression).arg.name;
+                }
                 if (expression instanceof MFDataModel.VariableExpression) {
-                    return new MFDataModel.InputDeclaration(declName, (MFDataModel.VariableExpression) expression);
+                    return new MFDataModel.InputDeclaration(inputVarName, (MFDataModel.VariableExpression) expression);
                 }
                 break;
             case "local":
@@ -751,10 +754,6 @@ class MFParser {
 
     // TODO: Debug utilities, to remove
 
-    private static final Gson GSON = new GsonBuilder()
-            // .setPrettyPrinting()
-            .setDateFormat("yyyyMMdd'T'HHmmss").create();
-
     static boolean debug = true;
 
     private void spy(String label, Object obj) {
@@ -764,13 +763,8 @@ class MFParser {
     private void spy(boolean force, String label, Object obj) {
         if (debug) {
             int position = input.getPosition();
-            if (force) {
-                System.out.printf("SPY: %s: %s%n", label, GSON.toJson(obj));
-                System.out.printf("%s\u2191\u2191\u2191%s%n", input.buffer.substring(0, position), input.buffer.substring(position));
-            } else {
-                System.out.printf("\033[90mSPY: %s: %s\033[m%n", label, GSON.toJson(obj));
-                System.out.printf("\033[90m%s\u2191\u2191\u2191%s\033[m%n", input.buffer.substring(0, position), input.buffer.substring(position));
-            }
+            String xtras = String.format("%s\u2191\u2191\u2191%s%n", input.buffer.substring(0, position), input.buffer.substring(position));
+            DbgUtil.spy(force, label, obj, xtras);
         }
     }
 }
