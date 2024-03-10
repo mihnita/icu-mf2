@@ -5,9 +5,7 @@ package com.ibm.icu.dev.test.message2;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import org.junit.Test;

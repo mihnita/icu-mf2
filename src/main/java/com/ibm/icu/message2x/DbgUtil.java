@@ -11,7 +11,7 @@ class DbgUtil {
 
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
-            .setDateFormat("yyyyMMdd'T'HHmmss").create();
+            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
 
     static boolean debug = true;
 

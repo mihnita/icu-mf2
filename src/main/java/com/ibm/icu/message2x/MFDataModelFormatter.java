@@ -186,9 +186,9 @@ class MFDataModelFormatter {
         return result;
     }
 
-    private static Map<String, Object> convertOptions(List<Option> options, Map<String, Object> localVars, Map<String, Object> arguments) {
+    private static Map<String, Object> convertOptions(Map<String, Option> options, Map<String, Object> localVars, Map<String, Object> arguments) {
         Map<String, Object> result = new HashMap<>();
-        for (Option option : options) {
+        for (Option option : options.values()) {
             result.put(option.name, resolveLiteralOrVariable(option.value, localVars, arguments));
         }
         return result;
@@ -206,12 +206,25 @@ class MFDataModelFormatter {
         Annotation annotation = null; // function name
         String functionName = null;
         Object toFormat = null;
-        Map<String, Object> options;
+        Map<String, Object> options = new HashMap<>();
 
         if (expression instanceof MFDataModel.VariableExpression) {
             MFDataModel.VariableExpression varPart = (MFDataModel.VariableExpression) expression;
-            annotation = varPart.annotation; // function name
-            toFormat = resolveLiteralOrVariable(varPart.arg, variables, arguments);
+            annotation = varPart.annotation; // function name & options
+            Object resolved = resolveLiteralOrVariable(varPart.arg, variables, arguments);
+            if (resolved instanceof FormattedPlaceholder) {
+                Object input = ((FormattedPlaceholder) resolved).getInput();
+                if (input instanceof ResolvedExpression) {
+                    ResolvedExpression re = (ResolvedExpression) input;
+                    toFormat = re.argument;
+                    functionName = re.functionName;
+                    options.putAll(re.options);
+                } else {
+                    toFormat = input;
+                }
+            } else {
+                toFormat = resolved;
+            }
         } else if (expression instanceof MFDataModel.FunctionExpression) { // Function without arguments
             MFDataModel.FunctionExpression fe = (FunctionExpression) expression;
             annotation = fe.annotation;
@@ -225,27 +238,32 @@ class MFDataModelFormatter {
 
         if (annotation instanceof FunctionAnnotation) {
             FunctionAnnotation fa = (FunctionAnnotation) annotation;
+            if (functionName != null && !functionName.equals(fa.name)) {
+                    formattingError("invalid function overrides, '" + functionName + "' <> '" + fa.name + "'");
+            }
             functionName = fa.name;
-            options = convertOptions(fa.options, variables, arguments);
-        } else {
-            functionName = null;
-            options = new HashMap<>();
+            Map<String, Object> newOptions = convertOptions(fa.options, variables, arguments);
+            options.putAll(newOptions);
         }
 
-        // AICI!!!
-        if (toFormat instanceof FormattedPlaceholder) { // chaining
-            FormattedValue formattedValue = ((FormattedPlaceholder) toFormat).getFormattedValue();
-            Object prevInput = ((FormattedPlaceholder) toFormat).getInput();
-            DbgUtil.spy("formattedValue", formattedValue);
-            DbgUtil.spy("prevInput", prevInput);
-        }
-
-        DbgUtil.spy("toFormat", toFormat);
         FormatterFactory funcFactory = getFormattingFunctionFactoryByName(toFormat, functionName);
         Formatter ff = funcFactory.createFormatter(locale, options);
         String res = ff.formatToString(toFormat, arguments);
 
-        return new FormattedPlaceholder(expression, new PlainStringFormattedValue(res));
+        ResolvedExpression resExpression = new ResolvedExpression(toFormat, functionName, options);
+        return new FormattedPlaceholder(resExpression, new PlainStringFormattedValue(res));
+    }
+
+    static class ResolvedExpression implements Expression {
+        final Object argument;
+        final String functionName;
+        final Map<String, Object> options;
+
+        public ResolvedExpression(Object argument, String functionName, Map<String, Object> options) {
+            this.argument = argument;
+            this.functionName = functionName;
+            this.options = options;
+        }
     }
 
     private Map<String, Object> resolveDeclarations(List<MFDataModel.Declaration> declarations, Map<String, Object> arguments) {
@@ -265,10 +283,8 @@ class MFDataModelFormatter {
                 }
                 FormattedPlaceholder fmt = formatExpression(value, variables, arguments);
                 variables.put(name, fmt);
-//                DbgUtil.spy("declaration", declaration);
             }
         }
-        DbgUtil.spy("variables", variables);
         return variables;
     }
 }

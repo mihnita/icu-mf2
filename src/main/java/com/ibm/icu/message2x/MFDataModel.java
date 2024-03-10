@@ -5,6 +5,7 @@ package com.ibm.icu.message2x;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This maps closely to the official specification.
@@ -404,14 +405,14 @@ public class MFDataModel {
     // TZUAT Deprecated
     static public class FunctionAnnotation implements Annotation {
         final String name;
-        final List<Option> options;
+        final Map<String, Option> options;
 
         /**
          * @internal ICU 72 technology preview
          * TzuAt deprecated This API is for technology preview only.
          */
         // TZUAT Deprecated
-        public FunctionAnnotation(String name, List<Option> options) {
+        public FunctionAnnotation(String name, Map<String, Option> options) {
             this.name = name;
             this.options = options;
         }
@@ -469,7 +470,7 @@ public class MFDataModel {
 
         final Kind kind;
         final String name;
-        final List<Option> options;
+        final Map<String, Option> options;
         final List<Attribute> attributes;
 
         /**
@@ -477,7 +478,7 @@ public class MFDataModel {
          * TzuAt deprecated This API is for technology preview only.
          */
         // TZUAT Deprecated
-        public Markup(Kind kind, String name, List<Option> options, List<Attribute> attributes) {
+        public Markup(Kind kind, String name, Map<String, Option> options, List<Attribute> attributes) {
             this.kind = kind;
             this.name = name;
             this.options = options;

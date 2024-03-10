@@ -4,7 +4,9 @@
 package com.ibm.icu.message2x;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -179,7 +181,7 @@ public class MFParser {
                 String identifier = getIdentifier();
                 spy("identifier", identifier);
                 checkCondition(identifier != null, "Annotation / function name missing");
-                List<MFDataModel.Option> options = getOptions();
+                Map<String, MFDataModel.Option> options = getOptions();
                 spy("options", options);
                 return new MFDataModel.FunctionAnnotation(identifier, options);
             default: // reserved && private
@@ -371,14 +373,17 @@ public class MFParser {
     }
 
     // abnf helper: *(s option)
-    private List<MFDataModel.Option> getOptions() throws MFParseException {
-        List<MFDataModel.Option> options = new ArrayList<>();
+    private Map<String, MFDataModel.Option> getOptions() throws MFParseException {
+        Map<String, MFDataModel.Option> options = new HashMap<>();
         while (true) {
             MFDataModel.Option option = getOption();
             if (option == null) {
                 break;
             }
-            options.add(option);
+            if (options.containsKey(option.name)) {
+                error("Duplicated option '" + option.name + "'");
+            }
+            options.put(option.name, option);
         }
         return options;
     }

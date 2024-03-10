@@ -50,7 +50,7 @@ public class DateFormatTest {
                 "Expires on {$exp :datetime year=numeric month=long}",
                 "Expires on August 2024", // expected
                 "Expires on {$exp :datetime year=numeric month=medium day=numeric weekday=long hour=numeric minute=numeric}",
-                "Expires on 2024 (day: 15), 7:42 PM", // expected
+                "Expires on 15 Thursday 2024, 7:42 PM", // expected
                 // Literals
                 "Expires on {|2025-02-27| :datetime dateStyle=full}", "Expires on Thursday, March 27, 2025",
                 "Expires at {|19:23:45| :datetime timeStyle=full}", "Expires at 7:23:45 PM Pacific Daylight Time",

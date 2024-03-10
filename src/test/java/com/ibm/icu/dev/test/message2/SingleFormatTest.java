@@ -21,18 +21,25 @@ public class SingleFormatTest {
     static {
         ARGS.put("user", "John");
         ARGS.put("count", 42);
-        ARGS.put("exp", new Date(2024 - 1900, 7, 15));
+        ARGS.put("exp", new Date(2024 - 1900, 7, 3, 21, 43, 57)); // Aug 3, 2024, at 9:43:57 pm
+        ARGS.put("tsOver", "full");
     }
 
     @Test
     public void test() {
         String[] testStrings = {
                 ""
-                        + ".input {$exp :datetime dateStyle=medium timeStyle=short}\n"
+                        + ".input {$exp :datetime timeStyle=short}\n"
                         + ".input {$user :string}\n"
-                        + ".local $longExp = {$exp :datetime dateStyle=full}"
-                        + "{{Hello {$user}, you want '{$exp}' or '{$longExp}'?}}"
-                // "Hello John, you want 'Aug 15, 2024, 12:00 AM' or 'Thursday, August 15, 2024 at 12:00 AM'?"
+                        + ".local $longExp = {$exp :datetime dateStyle=long}"
+                        + ".local $zooExp = {$exp :datetime dateStyle=short timeStyle=$tsOver}"
+                        + "{{Hello John, you want '{$exp}', '{$longExp}', or '{$zooExp}' or even '{$exp :datetime dateStyle=full}'?}}",
+                        // RESULT: "Hello John, you want '9:43 PM', 'August 3, 2024 at 9:43 PM', or '8/3/24, 9:43:57 PM Pacific Daylight Time' or even 'Saturday, August 3, 2024 at 9:43 PM'?"
+                ""
+                        + ".input {$exp :datetime year=numeric month=numeric day=|2-digit|}\n"
+                        + ".local $longExp = {$exp :datetime month=long weekday=long}"
+                        + "{{Expires on '{$exp}' ('{$longExp}').}}"
+                        // RESULT: "Expires on '8/03/2024' ('Saturday, August 03, 2024')."
         };
         for (String test : testStrings) {
             checkOneString(test);
