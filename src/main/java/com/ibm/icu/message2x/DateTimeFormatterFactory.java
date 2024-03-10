@@ -94,9 +94,9 @@ class DateTimeFormatterFactory implements FormatterFactory {
 
         opt = getOptionAsString(options, "weekday");
         switch (opt) {
-            case "long": skeleton.append(""); break;
-            case "short": skeleton.append(""); break;
-            case "narrow": skeleton.append(""); break;
+            case "long": skeleton.append("EEEE"); break;
+            case "short": skeleton.append("E"); break;
+            case "narrow": skeleton.append("EEEEEE"); break;
         }
 
         opt = getOptionAsString(options, "era");
