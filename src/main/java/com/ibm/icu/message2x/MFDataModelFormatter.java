@@ -3,6 +3,7 @@
 
 package com.ibm.icu.message2x;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.ibm.icu.message2x.MFDataModel.Annotation;
+import com.ibm.icu.message2x.MFDataModel.Declaration;
+import com.ibm.icu.message2x.MFDataModel.Expression;
 import com.ibm.icu.message2x.MFDataModel.FunctionAnnotation;
 import com.ibm.icu.message2x.MFDataModel.FunctionExpression;
 import com.ibm.icu.message2x.MFDataModel.Literal;
@@ -17,7 +20,6 @@ import com.ibm.icu.message2x.MFDataModel.LiteralExpression;
 import com.ibm.icu.message2x.MFDataModel.LiteralOrVariableRef;
 import com.ibm.icu.message2x.MFDataModel.Option;
 import com.ibm.icu.message2x.MFDataModel.StringPart;
-import com.ibm.icu.message2x.MFDataModel.UnsupportedExpression;
 import com.ibm.icu.message2x.MFDataModel.VariableRef;
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.CurrencyAmount;
@@ -26,13 +28,13 @@ import com.ibm.icu.util.CurrencyAmount;
  * Takes an {@link MFDataModel} and formats it to a {@link String}
  * (and later on we will also implement formatting to a {@code FormattedMessage}).
  */
-// TODO: move this in the MessageFormatter
+// TODO: move this in the MessageFormatter?
 class MFDataModelFormatter {
     private final Locale locale;
     private final MFDataModel.Message dm;
 
-    final MFFunctionRegistry standardFunctions;
-    final MFFunctionRegistry customFunctions;
+    private final MFFunctionRegistry standardFunctions;
+    private final MFFunctionRegistry customFunctions;
     private static final MFFunctionRegistry EMPTY_REGISTY = MFFunctionRegistry.builder().build();
 
     MFDataModelFormatter(MFDataModel.Message dm, Locale locale, MFFunctionRegistry customFunctionRegistry) {
@@ -42,11 +44,14 @@ class MFDataModelFormatter {
 
         standardFunctions = MFFunctionRegistry.builder()
                 // Date/time formatting
+                // TODO: `:date`, `:time` ?
                 .setFormatter("datetime", new DateTimeFormatterFactory())
                 .setDefaultFormatterNameForType(Date.class, "datetime")
                 .setDefaultFormatterNameForType(Calendar.class, "datetime")
+                .setDefaultFormatterNameForType(java.util.Calendar.class, "datetime")
 
                 // Number formatting
+                // TODO: `:integer` ?
                 .setFormatter("number", new NumberFormatterFactory())
                 .setDefaultFormatterNameForType(Integer.class, "number")
                 .setDefaultFormatterNameForType(Double.class, "number")
@@ -54,15 +59,15 @@ class MFDataModelFormatter {
                 .setDefaultFormatterNameForType(CurrencyAmount.class, "number")
 
                 // Format that returns "to string"
-                .setFormatter("identity", new IdentityFormatterFactory())
-                .setDefaultFormatterNameForType(String.class, "identity")
-                .setDefaultFormatterNameForType(CharSequence.class, "identity")
+                .setFormatter("string", new IdentityFormatterFactory())
+                .setDefaultFormatterNameForType(String.class, "string")
+                .setDefaultFormatterNameForType(CharSequence.class, "string")
 
                 // Register the standard selectors
-                .setSelector("plural", new PluralSelectorFactory("cardinal"))
-                .setSelector("selectordinal", new PluralSelectorFactory("ordinal"))
-                .setSelector("select", new TextSelectorFactory())
-                .setSelector("gender", new TextSelectorFactory())
+                // TODO: update this to spec
+                .setSelector("number", new PluralSelectorFactory("cardinal"))
+//                .setSelector("selectordinal", new PluralSelectorFactory("ordinal"))
+                .setSelector("string", new PluralSelectorFactory("ordinal"))
 
                 .build();
     }
@@ -87,66 +92,33 @@ class MFDataModelFormatter {
             return "ERROR!";
         }
 
-//        List<Expression> selectors = dm.getSelectors();
-//        Pattern patternToRender = selectors.isEmpty()
-//                ? dm.getPattern()
-//                : findBestMatchingPattern(selectors, arguments);
-//
+        Map<String, Object> variables = new HashMap<>();
+        
+
         StringBuilder result = new StringBuilder();
         for (MFDataModel.PatternPart part : patternToRender.parts) {
-            System.out.println(part);
-
-            Annotation annotation = null; // function name
-            Object toFormat = null;
-
             if (part instanceof MFDataModel.StringPart) {
                 MFDataModel.StringPart sPart = (StringPart) part;
                 result.append(sPart.value);
-            } else if (part instanceof MFDataModel.VariableExpression) {
-                MFDataModel.VariableExpression varPart = (MFDataModel.VariableExpression) part;
-                annotation = varPart.annotation; // function name
-                VariableRef argument = varPart.arg; // argument
-                toFormat = argument.name;
-//                FormattedPlaceholder fp = formatPlaceholder((Expression) part, arguments, false);
-//                result.append(fp.toString());
-            } else if (part instanceof MFDataModel.FunctionExpression) { // Function without arguments
-                MFDataModel.FunctionExpression fe = (FunctionExpression) part;
-                annotation = fe.annotation;
-            } else if (part instanceof MFDataModel.LiteralExpression) {
-                MFDataModel.LiteralExpression le = (LiteralExpression) part;
-                annotation = le.annotation;
-                Literal argument = le.arg;
-                toFormat = argument.value;
+            } else if (part instanceof MFDataModel.Expression) {
+                FormattedPlaceholder formattedExpression = formatExpression((Expression) part, variables, arguments);
+                result.append(formattedExpression.getFormattedValue().toString());
             } else if (part instanceof MFDataModel.Markup) {
+                // Ignore
             } else if (part instanceof MFDataModel.UnsupportedExpression) {
-                MFDataModel.UnsupportedExpression ue = (UnsupportedExpression) part;
-                formattingError("We don't know how to format UnsupportedExpression expressions (" + ue.annotation + ")");
+                // Ignore
             } else {
                 formattingError("Unknown part type: " + part);
-            }
-            
-            if (annotation instanceof FunctionAnnotation) {
-                FunctionAnnotation fa = (FunctionAnnotation) annotation;
-                String functionName = fa.name;
-                List<Option> options = fa.options;
-                for (Option option : options) {
-                    String name = option.name;
-                    LiteralOrVariableRef value = option.value;
-                }
-                FormatterFactory funcFactory = getFormattingFunctionFactoryByName(toFormat, functionName);
-                Formatter ff = funcFactory.createFormatter(locale, new HashMap<String, Object>());
-                String res = ff.formatToString(toFormat, arguments);
-                result.append(res);
             }
         }
         return result.toString();
     }
 
-    private void formattingError(String message) {
+    static private void formattingError(String message) {
         throw new IllegalArgumentException(message);
     }
-    
-    FormatterFactory getFormattingFunctionFactoryByName(Object toFormat, String functionName) {
+
+    private FormatterFactory getFormattingFunctionFactoryByName(Object toFormat, String functionName) {
         // Get a function name from the type of the object to format
         if (functionName == null || functionName.isEmpty()) {
             if (toFormat == null) {
@@ -173,5 +145,101 @@ class MFDataModelFormatter {
             }
         }
         return func;
+    }
+
+    private static Object resolveLiteralOrVariable(LiteralOrVariableRef value, Map<String, Object> localVars, Map<String, Object> arguments) {
+        if (value instanceof Literal) {
+            String val = ((Literal) value).value;
+            Number nr = tryParsingAsNumber(val);
+            if (nr != null) {
+                return nr;
+            }
+            return val;
+        } else if (value instanceof VariableRef) {
+            String varName = ((VariableRef) value).name;
+            Object val = localVars.get(varName);
+            if (val == null) {
+                val = localVars.get(varName);
+            }
+            if (val == null) {
+                val = arguments.get(varName);
+            }
+            return val;
+        }
+        return value;
+    }
+
+    private static Number tryParsingAsNumber(String text) {
+        Number result = null;
+        try {
+            result = Long.parseLong(text);
+        } catch (NumberFormatException e) {}
+        try {
+            result = Double.parseDouble(text);
+        } catch (NumberFormatException e) {}
+        try {
+            result = new BigDecimal(text);
+        } catch (NumberFormatException e) {}
+        return result;
+    }
+
+    private static Map<String, Object> convertOptions(List<Option> options, Map<String, Object> localVars, Map<String, Object> arguments) {
+        Map<String, Object> result = new HashMap<>();
+        for (Option option : options) {
+            result.put(option.name, resolveLiteralOrVariable(option.value, localVars, arguments));
+        }
+        return result;
+    }
+
+    
+    /**
+     * @param expression the expression to forma
+     * @param variables local variables, created from declarations (`.input` and `.local`)
+     * @param arguments the arguments passed at runtime to be formatted (`mf.format(arguments)`)
+     */
+    private FormattedPlaceholder formatExpression(Expression expression,
+            Map<String, Object> variables, Map<String, Object> arguments) {
+
+        Annotation annotation = null; // function name
+        String functionName = null;
+        Object toFormat = null;
+        Map<String, Object> options;
+
+        if (expression instanceof MFDataModel.VariableExpression) {
+            MFDataModel.VariableExpression varPart = (MFDataModel.VariableExpression) expression;
+            annotation = varPart.annotation; // function name
+            toFormat = resolveLiteralOrVariable(varPart.arg, variables, arguments);
+        } else if (expression instanceof MFDataModel.FunctionExpression) { // Function without arguments
+            MFDataModel.FunctionExpression fe = (FunctionExpression) expression;
+            annotation = fe.annotation;
+        } else if (expression instanceof MFDataModel.LiteralExpression) {
+            MFDataModel.LiteralExpression le = (LiteralExpression) expression;
+            annotation = le.annotation;
+            toFormat = resolveLiteralOrVariable(le.arg, variables, arguments);
+        } else {
+            return new FormattedPlaceholder(expression, new PlainStringFormattedValue("{\uFFFD}"));
+        }
+
+        if (annotation instanceof FunctionAnnotation) {
+            FunctionAnnotation fa = (FunctionAnnotation) annotation;
+            functionName = fa.name;
+            options = convertOptions(fa.options, variables, arguments);
+        } else {
+            functionName = null;
+            options = new HashMap<>();
+        }
+
+        FormatterFactory funcFactory = getFormattingFunctionFactoryByName(toFormat, functionName);
+        Formatter ff = funcFactory.createFormatter(locale, options);
+        String res = ff.formatToString(toFormat, arguments);
+
+        return new FormattedPlaceholder(expression, new PlainStringFormattedValue(res));
+    }
+
+    private void resolveDeclarations(List<MFDataModel.Declaration> declarations, Map<String, Object> arguments) {
+        Map<String, Object> variables = new HashMap<>();
+        for (Declaration declaration : declarations) {
+            // WIP
+        }
     }
 }
