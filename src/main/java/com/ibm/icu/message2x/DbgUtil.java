@@ -10,7 +10,7 @@ import com.google.gson.GsonBuilder;
 class DbgUtil {
 
     private static final Gson GSON = new GsonBuilder()
-            .setPrettyPrinting()
+//            .setPrettyPrinting()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
 
     static boolean debug = true;

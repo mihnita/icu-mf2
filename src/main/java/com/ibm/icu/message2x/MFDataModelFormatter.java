@@ -182,12 +182,12 @@ class MFDataModelFormatter {
 //                Map<String, Object> options = mf2OptToVariableOptions(selector.getOptions(), arguments);
                 Map<String, Object> options = new HashMap<>();
                 Object operand = resolvedSelector.argument;
-                String realKey = "???";
+                String realKey = "?";
                 if (keyToCheck instanceof Literal) {
                     realKey = ((Literal) keyToCheck).value;
                 } else if (keyToCheck instanceof CatchallKey){
-                    matches = true;
-                    break;
+                    realKey = "*";
+                    continue;
                 }
                 if (!resolvedSelector.selectorFunction.matches(operand, realKey, resolvedSelector.options)) {
                     matches = false;

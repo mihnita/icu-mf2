@@ -20,25 +20,28 @@ public class SingleFormatTest {
     static {
         ARGS.put("count", 1);
         ARGS.put("place", 27);
+        ARGS.put("fileCount", 12);
+        ARGS.put("folderCount", 5);
     }
 
     @Test
     public void test() {
         String[] testStrings = {
-                ""
-                        + ".match {$count :number}\n"
-                        + "one {{You deleted {$count} file}}\n"
-                        + "*   {{You deleted {$count} files}}",
-                        // RESULT: "Hello John, you want '9:43 PM', 'August 3, 2024 at 9:43 PM', or '8/3/24, 9:43:57 PM Pacific Daylight Time' or even 'Saturday, August 3, 2024 at 9:43 PM'?"
-                ""
-                        + ".match {$place :number select=ordinal}\n"
-                        + "1 {{You got the gold medal}}\n"
-                        + "2 {{You got the silver medal}}\n"
-                        + "3 {{You got the bronze medal}}\n"
-                        + "one {{You fininshed in the {$place}st place}}\n"
-                        + "two {{You fininshed in the {$place}nd place}}\n"
-                        + "few {{You fininshed in the {$place}rd place}}\n"
-                        + "*   {{You fininshed in the {$place}th place}}\n"
+//                ""
+//                        + ".match {$count :number}\n" + "one {{You deleted {$count} file}}\n"
+//                        + "*   {{You deleted {$count} files}}",
+//                "" + ".match {$place :number select=ordinal}\n" + "1 {{You got the gold medal}}\n"
+//                        + "2 {{You got the silver medal}}\n" + "3 {{You got the bronze medal}}\n"
+//                        + "one {{You fininshed in the {$place}st place}}\n"
+//                        + "two {{You fininshed in the {$place}nd place}}\n"
+//                        + "few {{You fininshed in the {$place}rd place}}\n"
+//                        + "*   {{You fininshed in the {$place}th place}}\n",
+                "" + ".match {$fileCount :number} {$folderCount :number}\n"
+                        + "one one {{You deleted {$fileCount} file in {$folderCount} folder}}\n"
+                        + "one *   {{You deleted {$fileCount} file in {$folderCount} folders}}\n"
+                        + "*   one {{You deleted {$fileCount} files in {$folderCount} folder}}\n"
+                        + "*   *   {{You deleted {$fileCount} files in {$folderCount} folders}}\n"
+
         };
         for (String test : testStrings) {
             checkOneString(test);
@@ -49,10 +52,7 @@ public class SingleFormatTest {
         System.out.println("========================");
         System.out.println(Utilities.str(pattern));
 
-        MessageFormatter mf = MessageFormatter.builder()
-                .setLocale(Locale.US)
-                .setPattern(pattern)
-                .build();
+        MessageFormatter mf = MessageFormatter.builder().setLocale(Locale.US).setPattern(pattern).build();
         String result = mf.formatToString(ARGS);
         System.out.println("RESULT: " + result);
     }
