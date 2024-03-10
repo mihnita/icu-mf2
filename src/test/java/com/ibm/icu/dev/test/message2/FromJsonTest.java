@@ -92,226 +92,225 @@ public class FromJsonTest { // extends CoreTestFmwk {
                 .expected("hello 4.20")
                 // errorsJs: ["invalid-type"]
                 .build(),
-//            new TestCase.Builder()
-//                .pattern(".local $foo = {|bar|} {{bar {$foo}}}")
-//                .expected("bar bar")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("let $foo = {(bar)} {bar {$foo}}")
-//                .arguments(Args.of("foo", "foo"))
-//                // expectedJs: "bar foo"
-//                // It is undefined if we allow arguments to override local variables, or it is an error.
-//                // And undefined who wins if that happens, the local variable of the argument.
-//                .expected("bar bar")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("let $foo = {$bar} {bar {$foo}}")
-//                .arguments(Args.of("bar", "foo"))
-//                .expected("bar foo")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("let $foo = {$bar :number} {bar {$foo}}")
-//                .arguments(Args.of("bar", 4.2))
-//                .expected("bar 4.2")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("let $foo = {$bar :number minimumFractionDigits=2} {bar {$foo}}")
-//                .arguments(Args.of("bar", 4.2))
-//                .expected("bar 4.20")
-//                .build(),
-//            new TestCase.Builder().ignore("Maybe") // Because minimumFractionDigits=foo
-//                .pattern("let $foo = {$bar :number minimumFractionDigits=foo} {bar {$foo}}")
-//                .arguments(Args.of("bar", 4.2))
-//                .expected("bar 4.2")
-//                .errors("invalid-type")
-//                .build(),
-//            new TestCase.Builder().ignore("Maybe. Function specific behavior.")
-//                .pattern("let $foo = {$bar :number} {bar {$foo}}")
-//                .arguments(Args.of("bar", "foo"))
-//                .expected("bar NaN")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("let $foo = {$bar} let $bar = {$baz} {bar {$foo}}")
-//                .arguments(Args.of("baz", "foo"))
-//                // expectedJs: "bar foo"
-//                // It is currently undefined if a local variable (like $foo)
-//                // can reference a local variable that was not yet defined (like $bar).
-//                // That is called hoisting and it is valid in JavaScript or Python.
-//                // Not allowing that would prevent circular references.
-//                // https://github.com/unicode-org/message-format-wg/issues/292
-//                .expected("bar {$bar}")
-//                .build(),
-//            new TestCase.Builder()
-//                .patternJs("match {$foo} when (1) {one} when * {other}")
-//                .pattern("match {$foo :select} when (1) {one} when * {other}")
-//                .arguments(Args.of("foo", "1"))
-//                .expected("one")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("match {$foo :plural} when 1 {one} when * {other}")
-//                .arguments(Args.of("foo", "1")) // Should this be error? Plural on string?
-//                // expectedJs: "one"
-//                .expected("other")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("match {$foo :select} when (1) {one} when * {other}")
-//                .arguments(Args.of("foo", "1"))
-//                .expected("one")
-//                .build(),
-//            new TestCase.Builder()
-//                .patternJs("match {$foo} when 1 {one} when * {other}")
-//                .pattern("match {$foo :plural} when 1 {one} when * {other}")
-//                .arguments(Args.of("foo", 1))
-//                .expected("one")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("match {$foo :plural} when 1 {one} when * {other}")
-//                .arguments(Args.of("foo", 1))
-//                .expected("one")
-//                .build(),
-//            new TestCase.Builder().ignore("not possible to put a null in a map")
-//                .pattern("match {$foo} when 1 {one} when * {other}")
-//                .arguments(Args.of("foo", null))
-//                .expected("other")
-//                .build(),
-//            new TestCase.Builder()
-//                .patternJs("match {$foo} when 1 {one} when * {other}")
-//                .pattern("match {$foo :plural} when 1 {one} when * {other}")
-//                .expected("other")
-//                .errors("missing-var")
-//                .build(),
-//            new TestCase.Builder()
-//                .patternJs("match {$foo} when one {one} when * {other}")
-//                .pattern("match {$foo :plural} when one {one} when * {other}")
-//                .arguments(Args.of("foo", 1))
-//                .expected("one")
-//                .build(),
-//            new TestCase.Builder()
-//                .patternJs("match {$foo} when 1 {=1} when one {one} when * {other}")
-//                .pattern("match {$foo :plural} when 1 {=1} when one {one} when * {other}")
-//                .arguments(Args.of("foo", 1))
-//                .expected("=1")
-//                .build(),
-//            new TestCase.Builder()
-//                .patternJs("match {$foo} when one {one} when 1 {=1} when * {other}")
-//                .pattern("match {$foo :plural} when one {one} when 1 {=1} when * {other}")
-//                .arguments(Args.of("foo", 1))
-//                .expected("one")
-//                .build(),
-//            new TestCase.Builder()
-//                .patternJs("match {$foo} {$bar} when one one {one one} when one * {one other} when * * {other}")
-//                .pattern("match {$foo :plural} {$bar :plural} when one one {one one} when one * {one other} when * * {other}")
-//                .arguments(Args.of("foo", 1, "bar", 1))
-//                .expected("one one")
-//                .build(),
-//            new TestCase.Builder()
-//                .patternJs("match {$foo} {$bar} when one one {one one} when one * {one other} when * * {other}")
-//                .pattern("match {$foo :plural} {$bar :plural} when one one {one one} when one * {one other} when * * {other}")
-//                .arguments(Args.of("foo", 1, "bar", 2))
-//                .expected("one other")
-//                .build(),
-//            new TestCase.Builder()
-//                .patternJs("match {$foo} {$bar} when one one {one one} when one * {one other} when * * {other}")
-//                .pattern("match {$foo :plural} {$bar :plural} when one one {one one} when one * {one other} when * * {other}")
-//                .arguments(Args.of("foo", 2, "bar", 2))
-//                .expected("other")
-//                .build(),
-//            new TestCase.Builder()
-//                .patternJs("let $foo = {$bar} match {$foo} when one {one} when * {other}")
-//                .pattern("let $foo = {$bar} match {$foo :plural} when one {one} when * {other}")
-//                .arguments(Args.of("bar", 1))
-//                .expected("one")
-//                .build(),
-//            new TestCase.Builder()
-//                .patternJs("let $foo = {$bar} match {$foo} when one {one} when * {other}")
-//                .pattern("let $foo = {$bar} match {$foo :plural} when one {one} when * {other}")
-//                .arguments(Args.of("bar", 2))
-//                .expected("other")
-//                .build(),
-//            new TestCase.Builder()
-//                .patternJs("let $bar = {$none} match {$foo} when one {one} when * {{$bar}}")
-//                .pattern("let $bar = {$none} match {$foo :plural} when one {one} when * {{$bar}}")
-//                .arguments(Args.of("foo", 1))
-//                .expected("one")
-//                .build(),
-//            new TestCase.Builder()
-//                .patternJs("let $bar = {$none} match {$foo} when one {one} when * {{$bar}}")
-//                .pattern("let $bar = {$none :plural} match {$foo} when one {one} when * {{$bar}}")
-//                .arguments(Args.of("foo", 2))
-//                .expected("{$bar}")
-//                .errors("missing-var")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("let bar = {(foo)} {{$bar}}")
-//                .expected("{$bar}")
-//                .errors("missing-char", "missing-var")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("let $bar {(foo)} {{$bar}}")
-//                .expected("foo")
-//                .errors("missing-char")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("let $bar = (foo) {{$bar}}")
-//                .expected("{$bar}")
-//                .errors("missing-char", "junk-element")
-//                .build(),
-//            new TestCase.Builder().ignore("no markup support")
-//                .pattern("{{+tag}}")
-//                .expected("{+tag}")
-//                .build(),
-//            new TestCase.Builder().ignore("no markup support")
-//                .pattern("{{+tag}content}")
-//                .expected("{+tag}content")
-//                .build(),
-//            new TestCase.Builder().ignore("no markup support")
-//                .pattern("{{+tag}content{-tag}}")
-//                .expected("{+tag}content{-tag}")
-//                .build(),
-//            new TestCase.Builder().ignore("no markup support")
-//                .pattern("{{-tag}content}")
-//                .expected("{-tag}content")
-//                .build(),
-//            new TestCase.Builder().ignore("no markup support")
-//                .pattern("{{+tag foo=bar}}")
-//                .expected("{+tag foo=bar}")
-//                .build(),
-//            new TestCase.Builder().ignore("no markup support")
-//                .pattern("{{+tag foo=(foo) bar=$bar}}")
-//                .arguments(Args.of("bar", "b a r"))
-//                .expected("{+tag foo=foo bar=(b a r)}")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("{bad {(foo) +markup}}")
-//                .expected("bad {+markup}")
+            new TestCase.Builder()
+                .pattern(".local $foo = {|bar|} {{bar {$foo}}}")
+                .expected("bar bar")
+                .build(),
+            new TestCase.Builder()
+                .pattern(".local $foo = {bar} {{bar {$foo}}}")
+                .arguments(Args.of("foo", "foo"))
+                // expectedJs: "bar foo"
+                // It is undefined if we allow arguments to override local variables, or it is an error.
+                // And undefined who wins if that happens, the local variable of the argument.
+                .expected("bar bar")
+                .build(),
+            new TestCase.Builder()
+                .pattern(".local $foo = {$bar} {{bar {$foo}}}")
+                .arguments(Args.of("bar", "foo"))
+                .expected("bar foo")
+                .build(),
+            new TestCase.Builder()
+                .pattern(".local $foo = {$bar :number} {{bar {$foo}}}")
+                .arguments(Args.of("bar", 4.2))
+                .expected("bar 4.2")
+                .build(),
+            new TestCase.Builder()
+                .pattern(".local $foo = {$bar :number minimumFractionDigits=2} {{bar {$foo}}}")
+                .arguments(Args.of("bar", 4.2))
+                .expected("bar 4.20")
+                .build(),
+            new TestCase.Builder().ignore("Maybe") // Because minimumFractionDigits=foo
+                .pattern(".local $foo = {$bar :number minimumFractionDigits=foo} {{bar {$foo}}}")
+                .arguments(Args.of("bar", 4.2))
+                .expected("bar 4.2")
+                .errors("invalid-type")
+                .build(),
+            new TestCase.Builder().ignore("Maybe. Function specific behavior.")
+                .pattern(".local $foo = {$bar :number} {{bar {$foo}}}")
+                .arguments(Args.of("bar", "foo"))
+                .expected("bar NaN")
+                .build(),
+            new TestCase.Builder()
+                .pattern(".local $bar = {$baz} .local $foo = {$bar} {{bar {$foo}}}")
+                .arguments(Args.of("baz", "foo"))
+                .expected("bar foo")
+                .build(),
+            new TestCase.Builder()
+                .patternJs(".match {$foo} 1 {{one}} * {{other}}")
+                .pattern(".match {$foo :string} 1 {{one}} * {{other}}")
+                .arguments(Args.of("foo", "1"))
+                .expected("one")
+                .build(),
+            new TestCase.Builder()
+                .pattern(".match {$foo :number} 1 {{one}} * {{other}}")
+                .arguments(Args.of("foo", "1")) // Should this be error? Plural on string?
+                // expectedJs: "one"
+                .expected("other")
+                .build(),
+            new TestCase.Builder()
+                .pattern(".match {$foo :string} 1 {{one}} * {{other}}")
+                .arguments(Args.of("foo", "1"))
+                .expected("one")
+                .build(),
+            new TestCase.Builder()
+                .patternJs(".match {$foo} 1 {{one}} * {{other}}")
+                .pattern(".match {$foo :number} 1 {{one}} * {{other}}")
+                .arguments(Args.of("foo", 1))
+                .expected("one")
+                .build(),
+            new TestCase.Builder()
+                .pattern(".match {$foo :number} 1 {{one}} * {{other}}")
+                .arguments(Args.of("foo", 1))
+                .expected("one")
+                .build(),
+            new TestCase.Builder().ignore("not possible to put a null in a map")
+                .pattern(".match {$foo} 1 {{one}} * {{other}}")
+                .arguments(Args.of("foo", null))
+                .expected("other")
+                .build(),
+            new TestCase.Builder()
+                .patternJs(".match {$foo} 1 {{one}} * {{other}}")
+                .pattern(".match {$foo :number} 1 {{one}} * {{other}}")
+                .expected("other")
+                .errors("missing-var")
+                .build(),
+            new TestCase.Builder()
+                .patternJs(".match {$foo} one {{one}} * {{other}}")
+                .pattern(".match {$foo :number} one {{one}} * {{other}}")
+                .arguments(Args.of("foo", 1))
+                .expected("one")
+                .build(),
+            new TestCase.Builder()
+                .patternJs(".match {$foo} 1 {{=1}} one {{one}} * {{other}}")
+                .pattern(".match {$foo :number} 1 {{=1}} one {{one}} * {{other}}")
+                .arguments(Args.of("foo", 1))
+                .expected("=1")
+                .build(),
+            new TestCase.Builder()
+                .patternJs(".match {$foo} one {{one}} 1 {{=1}} * {{other}}")
+                .pattern(".match {$foo :number} one {{one}} 1 {{=1}} * {{other}}")
+                .arguments(Args.of("foo", 1))
+                .expected("one")
+                .build(),
+            new TestCase.Builder()
+                .patternJs(".match {$foo} {$bar} one one {{one one}} one * {{one other}} * * {{other}}")
+                .pattern(".match {$foo :number} {$bar :number} one one {{one one}} one * {{one other}} * * {{other}}")
+                .arguments(Args.of("foo", 1, "bar", 1))
+                .expected("one one")
+                .build(),
+            new TestCase.Builder()
+                .patternJs(".match {$foo} {$bar} one one {{one one}} one * {{one other}} * * {{other}}")
+                .pattern(".match {$foo :number} {$bar :number} one one {{one one}} one * {{one other}} * * {{other}}")
+                .arguments(Args.of("foo", 1, "bar", 2))
+                .expected("one other")
+                .build(),
+            new TestCase.Builder()
+                .patternJs(".match {$foo} {$bar} one one {{one one}} one * {{one other}} * * {{other}}")
+                .pattern(".match {$foo :number} {$bar :number} one one {{one one}} one * {{one other}} * * {{other}}")
+                .arguments(Args.of("foo", 2, "bar", 2))
+                .expected("other")
+                .build(),
+            new TestCase.Builder()
+                .patternJs(".local $foo = {$bar} .match {$foo} one {{one}} * {{other}}")
+                .pattern(".local $foo = {$bar} .match {$foo :number} one {{one}} * {{other}}")
+                .arguments(Args.of("bar", 1))
+                .expected("one")
+                .build(),
+            new TestCase.Builder()
+                .patternJs(".local $foo = {$bar} .match {$foo} one {{one}} * {{other}}")
+                .pattern(".local $foo = {$bar} .match {$foo :number} one {{one}} * {{other}}")
+                .arguments(Args.of("bar", 2))
+                .expected("other")
+                .build(),
+            new TestCase.Builder()
+                .patternJs(".local $bar = {$none} .match {$foo} one {{one}} * {{{$bar}}}")
+                .pattern(".local $bar = {$none} .match {$foo :number} one {{one}} * {{{$bar}}}")
+                .arguments(Args.of("foo", 1, "none", ""))
+                .expected("one")
+                .build(),
+            new TestCase.Builder()
+                .patternJs(".local $bar = {$none} .match {$foo} one {{one}} * {{{$bar}}}")
+                .pattern(".local $bar = {$none :number} .match {$foo} one {{one}} * {{{$bar}}}")
+                .arguments(Args.of("foo", 2))
+                .expected("{$bar}")
+                .errors("missing-var")
+                .build(),
+            new TestCase.Builder()
+                .pattern(".local bar = {(foo)} {{$bar}}")
+                .expected("{$bar}")
+                .errors("missing-char", "missing-var")
+                .build(),
+            new TestCase.Builder()
+                .pattern(".local $bar {(foo)} {{$bar}}")
+                .expected("foo")
+                .errors("missing-char")
+                .build(),
+            new TestCase.Builder()
+                .pattern(".local $bar = (foo) {{$bar}}")
+                .expected("{$bar}")
+                .errors("missing-char", "junk-element")
+                .build(),
+            new TestCase.Builder()
+                .pattern("{{#tag}}")
+                .expected("#tag")
+                .build(),
+            new TestCase.Builder()
+                .pattern("{#tag}")
+                .expected("")
+                .build(),
+            new TestCase.Builder().ignore("no markup support")
+                .pattern("{{+tag}content}")
+                .expected("{+tag}content")
+                .build(),
+            new TestCase.Builder()
+                .pattern("{#tag}content{/tag}")
+                .expected("content")
+                .build(),
+            new TestCase.Builder()
+                .pattern("{#tag}content")
+                .expected("content")
+                .build(),
+            new TestCase.Builder()
+                // When we format markup to string we generate no output
+                .pattern("{#tag foo=bar}")
+                .expected("")
+                .build(),
+            new TestCase.Builder()
+                .pattern("{#tag foo=foo bar=$bar}")
+                .arguments(Args.of("bar", "b a r"))
+                .expected("")
+                .build(),
+            new TestCase.Builder()
+                .pattern("bad {#markup/} test")
+                .expected("bad  test")
 //                .errors("extra-content")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("{{-tag foo=bar}}")
-//                .expected("{-tag}")
+                .build(),
+            new TestCase.Builder()
+                .pattern("{#tag foo=bar}")
+                .expected("")
 //                .errors("extra-content")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("no braces")
-//                .expected("{no braces}")
+                .build(),
+            new TestCase.Builder()
+                .pattern("no braces")
+                .expected("no braces")
 //                .errors("parse-error", "junk-element")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("no braces {$foo}")
-//                .arguments(Args.of("foo", 2))
-//                .expected("{no braces {$foo}}")
+                .build(),
+            new TestCase.Builder()
+                .pattern("no braces {$foo}")
+                .arguments(Args.of("foo", 2))
+                .expected("no braces 2")
 //                .errors("parse-error", "junk-element")
-//                .build(),
-//            new TestCase.Builder().ignore("infinite loop!")
-//                .pattern("{missing end brace")
-//                .expected("missing end brace")
-//                .errors("missing-char")
-//                .build(),
-//            new TestCase.Builder()
-//                .pattern("{missing end {$brace")
-//                .expected("missing end {$brace}")
-//                .errors("missing-char", "missing-char", "missing-var")
-//                .build(),
+                .build(),
+            new TestCase.Builder().ignore("infinite loop!")
+                .pattern("{missing end brace")
+                .expected("missing end brace")
+                .errors("missing-char")
+                .build(),
+            new TestCase.Builder()
+                .pattern("{missing end {$brace")
+                .expected("missing end {$brace}")
+                .errors("missing-char", "missing-char", "missing-var")
+                .build(),
             new TestCase.Builder()
                 .pattern("{{extra}} content")
                 .expected("extra")
@@ -332,11 +331,11 @@ public class FromJsonTest { // extends CoreTestFmwk {
                 .expected("bad placeholder")
 //                .errors("parse-error", "extra-content", "junk-element")
                 .build(),
-//            new TestCase.Builder()
-//                .pattern("no-equal {|42| :number minimumFractionDigits 2}")
-//                .expected( "no-equal 42.00")
-//                .errors("missing-char")
-//                .build(),
+            new TestCase.Builder()
+                .pattern("no-equal {|42| :number minimumFractionDigits 2}")
+                .expected( "no-equal 42.00")
+                .errors("missing-char")
+                .build(),
             new TestCase.Builder()
                 .pattern("bad {:placeholder option=}")
                 .expected("bad {:placeholder}")
@@ -363,47 +362,47 @@ public class FromJsonTest { // extends CoreTestFmwk {
                 .errors("extra-content", "missing-var")
                 .build(),
 //            new TestCase.Builder()
-//                .pattern("match {} when * {foo}")
+//                .pattern(".match {} * {foo}")
 //                .expected("foo")
 //                .errors("parse-error", "bad-selector", "junk-element")
 //                .build(),
 //            new TestCase.Builder()
-//                .pattern("match {+foo} when * {foo}")
+//                .pattern(".match {+foo} * {foo}")
 //                .expected("foo")
 //                .errors("bad-selector")
 //                .build(),
 //            new TestCase.Builder()
-//                .pattern("match {(foo)} when*{foo}")
+//                .pattern(".match {(foo)} when*{foo}")
 //                .expected("foo")
 //                .errors("missing-char")
 //                .build(),
 //            new TestCase.Builder()
-//                .pattern("match when * {foo}")
+//                .pattern(".match * {foo}")
 //                .expected("foo")
 //                .errors("empty-token")
 //                .build(),
 //            new TestCase.Builder()
-//                .pattern("match {(x)} when * foo")
+//                .pattern(".match {(x)} * foo")
 //                .expected("")
 //                .errors("key-mismatch", "missing-char")
 //                .build(),
 //            new TestCase.Builder()
-//                .pattern("match {(x)} when * {foo} extra")
+//                .pattern(".match {(x)} * {foo} extra")
 //                .expected("foo")
 //                .errors("extra-content")
 //                .build(),
 //            new TestCase.Builder()
-//                .pattern("match (x) when * {foo}")
+//                .pattern(".match (x) * {foo}")
 //                .expected("")
 //                .errors("empty-token", "extra-content")
 //                .build(),
 //            new TestCase.Builder()
-//                .pattern("match {$foo} when * * {foo}")
+//                .pattern(".match {$foo} * * {foo}")
 //                .expected("foo")
 //                .errors("key-mismatch", "missing-var")
 //                .build(),
 //            new TestCase.Builder()
-//                .pattern("match {$foo} {$bar} when * {foo}")
+//                .pattern(".match {$foo} {$bar} * {foo}")
 //                .expected("foo")
 //                .errors("key-mismatch", "missing-var", "missing-var")
 //                .build()

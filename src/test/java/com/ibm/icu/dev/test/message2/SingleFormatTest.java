@@ -36,12 +36,15 @@ public class SingleFormatTest {
 //                        + "two {{You fininshed in the {$place}nd place}}\n"
 //                        + "few {{You fininshed in the {$place}rd place}}\n"
 //                        + "*   {{You fininshed in the {$place}th place}}\n",
-                "" + ".match {$fileCount :number} {$folderCount :number}\n"
+                ""
+                        + ".match {$fileCount :number} {$folderCount :number}\n"
                         + "one one {{You deleted {$fileCount} file in {$folderCount} folder}}\n"
                         + "one *   {{You deleted {$fileCount} file in {$folderCount} folders}}\n"
                         + "*   one {{You deleted {$fileCount} files in {$folderCount} folder}}\n"
-                        + "*   *   {{You deleted {$fileCount} files in {$folderCount} folders}}\n"
-
+                        + "*   *   {{You deleted {$fileCount} files in {$folderCount} folders}}\n",
+                ""
+                        + ".match {$count :number minimumFractionDigits=2}\n" + "1 {{{$count} dollar}}\n"
+                        + "*   {{{$count} dollars}}",
         };
         for (String test : testStrings) {
             checkOneString(test);

@@ -338,6 +338,9 @@ class MFDataModelFormatter {
             MFDataModel.LiteralExpression le = (LiteralExpression) expression;
             annotation = le.annotation;
             toFormat = resolveLiteralOrVariable(le.arg, variables, arguments);
+        } else if (expression instanceof MFDataModel.Markup) {
+            // No output on markup, for now (we only format to string)
+            return new FormattedPlaceholder(expression, new PlainStringFormattedValue(""));
         } else {
             return new FormattedPlaceholder(expression, new PlainStringFormattedValue("{\uFFFD}"));
         }
