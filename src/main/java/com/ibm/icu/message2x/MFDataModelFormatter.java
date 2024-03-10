@@ -4,6 +4,7 @@
 package com.ibm.icu.message2x;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.ibm.icu.message2x.MFDataModel.Annotation;
+import com.ibm.icu.message2x.MFDataModel.CatchallKey;
 import com.ibm.icu.message2x.MFDataModel.Declaration;
 import com.ibm.icu.message2x.MFDataModel.Expression;
 import com.ibm.icu.message2x.MFDataModel.FunctionAnnotation;
@@ -18,11 +20,15 @@ import com.ibm.icu.message2x.MFDataModel.FunctionExpression;
 import com.ibm.icu.message2x.MFDataModel.InputDeclaration;
 import com.ibm.icu.message2x.MFDataModel.Literal;
 import com.ibm.icu.message2x.MFDataModel.LiteralExpression;
+import com.ibm.icu.message2x.MFDataModel.LiteralOrCatchallKey;
 import com.ibm.icu.message2x.MFDataModel.LiteralOrVariableRef;
 import com.ibm.icu.message2x.MFDataModel.LocalDeclaration;
 import com.ibm.icu.message2x.MFDataModel.Option;
+import com.ibm.icu.message2x.MFDataModel.Pattern;
+import com.ibm.icu.message2x.MFDataModel.SelectMessage;
 import com.ibm.icu.message2x.MFDataModel.StringPart;
 import com.ibm.icu.message2x.MFDataModel.VariableRef;
+import com.ibm.icu.message2x.MFDataModel.Variant;
 import com.ibm.icu.text.FormattedValue;
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.CurrencyAmount;
@@ -68,35 +74,33 @@ class MFDataModelFormatter {
 
                 // Register the standard selectors
                 // TODO: update this to spec
-                .setSelector("number", new PluralSelectorFactory("cardinal"))
+                .setSelector("number", new PluralSelectorFactory())
 //                .setSelector("selectordinal", new PluralSelectorFactory("ordinal"))
-                .setSelector("string", new PluralSelectorFactory("ordinal"))
+                .setSelector("string", new TextSelectorFactory())
 
                 .build();
     }
 
     String format(Map<String, Object> arguments) {
         MFDataModel.Pattern patternToRender = null;
-        List<MFDataModel.Declaration> declarations = null;
 
+        Map<String, Object> variables;
         if (dm instanceof MFDataModel.PatternMessage) {
             MFDataModel.PatternMessage pm = (MFDataModel.PatternMessage) dm;
+            variables = resolveDeclarations(pm.declarations, arguments);
             patternToRender = pm.pattern;
-            declarations = pm.declarations;
         } else if (dm instanceof MFDataModel.SelectMessage) {
             MFDataModel.SelectMessage sm = (MFDataModel.SelectMessage) dm;
-            declarations = sm.declarations;
-//            findBestMatchingPattern(selectors, arguments);
-//            sm.declarations;
-//            sm.selectors;
-//            sm.variants
+            variables = resolveDeclarations(sm.declarations, arguments);
+            patternToRender = findBestMatchingPattern(sm, variables, arguments);
+        } else {
+            formattingError("");
+            return "ERROR!";
         }
 
         if (patternToRender == null) {
             return "ERROR!";
         }
-
-        Map<String, Object> variables = resolveDeclarations(declarations, arguments);
 
         StringBuilder result = new StringBuilder();
         for (MFDataModel.PatternPart part : patternToRender.parts) {
@@ -115,6 +119,108 @@ class MFDataModelFormatter {
             }
         }
         return result.toString();
+    }
+
+    private Pattern findBestMatchingPattern(SelectMessage sm,
+            Map<String, Object> variables,
+            Map<String, Object> arguments) {
+        Pattern patternToRender = null;
+
+        // Collect all the selector functions in an array, to reuse
+        List<Expression> selectors = sm.selectors;
+        List<ResolvedSelector> selectorFunctions = new ArrayList<>(selectors.size());
+        for (Expression selector : selectors) {
+            FormattedPlaceholder fph = formatExpression(selector, variables, arguments);
+            String functionName = null;
+            Object argument = null;
+            Map<String, Object> options = new HashMap<>();
+            if (fph.getInput() instanceof ResolvedExpression) {
+                ResolvedExpression re = (ResolvedExpression) fph.getInput();
+                argument = re.argument;
+                functionName = re.functionName;
+                // re.argument; // TODO: ????
+                options.putAll(re.options);
+            }
+            SelectorFactory funcFactory = standardFunctions.getSelector(functionName);
+            if (funcFactory == null) {
+                funcFactory = customFunctions.getSelector(functionName);
+            }
+            if (funcFactory != null) {
+                Selector selectorFunction = funcFactory.createSelector(locale, options);
+                ResolvedSelector rs = new ResolvedSelector(argument, functionName, options, selectorFunction);
+                selectorFunctions.add(rs);
+            } else {
+                throw new IllegalArgumentException("Unknown selector type: " + functionName);
+            }
+        }
+        // This should not be possible, we added one function for each selector, or we have thrown an exception.
+        // But just in case someone removes the throw above?
+        if (selectorFunctions.size() != selectors.size()) {
+            throw new IllegalArgumentException("Something went wrong, not enough selector functions, "
+                    + selectorFunctions.size() + " vs. " + selectors.size());
+        }
+
+        // Iterate "vertically", through all variants
+        for (Variant variant : sm.variants) {
+            int maxCount = selectors.size();
+            List<LiteralOrCatchallKey> keysToCheck = variant.keys;
+            if (selectors.size() != keysToCheck.size()) {
+                throw new IllegalArgumentException("Mismatch between the number of selectors and the number of keys: "
+                        + selectors.size() + " vs. " + keysToCheck.size());
+            }
+
+            boolean matches = true;
+            // Iterate "horizontally", through all matching functions and keys
+            for (int i = 0; i < maxCount; i++) {
+//                Expression selector = selectors.get(i);
+                LiteralOrCatchallKey keyToCheck = keysToCheck.get(i);
+                ResolvedSelector resolvedSelector = selectorFunctions.get(i);
+//                DbgUtil.spy("selector", selector);
+                DbgUtil.spy("func", resolvedSelector);
+                DbgUtil.spy("valToCheck", keyToCheck);
+                System.out.println("==================");
+//                Map<String, Object> options = mf2OptToVariableOptions(selector.getOptions(), arguments);
+                Map<String, Object> options = new HashMap<>();
+                Object operand = resolvedSelector.argument;
+                String realKey = "???";
+                if (keyToCheck instanceof Literal) {
+                    realKey = ((Literal) keyToCheck).value;
+                } else if (keyToCheck instanceof CatchallKey){
+                    matches = true;
+                    break;
+                }
+                if (!resolvedSelector.selectorFunction.matches(operand, realKey, resolvedSelector.options)) {
+                    matches = false;
+                    break;
+                }
+            }
+            if (matches) {
+                patternToRender = variant.value;
+                break;
+            }
+        }
+
+        // TODO: check that there was an entry with all the keys set to `*`
+        // And should do that only once, when building the data model.
+        if (patternToRender == null) {
+            // If there was a case with all entries in the keys `*` this should not happen
+            throw new IllegalArgumentException("The selection went wrong, cannot select any option.");
+        }
+
+        return patternToRender;
+    }
+    
+    private static class ResolvedSelector {
+        final Object argument;
+        final String functionName;
+        final Map<String, Object> options;
+        final Selector selectorFunction;
+        public ResolvedSelector(Object argument, String functionName, Map<String, Object> options, Selector selectorFunction) {
+            this.argument = argument;
+            this.functionName = functionName;
+            this.options = new HashMap<>(options);
+            this.selectorFunction = selectorFunction;
+        }
     }
 
     static private void formattingError(String message) {

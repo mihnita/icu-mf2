@@ -21,36 +21,38 @@ import com.ibm.icu.message2x.MessageFormatter;
 public class DateFormatTest {
     static private final Map<String, Object> ARGS = new HashMap<>();
     static {
-        ARGS.put("exp", new Date(2024 - 1900, 7, 15, 19, 42, 58));
+        ARGS.put("user", "John");
+        ARGS.put("exp", new Date(2024 - 1900, 7, 3, 21, 43, 57)); // Aug 3, 2024, at 9:43:57 pm
+        ARGS.put("tsOver", "full");
     }
 
     @Test
     public void test() {
         String[] testStrings = {
                 "Expires on {$exp}",
-                "Expires on 8/15/24, 7:42 PM", // expected
+                "Expires on 8/3/24, 9:43 PM", // expected
                 "Expires on {$exp :datetime}",
-                "Expires on 8/15/24, 7:42 PM", // expected
+                "Expires on 8/3/24, 9:43 PM", // expected
                 "Expires on {$exp :datetime icu:skeleton=yMMMMdjmsSSEE}",
-                "Expires on Thu, August 15, 2024 at 7:42:58.00 PM", // expected
+                "Expires on Sat, August 3, 2024 at 9:43:57.00 PM", // expected
                 "Expires on {$exp :datetime dateStyle=full}",
-                "Expires on Thursday, August 15, 2024", // expected
+                "Expires on Saturday, August 3, 2024", // expected
                 "Expires on {$exp :datetime dateStyle=long}",
-                "Expires on August 15, 2024", // expected
+                "Expires on August 3, 2024", // expected
                 "Expires on {$exp :datetime dateStyle=medium}",
-                "Expires on Aug 15, 2024", // expected
+                "Expires on Aug 3, 2024", // expected
                 "Expires on {$exp :datetime timeStyle=long}",
-                "Expires on 7:42:58 PM PDT", // expected
+                "Expires on 9:43:57 PM PDT", // expected
                 "Expires on {$exp :datetime timeStyle=medium}",
-                "Expires on 7:42:58 PM", // expected
+                "Expires on 9:43:57 PM", // expected
                 "Expires on {$exp :datetime timeStyle=short}",
-                "Expires on 7:42 PM", // expected
+                "Expires on 9:43 PM", // expected
                 "Expires on {$exp :datetime dateStyle=full timeStyle=medium}",
-                "Expires on Thursday, August 15, 2024 at 7:42:58 PM", // expected
+                "Expires on Saturday, August 3, 2024 at 9:43:57 PM", // expected
                 "Expires on {$exp :datetime year=numeric month=long}",
                 "Expires on August 2024", // expected
                 "Expires on {$exp :datetime year=numeric month=medium day=numeric weekday=long hour=numeric minute=numeric}",
-                "Expires on 15 Thursday 2024, 7:42 PM", // expected
+                "Expires on 3 Saturday 2024, 9:43 PM", // expected
                 // Literals
                 "Expires on {|2025-02-27| :datetime dateStyle=full}", "Expires on Thursday, March 27, 2025",
                 "Expires at {|19:23:45| :datetime timeStyle=full}", "Expires at 7:23:45 PM Pacific Daylight Time",
@@ -58,6 +60,20 @@ public class DateFormatTest {
                 "Expires on {|2025-02-27T19:23:45| :datetime dateStyle=full}", "Expires on Thursday, March 27, 2025",
                 "Expires at {|19:23:45Z| :datetime timeStyle=full}", "Expires at 19:23:45Z",
                 "Expires at {|19:23:45+03:30:00| :datetime timeStyle=full}", "Expires at 19:23:45+03:30:00",
+                
+                // Chaining
+                ""
+                    + ".input {$exp :datetime timeStyle=short}\n"
+                    + ".input {$user :string}\n"
+                    + ".local $longExp = {$exp :datetime dateStyle=long}"
+                    + ".local $zooExp = {$exp :datetime dateStyle=short timeStyle=$tsOver}"
+                    + "{{Hello John, you want '{$exp}', '{$longExp}', or '{$zooExp}' or even '{$exp :datetime dateStyle=full}'?}}",
+                    "Hello John, you want '9:43 PM', 'August 3, 2024 at 9:43 PM', or '8/3/24, 9:43:57 PM Pacific Daylight Time' or even 'Saturday, August 3, 2024 at 9:43 PM'?",
+                ""
+                        + ".input {$exp :datetime year=numeric month=numeric day=|2-digit|}\n"
+                        + ".local $longExp = {$exp :datetime month=long weekday=long}"
+                        + "{{Expires on '{$exp}' ('{$longExp}').}}",
+                    "Expires on '8/03/2024' ('Saturday, August 03, 2024').",
         };
         for (int i = 0; i < testStrings.length; i += 2) {
             checkOneString(testStrings[i], testStrings[i + 1]);

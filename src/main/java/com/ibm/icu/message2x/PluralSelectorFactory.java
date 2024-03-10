@@ -5,6 +5,7 @@ package com.ibm.icu.message2x;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import com.ibm.icu.number.FormattedNumber;
 import com.ibm.icu.text.FormattedValue;
@@ -16,15 +17,19 @@ import com.ibm.icu.text.PluralRules.PluralType;
  * in {@link com.ibm.icu.text.MessageFormat}.
  */
 class PluralSelectorFactory implements SelectorFactory {
-    private final PluralType pluralType;
-
     /**
      * Creates a {@code PluralSelectorFactory} of the desired type.
-     *
-     * @param type the kind of plural selection we want
      */
-    // TODO: Use an enum
-    PluralSelectorFactory(String type) {
+    PluralSelectorFactory() {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Selector createSelector(Locale locale, Map<String, Object> fixedOptions) {
+        String type = Objects.toString(fixedOptions.get("select"));
+        PluralType pluralType;
         switch (type) {
             case "ordinal":
                 pluralType = PluralType.ORDINAL;
@@ -33,13 +38,7 @@ class PluralSelectorFactory implements SelectorFactory {
             default:
                 pluralType = PluralType.CARDINAL;
         }
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Selector createSelector(Locale locale, Map<String, Object> fixedOptions) {
         PluralRules rules = PluralRules.forLocale(locale, pluralType);
         return new PluralSelectorImpl(rules, fixedOptions);
     }

@@ -3,7 +3,6 @@
 
 package com.ibm.icu.dev.test.message2;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -19,27 +18,27 @@ import com.ibm.icu.message2x.MessageFormatter;
 public class SingleFormatTest {
     static private final Map<String, Object> ARGS = new HashMap<>();
     static {
-        ARGS.put("user", "John");
-        ARGS.put("count", 42);
-        ARGS.put("exp", new Date(2024 - 1900, 7, 3, 21, 43, 57)); // Aug 3, 2024, at 9:43:57 pm
-        ARGS.put("tsOver", "full");
+        ARGS.put("count", 1);
+        ARGS.put("place", 27);
     }
 
     @Test
     public void test() {
         String[] testStrings = {
                 ""
-                        + ".input {$exp :datetime timeStyle=short}\n"
-                        + ".input {$user :string}\n"
-                        + ".local $longExp = {$exp :datetime dateStyle=long}"
-                        + ".local $zooExp = {$exp :datetime dateStyle=short timeStyle=$tsOver}"
-                        + "{{Hello John, you want '{$exp}', '{$longExp}', or '{$zooExp}' or even '{$exp :datetime dateStyle=full}'?}}",
+                        + ".match {$count :number}\n"
+                        + "one {{You deleted {$count} file}}\n"
+                        + "*   {{You deleted {$count} files}}",
                         // RESULT: "Hello John, you want '9:43 PM', 'August 3, 2024 at 9:43 PM', or '8/3/24, 9:43:57 PM Pacific Daylight Time' or even 'Saturday, August 3, 2024 at 9:43 PM'?"
                 ""
-                        + ".input {$exp :datetime year=numeric month=numeric day=|2-digit|}\n"
-                        + ".local $longExp = {$exp :datetime month=long weekday=long}"
-                        + "{{Expires on '{$exp}' ('{$longExp}').}}"
-                        // RESULT: "Expires on '8/03/2024' ('Saturday, August 03, 2024')."
+                        + ".match {$place :number select=ordinal}\n"
+                        + "1 {{You got the gold medal}}\n"
+                        + "2 {{You got the silver medal}}\n"
+                        + "3 {{You got the bronze medal}}\n"
+                        + "one {{You fininshed in the {$place}st place}}\n"
+                        + "two {{You fininshed in the {$place}nd place}}\n"
+                        + "few {{You fininshed in the {$place}rd place}}\n"
+                        + "*   {{You fininshed in the {$place}th place}}\n"
         };
         for (String test : testStrings) {
             checkOneString(test);
