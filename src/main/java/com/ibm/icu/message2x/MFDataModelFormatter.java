@@ -73,7 +73,7 @@ class MFDataModelFormatter {
 
                 // Register the standard selectors
                 // TODO: update this to spec
-                .setSelector("number", new PluralSelectorFactory())
+                .setSelector("number", new NumberFormatterFactory())
 //                .setSelector("selectordinal", new PluralSelectorFactory("ordinal"))
                 .setSelector("string", new TextSelectorFactory())
 

@@ -47,14 +47,10 @@ public class SingleFormatTest {
 //                "{|3.1415| :number minimumFractionDigits=5} dollars",
 //                "{|3.1415| :number maximumFractionDigits=2} dollars",
                 ""
-                        + ".local $c = {$count :number minimumFractionDigits=0}\n"
+                        + ".local $c = {$count :number minimumFractionDigits=2}\n"
                         + ".match {$c}\n"
-                        + "1 {{{$c} dollar}}\n"
+                        + "one {{{$c} dollar}}\n"
                         + "*   {{{$c} dollars}}",
-//                ""
-//                        + ".match {$count :number minimumFractionDigits=2}\n"
-//                        + "1 {{{$count} dollar}}\n"
-//                        + "*   {{{$count} dollars}}",
         };
         for (String test : testStrings) {
             checkOneString(test);
