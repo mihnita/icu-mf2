@@ -3,9 +3,7 @@
 
 package com.ibm.icu.message2x;
 
-import com.ibm.icu.message2x.MFDataModel.VariableExpression;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +31,7 @@ public class MFParser {
      * Parses a {@code MessageFormat 2} syntax into a {@link MFDataModel.Message}.
      *
      * <p>It is used by {@link MessageFormatter}, but it might be handy for various tools.</p>
-     * @param input the text to parse 
+     * @param input the text to parse
      * @return the parsed {@code MFDataModel.Message}
      * @throws MFParseException if errors are detected
      *
@@ -74,6 +72,7 @@ public class MFParser {
         skipOptionalWhitespaces();
         checkCondition(input.atEnd(), "Content detected after the end of the message.");
         spy(true, "message", result);
+        new MFDataModelValidator(result).validate();
         return result;
     }
 
@@ -659,8 +658,8 @@ public class MFParser {
                 skipMandatoryWhitespaces();
                 expression = getPlaceholder();
                 String inputVarName = null;
-                if (expression instanceof VariableExpression) {
-                    inputVarName = ((VariableExpression) expression).arg.name;
+                if (expression instanceof MFDataModel.VariableExpression) {
+                    inputVarName = ((MFDataModel.VariableExpression) expression).arg.name;
                 }
                 if (expression instanceof MFDataModel.VariableExpression) {
                     return new MFDataModel.InputDeclaration(

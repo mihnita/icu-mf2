@@ -141,7 +141,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
     }
 
     private static class PluralSelectorImpl implements Selector {
-        private static final String NO_MATCH = "\u27E4NO_MATCH\u27E5"; // Something unlikely to show in a key
+        private static final String NO_MATCH = "\uFFFDNO_MATCH\uFFFE"; // Unlikely to show in a key
         private final PluralRules rules;
         private Map<String, Object> fixedOptions;
         private LocalizedNumberFormatter icuFormatter;

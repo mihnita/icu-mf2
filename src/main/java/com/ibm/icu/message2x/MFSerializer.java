@@ -3,10 +3,6 @@
 
 package com.ibm.icu.message2x;
 
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-
 import com.ibm.icu.message2x.MFDataModel.Annotation;
 import com.ibm.icu.message2x.MFDataModel.Attribute;
 import com.ibm.icu.message2x.MFDataModel.CatchallKey;
@@ -33,6 +29,9 @@ import com.ibm.icu.message2x.MFDataModel.UnsupportedStatement;
 import com.ibm.icu.message2x.MFDataModel.VariableExpression;
 import com.ibm.icu.message2x.MFDataModel.VariableRef;
 import com.ibm.icu.message2x.MFDataModel.Variant;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
 
 // TODO: find a better name for this class
 public class MFSerializer {
@@ -216,8 +215,8 @@ public class MFSerializer {
     // Not identical to the one in the parser. This one has a $ at the end, to
     // match the whole string
     // TBD if it can be refactored to reuse.
-    private static final java.util.regex.Pattern RE_NUMBER_LITERAL = java.util.regex.Pattern
-            .compile("^-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+\\-]?[0-9]+)?$");
+    private static final java.util.regex.Pattern RE_NUMBER_LITERAL =
+            java.util.regex.Pattern.compile("^-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+\\-]?[0-9]+)?$");
 
     private void literalToString(Literal literal) {
         String value = literal.value;

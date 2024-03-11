@@ -3,16 +3,14 @@
 
 package com.ibm.icu.dev.test.message2;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
 import com.ibm.icu.message2x.MFDataModel.Message;
 import com.ibm.icu.message2x.MFParser;
 import com.ibm.icu.message2x.MFSerializer;
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 @SuppressWarnings({"static-method", "javadoc"})
@@ -29,7 +27,7 @@ public class SerializationTest {
     @Test
     public void test() throws Exception {
         String[] testStrings = {
-        "Hello {$count &something}",
+            "Hello {$count &something}",
             "Hello world!",
             "{{.Hello world!}}",
             "Hello {userName}",
@@ -67,8 +65,7 @@ public class SerializationTest {
                     + ".match {$c}\n"
                     + "one {{{$c} dollar}}\n"
                     + "*   {{{$c} dollars}}",
-
-            ".local $c = {$count} .foobar asd asd asd asd {$bar1} {$bar2} {$bar3} .local $c = {$bar} {{Foo bar}}\n",
+            ".local $c = {$count} .foobar asd asd asd asd {$bar1} {$bar2} {$bar3} .local $b = {$bar} {{Foo bar}}\n",
             ".local $c = {1 :number minimumFractionDigits=2}\n"
                     + ".match {$c}\n"
                     + "one {{{$c} dollar}}\n"
@@ -96,7 +93,7 @@ public class SerializationTest {
     void checkOneString(String pattern) throws Exception {
         Message dm = MFParser.parse(pattern);
         String parsed = MFSerializer.dataModelToString(dm);
-        
+
         pattern = pattern.replace('\n', ' ').replaceAll("  +", " ").trim();
         if (!pattern.equals(parsed)) {
             System.out.println("========================");
