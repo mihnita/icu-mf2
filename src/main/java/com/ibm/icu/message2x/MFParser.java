@@ -6,6 +6,7 @@ package com.ibm.icu.message2x;
 import com.ibm.icu.message2x.MFDataModel.VariableExpression;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -209,9 +210,6 @@ public class MFParser {
                     String body = getReservedBody();
                     spy("reserved-body", body);
                     // The sigil is part of the body.
-                    // It is safe to cast, we know it is in the BMP
-                    body = (char) (cp) + body;
-                    // Safe to cast, we already know if it one of the ACII symbols (^&?<>~ etc.)
                     return new MFDataModel.UnsupportedAnnotation(body);
                 }
         }
@@ -392,7 +390,7 @@ public class MFParser {
 
     // abnf helper: *(s option)
     private Map<String, MFDataModel.Option> getOptions() throws MFParseException {
-        Map<String, MFDataModel.Option> options = new HashMap<>();
+        Map<String, MFDataModel.Option> options = new LinkedHashMap<>();
         while (true) {
             MFDataModel.Option option = getOption();
             if (option == null) {
