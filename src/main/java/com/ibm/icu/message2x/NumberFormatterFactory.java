@@ -3,13 +3,6 @@
 
 package com.ibm.icu.message2x;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-
 import com.ibm.icu.math.BigDecimal;
 import com.ibm.icu.number.FormattedNumber;
 import com.ibm.icu.number.LocalizedNumberFormatter;
@@ -22,7 +15,12 @@ import com.ibm.icu.text.FormattedValue;
 import com.ibm.icu.text.PluralRules;
 import com.ibm.icu.text.PluralRules.PluralType;
 import com.ibm.icu.util.CurrencyAmount;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Creates a {@link Formatter} doing numeric formatting, similar to <code>{exp, number}</code>
@@ -143,12 +141,13 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
     }
 
     private static class PluralSelectorImpl implements Selector {
-        private final static String NO_MATCH = "\u1234NO_MATCH\u5678";
+        private static final String NO_MATCH = "\u1234NO_MATCH\u5678";
         private final PluralRules rules;
         private Map<String, Object> fixedOptions;
         private LocalizedNumberFormatter icuFormatter;
 
-        private PluralSelectorImpl(Locale locale, PluralRules rules, Map<String, Object> fixedOptions) {
+        private PluralSelectorImpl(
+                Locale locale, PluralRules rules, Map<String, Object> fixedOptions) {
             this.rules = rules;
             this.fixedOptions = fixedOptions;
             this.icuFormatter = formatterForOptions(locale, fixedOptions);
@@ -158,7 +157,8 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
          * {@inheritDoc}
          */
         @Override
-        public List<String> matches(Object value, List<String> keys, Map<String, Object> variableOptions) {
+        public List<String> matches(
+                Object value, List<String> keys, Map<String, Object> variableOptions) {
             List<String> result = new ArrayList<>();
             if (value == null) {
                 return result;
@@ -179,8 +179,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
         // There is no need to be very strict, as these are keys that are already equal
         // So we will not get to compare "1" vs "2", or "one" vs "few".
         private static int pluralComparator(String o1, String o2) {
-            if (o1.equals(o2))
-                return 0;
+            if (o1.equals(o2)) return 0;
             if (NO_MATCH.equals(o1)) {
                 return 1;
             }
@@ -245,7 +244,8 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
         }
     }
 
-    private static LocalizedNumberFormatter formatterForOptions(Locale locale, Map<String, Object> fixedOptions) {
+    private static LocalizedNumberFormatter formatterForOptions(
+            Locale locale, Map<String, Object> fixedOptions) {
         UnlocalizedNumberFormatter nf;
         String skeleton = OptUtils.getString(fixedOptions, "skeleton");
         if (skeleton != null) {
@@ -280,11 +280,19 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
 
             String strOption = OptUtils.getString(fixedOptions, "signDisplay", "auto");
             SignDisplay signDisplay;
-            switch (strOption) { 
-                case "always": signDisplay = SignDisplay.ALWAYS; break;
-                case "exceptZero": signDisplay = SignDisplay.EXCEPT_ZERO; break;
-                case "negative": signDisplay = SignDisplay.NEGATIVE; break;
-                case "never": signDisplay = SignDisplay.NEVER; break;
+            switch (strOption) {
+                case "always":
+                    signDisplay = SignDisplay.ALWAYS;
+                    break;
+                case "exceptZero":
+                    signDisplay = SignDisplay.EXCEPT_ZERO;
+                    break;
+                case "negative":
+                    signDisplay = SignDisplay.NEGATIVE;
+                    break;
+                case "never":
+                    signDisplay = SignDisplay.NEVER;
+                    break;
                 case "auto": // intentional fall-through
                 default:
                     signDisplay = SignDisplay.AUTO;
@@ -293,10 +301,16 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
 
             GroupingStrategy grp;
             strOption = OptUtils.getString(fixedOptions, "useGrouping", "auto");
-            switch (strOption) { 
-                case "always": grp = GroupingStrategy.ON_ALIGNED; break; // TODO: check
-                case "never": grp = GroupingStrategy.OFF; break;
-                case "min2": grp = GroupingStrategy.MIN2; break;
+            switch (strOption) {
+                case "always":
+                    grp = GroupingStrategy.ON_ALIGNED;
+                    break; // TODO: check
+                case "never":
+                    grp = GroupingStrategy.OFF;
+                    break;
+                case "min2":
+                    grp = GroupingStrategy.MIN2;
+                    break;
                 case "auto": // intentional fall-through
                 default:
                     grp = GroupingStrategy.AUTO;

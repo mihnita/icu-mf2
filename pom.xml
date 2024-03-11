@@ -90,6 +90,10 @@
         </plugin>
 
         <plugin>
+          <!--
+            mvn spotless:check
+            mvn spotless:apply
+          -->
           <groupId>com.diffplug.spotless</groupId>
           <artifactId>spotless-maven-plugin</artifactId>
           <version>${spotless.version}</version>

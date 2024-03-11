@@ -54,12 +54,12 @@ import java.util.Map;
  *     Map<String, Object> arguments = new HashMap<>();
  *     arguments.put("name", "John");
  *     arguments.put("exp", new Date(2023 - 1900, 2, 27, 19, 42, 51));  // March 27, 2023, 7:42:51 PM
- * 
+ *
  *     MessageFormatter mf2 = MessageFormatter.builder()
  *             .setPattern("Hello {$name}, your card expires on {$exp :datetime year=numeric month=short day=numeric weekday=short}!")
  *             .setLocale(enGb)
  *             .build();
- * 
+ *
  *     assertEquals(
  *             "Hello John, your card expires on Mon, 27 Mar 2023!",
  *             mf2.formatToString(arguments));
@@ -134,7 +134,7 @@ import java.util.Map;
  * (they are named {@code Custom*Test.java}).</p>
  *
  * <p>The complete list of valid options for each function, and how they infulence the results, can be found at
- * <a target="github" href="https://github.com/unicode-org/message-format-wg/blob/main/spec/registry.md">here</a>.<p>   
+ * <a target="github" href="https://github.com/unicode-org/message-format-wg/blob/main/spec/registry.md">here</a>.<p>
  *
  * @internal ICU 72 technology preview
  * TzuAt deprecated This API is for technology preview only.
@@ -152,7 +152,8 @@ public class MessageFormatter {
         this.functionRegistry = builder.functionRegistry;
         if ((builder.pattern == null && builder.dataModel == null)
                 || (builder.pattern != null && builder.dataModel != null)) {
-            throw new IllegalArgumentException("You need to set either a pattern, or a dataModel, but not both.");
+            throw new IllegalArgumentException(
+                    "You need to set either a pattern, or a dataModel, but not both.");
         }
 
         if (builder.dataModel != null) {
@@ -164,10 +165,10 @@ public class MessageFormatter {
             try {
                 this.dataModel = MFParser.parse(pattern);
             } catch (MFParseException pe) {
-                throw new IllegalArgumentException(
-                        "Parse error:\n"
+                throw new IllegalArgumentException(""
+                        + "Parse error:\n"
                         + "Message: <<" + pattern + ">>\n"
-                        + "Error:" + pe.getMessage() + "\n");
+                        + "Error: " + pe.getMessage() + "\n");
             }
         }
         modelFormatter = new MFDataModelFormatter(dataModel, locale, functionRegistry);
@@ -283,8 +284,7 @@ public class MessageFormatter {
         private MFDataModel.Message dataModel = null;
 
         // Prevent direct creation
-        private Builder() {
-        }
+        private Builder() {}
 
         /**
          * Sets the locale to use for all formatting and selection operations.

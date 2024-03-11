@@ -27,7 +27,8 @@ class TextSelectorFactory implements SelectorFactory {
          * {@inheritDoc}
          */
         @Override
-        public List<String> matches(Object value, List<String> keys, Map<String, Object> variableOptions) {
+        public List<String> matches(
+                Object value, List<String> keys, Map<String, Object> variableOptions) {
             List<String> result = new ArrayList<>();
             if (value == null) {
                 return result;

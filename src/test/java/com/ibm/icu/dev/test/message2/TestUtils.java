@@ -1,18 +1,14 @@
 // © 2022 and later: Unicode, Inc. and others.
-// License & terms of use: http://www.unicode.org/copyright.html
+// License & terms of use: https://www.unicode.org/copyright.html
 
 package com.ibm.icu.dev.test.message2;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.junit.Ignore;
-
 import com.ibm.icu.message2x.MFFunctionRegistry;
 import com.ibm.icu.message2x.MessageFormatter;
-
-//import com.ibm.icu.message2x.MessageFormatter;
-//import com.ibm.icu.message2x.MFFunctionRegistry;
+import org.junit.Ignore;
 
 @Ignore("Utility class, has no test methods.")
 /** Utility class, has no test methods. */
@@ -39,14 +35,16 @@ public class TestUtils {
             MessageFormatter mf = mfBuilder.build();
             String result = mf.formatToString(testCase.arguments);
             if (!testCase.errors.isEmpty()) {
-                fail(reportCase(testCase) + "\nExpected error, but it didn't happen.\n"
+                fail(reportCase(testCase)
+                        + "\nExpected error, but it didn't happen.\n"
                         + "Result: '" + result + "'");
             } else {
                 assertEquals(reportCase(testCase), testCase.expected, result);
             }
         } catch (IllegalArgumentException | NullPointerException e) {
             if (testCase.errors.isEmpty()) {
-                fail(reportCase(testCase) + "\nNo error was expected here, but it happened:\n"
+                fail(reportCase(testCase)
+                        + "\nNo error was expected here, but it happened:\n"
                         + e.getMessage());
             }
         }

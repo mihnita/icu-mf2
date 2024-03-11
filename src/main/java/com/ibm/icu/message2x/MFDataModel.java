@@ -41,7 +41,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class PatternMessage implements Message {
+    public static class PatternMessage implements Message {
         final List<Declaration> declarations;
         final Pattern pattern;
 
@@ -61,7 +61,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class SelectMessage implements Message {
+    public static class SelectMessage implements Message {
         final List<Declaration> declarations;
         final List<Expression> selectors;
         final List<Variant> variants;
@@ -71,7 +71,10 @@ public class MFDataModel {
          * TzuAt deprecated This API is for technology preview only.
          */
         // TZUAT Deprecated
-        public SelectMessage(List<Declaration> declarations, List<Expression> selectors, List<Variant> variants) {
+        public SelectMessage(
+                List<Declaration> declarations,
+                List<Expression> selectors,
+                List<Variant> variants) {
             this.declarations = declarations;
             this.selectors = selectors;
             this.variants = variants;
@@ -92,7 +95,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class InputDeclaration implements Declaration {
+    public static class InputDeclaration implements Declaration {
         final String name;
         final VariableExpression value;
 
@@ -112,7 +115,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class LocalDeclaration implements Declaration {
+    public static class LocalDeclaration implements Declaration {
         final String name;
         final Expression value;
 
@@ -132,7 +135,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class UnsupportedStatement implements Declaration {
+    public static class UnsupportedStatement implements Declaration {
         final String keyword;
         final String body;
         final List<Expression> expressions;
@@ -163,7 +166,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class Variant implements LiteralOrCatchallKey {
+    public static class Variant implements LiteralOrCatchallKey {
         final List<LiteralOrCatchallKey> keys;
         final Pattern value;
 
@@ -183,7 +186,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class CatchallKey implements LiteralOrCatchallKey {
+    public static class CatchallKey implements LiteralOrCatchallKey {
         // String value; // Always '*' in MF2
     }
 
@@ -195,7 +198,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class Pattern {
+    public static class Pattern {
         final List<PatternPart> parts;
 
         Pattern() {
@@ -217,7 +220,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class StringPart implements PatternPart {
+    public static class StringPart implements PatternPart {
         final String value;
 
         StringPart(String value) {
@@ -240,7 +243,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class LiteralExpression implements Expression {
+    public static class LiteralExpression implements Expression {
         final Literal arg;
         final Annotation annotation;
         final List<Attribute> attributes;
@@ -262,7 +265,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class VariableExpression implements Expression {
+    public static class VariableExpression implements Expression {
         final VariableRef arg;
         final Annotation annotation;
         final List<Attribute> attributes;
@@ -272,7 +275,8 @@ public class MFDataModel {
          * TzuAt deprecated This API is for technology preview only.
          */
         // TZUAT Deprecated
-        public VariableExpression(VariableRef arg, Annotation annotation, List<Attribute> attributes) {
+        public VariableExpression(
+                VariableRef arg, Annotation annotation, List<Attribute> attributes) {
             this.arg = arg;
             this.annotation = annotation;
             this.attributes = attributes;
@@ -293,7 +297,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class FunctionExpression implements Expression {
+    public static class FunctionExpression implements Expression {
         final FunctionAnnotation annotation;
         final List<Attribute> attributes;
 
@@ -313,7 +317,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class UnsupportedExpression implements Expression {
+    public static class UnsupportedExpression implements Expression {
         final UnsupportedAnnotation annotation;
         final List<Attribute> attributes;
 
@@ -333,7 +337,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class Attribute {
+    public static class Attribute {
         final String name;
         final LiteralOrVariableRef value;
 
@@ -366,7 +370,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class Literal implements LiteralOrVariableRef, LiteralOrCatchallKey {
+    public static class Literal implements LiteralOrVariableRef, LiteralOrCatchallKey {
         final String value;
 
         /**
@@ -379,13 +383,12 @@ public class MFDataModel {
         }
     }
 
-
     /**
      * @internal ICU 72 technology preview
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class VariableRef implements LiteralOrVariableRef {
+    public static class VariableRef implements LiteralOrVariableRef {
         final String name;
 
         /**
@@ -403,7 +406,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class FunctionAnnotation implements Annotation {
+    public static class FunctionAnnotation implements Annotation {
         final String name;
         final Map<String, Option> options;
 
@@ -423,7 +426,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class Option {
+    public static class Option {
         final String name;
         final LiteralOrVariableRef value;
 
@@ -443,7 +446,7 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class UnsupportedAnnotation implements Annotation {
+    public static class UnsupportedAnnotation implements Annotation {
         final String source;
 
         /**
@@ -463,9 +466,11 @@ public class MFDataModel {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    static public class Markup implements Expression {
+    public static class Markup implements Expression {
         enum Kind {
-            OPEN, CLOSE, STANDALONE
+            OPEN,
+            CLOSE,
+            STANDALONE
         }
 
         final Kind kind;
@@ -478,7 +483,8 @@ public class MFDataModel {
          * TzuAt deprecated This API is for technology preview only.
          */
         // TZUAT Deprecated
-        public Markup(Kind kind, String name, Map<String, Option> options, List<Attribute> attributes) {
+        public Markup(
+                Kind kind, String name, Map<String, Option> options, List<Attribute> attributes) {
             this.kind = kind;
             this.name = name;
             this.options = options;

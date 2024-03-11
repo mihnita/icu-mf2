@@ -25,7 +25,8 @@ class IdentityFormatterFactory implements FormatterFactory {
          */
         @Override
         public FormattedPlaceholder format(Object toFormat, Map<String, Object> variableOptions) {
-            return new FormattedPlaceholder(toFormat, new PlainStringFormattedValue(Objects.toString(toFormat)));
+            return new FormattedPlaceholder(
+                    toFormat, new PlainStringFormattedValue(Objects.toString(toFormat)));
         }
 
         /**

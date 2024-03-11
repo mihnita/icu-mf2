@@ -3,6 +3,7 @@
 
 package com.ibm.icu.message2x;
 
+import com.ibm.icu.text.DateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,8 +18,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import com.ibm.icu.text.DateFormat;
-
 /**
  * Creates a {@link Formatter} doing formatting of date / time, similar to
  * <code>{exp, date}</code> and <code>{exp, time}</code> in {@link com.ibm.icu.text.MessageFormat}.
@@ -27,11 +26,16 @@ class DateTimeFormatterFactory implements FormatterFactory {
 
     private static int stringToStyle(String option) {
         switch (option) {
-            case "full": return DateFormat.FULL;
-            case "long": return DateFormat.LONG;
-            case "medium": return DateFormat.MEDIUM;
-            case "short": return DateFormat.SHORT;
-            default: throw new IllegalArgumentException("Invalid datetime style: " + option);
+            case "full":
+                return DateFormat.FULL;
+            case "long":
+                return DateFormat.LONG;
+            case "medium":
+                return DateFormat.MEDIUM;
+            case "short":
+                return DateFormat.SHORT;
+            default:
+                throw new IllegalArgumentException("Invalid datetime style: " + option);
         }
     }
 
@@ -84,69 +88,111 @@ class DateTimeFormatterFactory implements FormatterFactory {
 
         // In all the switches below we just ignore invalid options.
         // Would be nice to report (log?), but ICU does not have a clear policy on how to do that.
-        // But we don't want to throw, that is too drastic. 
+        // But we don't want to throw, that is too drastic.
 
         opt = OptUtils.getString(options, "weekday", "");
         switch (opt) {
-            case "long": skeleton.append("EEEE"); break;
-            case "short": skeleton.append("E"); break;
-            case "narrow": skeleton.append("EEEEEE"); break;
+            case "long":
+                skeleton.append("EEEE");
+                break;
+            case "short":
+                skeleton.append("E");
+                break;
+            case "narrow":
+                skeleton.append("EEEEEE");
+                break;
             default:
-                // invalid value, we just ignore it. 
+                // invalid value, we just ignore it.
         }
 
         opt = OptUtils.getString(options, "era", "");
         switch (opt) {
-            case "long": skeleton.append("GGGG"); break;
-            case "short": skeleton.append("G"); break;
-            case "narrow": skeleton.append("GGGGG"); break;
+            case "long":
+                skeleton.append("GGGG");
+                break;
+            case "short":
+                skeleton.append("G");
+                break;
+            case "narrow":
+                skeleton.append("GGGGG");
+                break;
             default:
-                // invalid value, we just ignore it. 
+                // invalid value, we just ignore it.
         }
 
         opt = OptUtils.getString(options, "year", "");
         switch (opt) {
-            case "numeric": skeleton.append("y"); break;
-            case "2-digit": skeleton.append("yy"); break;
+            case "numeric":
+                skeleton.append("y");
+                break;
+            case "2-digit":
+                skeleton.append("yy");
+                break;
             default:
-                // invalid value, we just ignore it. 
+                // invalid value, we just ignore it.
         }
 
         opt = OptUtils.getString(options, "month", "");
         switch (opt) {
-            case "numeric": skeleton.append("M"); break;
-            case "2-digit": skeleton.append("MM"); break;
-            case "long": skeleton.append("MMMM"); break;
-            case "short": skeleton.append("MMM"); break;
-            case "narrow": skeleton.append("MMMMM"); break;
+            case "numeric":
+                skeleton.append("M");
+                break;
+            case "2-digit":
+                skeleton.append("MM");
+                break;
+            case "long":
+                skeleton.append("MMMM");
+                break;
+            case "short":
+                skeleton.append("MMM");
+                break;
+            case "narrow":
+                skeleton.append("MMMMM");
+                break;
             default:
-                // invalid value, we just ignore it. 
+                // invalid value, we just ignore it.
         }
 
         opt = OptUtils.getString(options, "day", "");
         switch (opt) {
-            case "numeric": skeleton.append("d"); break;
-            case "2-digit": skeleton.append("dd"); break;
+            case "numeric":
+                skeleton.append("d");
+                break;
+            case "2-digit":
+                skeleton.append("dd");
+                break;
             default:
-                // invalid value, we just ignore it. 
+                // invalid value, we just ignore it.
         }
 
-        int showHour = 0; 
+        int showHour = 0;
         opt = OptUtils.getString(options, "hour", "");
         switch (opt) {
-            case "numeric": showHour = 1; break;
-            case "2-digit": showHour = 2; break;
+            case "numeric":
+                showHour = 1;
+                break;
+            case "2-digit":
+                showHour = 2;
+                break;
             default:
-                // invalid value, we just ignore it. 
+                // invalid value, we just ignore it.
         }
         if (showHour > 0) {
             String hourCycle = "";
             opt = OptUtils.getString(options, "hourCycle", "");
             switch (opt) {
-                case "h11": hourCycle = "K"; break;
-                case "h12": hourCycle = "h"; break;
-                case "h23": hourCycle = "H"; break;
-                case "h24": hourCycle = "k"; break;
+                case "h11":
+                    hourCycle = "K";
+                    break;
+                case "h12":
+                    hourCycle = "h";
+                    break;
+                case "h23":
+                    hourCycle = "H";
+                    break;
+                case "h24":
+                    hourCycle = "k";
+                    break;
                 default:
                     hourCycle = "j"; // default for the locale
             }
@@ -158,39 +204,65 @@ class DateTimeFormatterFactory implements FormatterFactory {
 
         opt = OptUtils.getString(options, "minute", "");
         switch (opt) {
-            case "numeric": skeleton.append("m"); break;
-            case "2-digit": skeleton.append("mm"); break;
+            case "numeric":
+                skeleton.append("m");
+                break;
+            case "2-digit":
+                skeleton.append("mm");
+                break;
             default:
-                // invalid value, we just ignore it. 
+                // invalid value, we just ignore it.
         }
 
         opt = OptUtils.getString(options, "second", "");
         switch (opt) {
-            case "numeric": skeleton.append("s"); break;
-            case "2-digit": skeleton.append("ss"); break;
+            case "numeric":
+                skeleton.append("s");
+                break;
+            case "2-digit":
+                skeleton.append("ss");
+                break;
             default:
-                // invalid value, we just ignore it. 
+                // invalid value, we just ignore it.
         }
 
         opt = OptUtils.getString(options, "fractionalSecondDigits", "");
         switch (opt) {
-            case "1": skeleton.append("S"); break;
-            case "2": skeleton.append("SS"); break;
-            case "3": skeleton.append("SSS"); break;
+            case "1":
+                skeleton.append("S");
+                break;
+            case "2":
+                skeleton.append("SS");
+                break;
+            case "3":
+                skeleton.append("SSS");
+                break;
             default:
-                // invalid value, we just ignore it. 
+                // invalid value, we just ignore it.
         }
 
         opt = OptUtils.getString(options, "timeZoneName", "");
         switch (opt) {
-            case "long": skeleton.append("z"); break;
-            case "short": skeleton.append("zzzz"); break;
-            case "shortOffset": skeleton.append("O"); break;
-            case "longOffset": skeleton.append("OOOO"); break;
-            case "shortGeneric": skeleton.append("v"); break;
-            case "longGeneric": skeleton.append("vvvv"); break;
+            case "long":
+                skeleton.append("z");
+                break;
+            case "short":
+                skeleton.append("zzzz");
+                break;
+            case "shortOffset":
+                skeleton.append("O");
+                break;
+            case "longOffset":
+                skeleton.append("OOOO");
+                break;
+            case "shortGeneric":
+                skeleton.append("v");
+                break;
+            case "longGeneric":
+                skeleton.append("vvvv");
+                break;
             default:
-                // invalid value, we just ignore it. 
+                // invalid value, we just ignore it.
         }
 
         return skeleton.toString();
@@ -217,14 +289,16 @@ class DateTimeFormatterFactory implements FormatterFactory {
             if (toFormat instanceof CharSequence) {
                 toFormat = parseIso8601(toFormat.toString());
                 if (toFormat instanceof CharSequence) {
-                    return new FormattedPlaceholder(toFormat, new PlainStringFormattedValue(toFormat.toString()));
+                    return new FormattedPlaceholder(
+                            toFormat, new PlainStringFormattedValue(toFormat.toString()));
                 }
             }
             if (toFormat instanceof Calendar) {
                 TimeZone tz = ((Calendar) toFormat).getTimeZone();
                 long milis = ((Calendar) toFormat).getTimeInMillis();
                 com.ibm.icu.util.TimeZone icuTz = com.ibm.icu.util.TimeZone.getTimeZone(tz.getID());
-                com.ibm.icu.util.Calendar calendar = com.ibm.icu.util.Calendar.getInstance(icuTz, locale);
+                com.ibm.icu.util.Calendar calendar =
+                        com.ibm.icu.util.Calendar.getInstance(icuTz, locale);
                 calendar.setTimeInMillis(milis);
                 toFormat = calendar;
             }
@@ -246,44 +320,68 @@ class DateTimeFormatterFactory implements FormatterFactory {
         if (text == null || text.isEmpty()) {
             return text;
         }
-        
+
         try {
             LocalDate ld = LocalDate.parse(text);
             return new Date(ld.getYear() - 1900, ld.getMonthValue(), ld.getDayOfMonth());
-        } catch (Exception e) { /* just ignore, we want to try more */ }
+        } catch (Exception e) {
+            // just ignore, we want to try more
+        }
 
         try {
             LocalDateTime ldt = LocalDateTime.parse(text);
-            return new Date(ldt.getYear() - 1900, ldt.getMonthValue(), ldt.getDayOfMonth(),
-                    ldt.getHour(), ldt.getMinute(), ldt.getSecond());
-        } catch (Exception e) { /* just ignore, we want to try more */ }
+            return new Date(
+                    ldt.getYear() - 1900,
+                    ldt.getMonthValue(),
+                    ldt.getDayOfMonth(),
+                    ldt.getHour(),
+                    ldt.getMinute(),
+                    ldt.getSecond());
+        } catch (Exception e) {
+            // just ignore, we want to try more
+        }
 
         try {
             LocalTime lt = LocalTime.parse(text);
             LocalDateTime ldt = LocalDateTime.of(LocalDate.now(), lt);
-            return new Date(ldt.getYear() - 1900, ldt.getMonthValue(), ldt.getDayOfMonth(),
-                    ldt.getHour(), ldt.getMinute(), ldt.getSecond());
-        } catch (Exception e) { /* just ignore, we want to try more */ }
+            return new Date(
+                    ldt.getYear() - 1900,
+                    ldt.getMonthValue(),
+                    ldt.getDayOfMonth(),
+                    ldt.getHour(),
+                    ldt.getMinute(),
+                    ldt.getSecond());
+        } catch (Exception e) {
+            // just ignore, we want to try more
+        }
 
         try {
             Instant instant = Instant.parse(text);
             return new Date(instant.toEpochMilli());
-        } catch (Exception e) { /* just ignore, we want to try more */ }
+        } catch (Exception e) {
+            // just ignore, we want to try more
+        }
 
         try {
             OffsetDateTime odt = OffsetDateTime.parse(text);
             return GregorianCalendar.from(odt.toZonedDateTime());
-        } catch (Exception e) { /* just ignore, we want to try more */ }
+        } catch (Exception e) {
+            // just ignore, we want to try more
+        }
 
         try {
             OffsetTime ot = OffsetTime.parse(text);
             return GregorianCalendar.from(OffsetDateTime.from(ot).toZonedDateTime());
-        } catch (Exception e) { /* just ignore, we want to try more */ }
+        } catch (Exception e) {
+            // just ignore, we want to try more
+        }
 
         try {
             ZonedDateTime zdt = ZonedDateTime.parse(text);
             return GregorianCalendar.from(zdt);
-        } catch (Exception e) { /* just ignore, we want to try more */ }
+        } catch (Exception e) {
+            // just ignore, we want to try more
+        }
 
         return text;
     }

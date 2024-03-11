@@ -176,8 +176,7 @@ public class MFFunctionRegistry {
         private final Map<Class<?>, String> classToFormatter = new HashMap<>();
 
         // Prevent direct creation
-        private Builder() {
-        }
+        private Builder() {}
 
         /**
          * Adds all the mapping from another registry to this one.

@@ -3,13 +3,6 @@
 
 package com.ibm.icu.message2x;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 import com.ibm.icu.message2x.MFDataModel.Annotation;
 import com.ibm.icu.message2x.MFDataModel.CatchallKey;
 import com.ibm.icu.message2x.MFDataModel.Declaration;
@@ -30,6 +23,12 @@ import com.ibm.icu.message2x.MFDataModel.VariableRef;
 import com.ibm.icu.message2x.MFDataModel.Variant;
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.CurrencyAmount;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Takes an {@link MFDataModel} and formats it to a {@link String}
@@ -44,10 +43,12 @@ class MFDataModelFormatter {
     private final MFFunctionRegistry customFunctions;
     private static final MFFunctionRegistry EMPTY_REGISTY = MFFunctionRegistry.builder().build();
 
-    MFDataModelFormatter(MFDataModel.Message dm, Locale locale, MFFunctionRegistry customFunctionRegistry) {
+    MFDataModelFormatter(
+            MFDataModel.Message dm, Locale locale, MFFunctionRegistry customFunctionRegistry) {
         this.locale = locale;
         this.dm = dm;
-        this.customFunctions = customFunctionRegistry == null ? EMPTY_REGISTY : customFunctionRegistry;
+        this.customFunctions = 
+                customFunctionRegistry == null ? EMPTY_REGISTY : customFunctionRegistry;
 
         standardFunctions = MFFunctionRegistry.builder()
                 // Date/time formatting
@@ -56,7 +57,6 @@ class MFDataModelFormatter {
                 .setDefaultFormatterNameForType(Date.class, "datetime")
                 .setDefaultFormatterNameForType(Calendar.class, "datetime")
                 .setDefaultFormatterNameForType(java.util.Calendar.class, "datetime")
-
                 // Number formatting
                 // TODO: `:integer` ?
                 .setFormatter("number", new NumberFormatterFactory())
@@ -64,18 +64,14 @@ class MFDataModelFormatter {
                 .setDefaultFormatterNameForType(Double.class, "number")
                 .setDefaultFormatterNameForType(Number.class, "number")
                 .setDefaultFormatterNameForType(CurrencyAmount.class, "number")
-
                 // Format that returns "to string"
                 .setFormatter("string", new IdentityFormatterFactory())
                 .setDefaultFormatterNameForType(String.class, "string")
                 .setDefaultFormatterNameForType(CharSequence.class, "string")
-
                 // Register the standard selectors
                 // TODO: update this to spec
                 .setSelector("number", new NumberFormatterFactory())
-//                .setSelector("selectordinal", new PluralSelectorFactory("ordinal"))
                 .setSelector("string", new TextSelectorFactory())
-
                 .build();
     }
 
@@ -106,7 +102,8 @@ class MFDataModelFormatter {
                 MFDataModel.StringPart sPart = (StringPart) part;
                 result.append(sPart.value);
             } else if (part instanceof MFDataModel.Expression) {
-                FormattedPlaceholder formattedExpression = formatExpression((Expression) part, variables, arguments);
+                FormattedPlaceholder formattedExpression =
+                        formatExpression((Expression) part, variables, arguments);
                 result.append(formattedExpression.getFormattedValue().toString());
             } else if (part instanceof MFDataModel.Markup) {
                 // Ignore
@@ -119,9 +116,8 @@ class MFDataModelFormatter {
         return result.toString();
     }
 
-    private Pattern findBestMatchingPattern(SelectMessage sm,
-            Map<String, Object> variables,
-            Map<String, Object> arguments) {
+    private Pattern findBestMatchingPattern(
+            SelectMessage sm, Map<String, Object> variables, Map<String, Object> arguments) {
         Pattern patternToRender = null;
 
         // ====================================
@@ -161,11 +157,13 @@ class MFDataModelFormatter {
             }
         }
 
-        // This should not be possible, we added one function for each selector, or we have thrown an exception.
+        // This should not be possible, we added one function for each selector,
+        // or we have thrown an exception.
         // But just in case someone removes the throw above?
         if (res.size() != selectors.size()) {
-            throw new IllegalArgumentException("Something went wrong, not enough selector functions, "
-                    + res.size() + " vs. " + selectors.size());
+            throw new IllegalArgumentException(
+                    "Something went wrong, not enough selector functions, "
+                            + res.size() + " vs. " + selectors.size());
         }
 
         // ====================================
@@ -190,9 +188,9 @@ class MFDataModelFormatter {
                     // spec: Let `ks` be the resolved value of `key`.
                     String ks = ((Literal) key).value;
                     // spec: Append `ks` as the last element of the list `keys`.
-                    keys.add(ks);   
+                    keys.add(ks);
                 } else {
-                    formattingError("Literal expected, but got " + key);                        
+                    formattingError("Literal expected, but got " + key);
                 }
             }
             // spec: Let `rv` be the resolved value at index `i` of `res`.
@@ -211,28 +209,28 @@ class MFDataModelFormatter {
         List<Variant> vars = new ArrayList<>();
         // spec: For each _variant_ `var` of the message:
         for (Variant var : sm.variants) {
-            // spec:    For each index `i` in `pref`:
+            // spec: For each index `i` in `pref`:
             int found = 0;
             for (int i = 0; i < pref.size(); i++) {
-                // spec:       Let `key` be the `var` key at position `i`.
+                // spec: Let `key` be the `var` key at position `i`.
                 LiteralOrCatchallKey key = var.keys.get(i);
-                // spec:       If `key` is the catch-all key `'*'`:
+                // spec: If `key` is the catch-all key `'*'`:
                 if (key instanceof CatchallKey) {
-                    // spec:          Continue the inner loop on `pref`.
+                    // spec: Continue the inner loop on `pref`.
                     found++;
                     continue;
                 }
-                // spec:       1. Assert that `key` is a _literal_.
+                // spec: Assert that `key` is a _literal_.
                 if (!(key instanceof Literal)) {
                     formattingError("Literal expected");
                 }
-                // spec:       Let `ks` be the resolved value of `key`.
+                // spec: Let `ks` be the resolved value of `key`.
                 String ks = ((Literal) key).value;
-                // spec:       Let `matches` be the list of strings at index `i` of `pref`.
+                // spec: Let `matches` be the list of strings at index `i` of `pref`.
                 List<String> matches = pref.get(i);
                 // spec: If `matches` includes `ks`:
                 if (matches.contains(ks)) {
-                    // spec:          1. Continue the inner loop on `pref`.
+                    // spec: Continue the inner loop on `pref`.
                     found++;
                     continue;
                 } else {
@@ -247,7 +245,6 @@ class MFDataModelFormatter {
             }
         }
 
-        
         // ====================================
         // spec: ### Sort Variants
         // ====================================
@@ -255,9 +252,9 @@ class MFDataModelFormatter {
         List<IntVarTuple> sortable = new ArrayList<>();
         // spec: For each _variant_ `var` of `vars`:
         for (Variant var : vars) {
-            // spec:    Let `tuple` be a new tuple (-1, `var`).
+            // spec: Let `tuple` be a new tuple (-1, `var`).
             IntVarTuple tuple = new IntVarTuple(-1, var);
-            // spec:    Append `tuple` as the last element of the list `sortable`.
+            // spec: Append `tuple` as the last element of the list `sortable`.
             sortable.add(tuple);
         }
         // spec: Let `len` be the integer count of items in `pref`.
@@ -266,33 +263,33 @@ class MFDataModelFormatter {
         int i = len - 1;
         // spec: While `i` >= 0:
         while (i >= 0) {
-            // spec:    Let `matches` be the list of strings at index `i` of `pref`.
+            // spec: Let `matches` be the list of strings at index `i` of `pref`.
             List<String> matches = pref.get(i);
-            // spec:    Let `minpref` be the integer count of items in `matches`.
+            // spec: Let `minpref` be the integer count of items in `matches`.
             int minpref = matches.size();
-            // spec:    For each tuple `tuple` of `sortable`:
+            // spec: For each tuple `tuple` of `sortable`:
             for (IntVarTuple tuple : sortable) {
-                // spec:       Let `matchpref` be an integer with the value `minpref`.
+                // spec: Let `matchpref` be an integer with the value `minpref`.
                 int matchpref = minpref;
-                // spec:       Let `key` be the `tuple` _variant_ key at position `i`.
+                // spec: Let `key` be the `tuple` _variant_ key at position `i`.
                 LiteralOrCatchallKey key = tuple.variant.keys.get(i);
-                // spec:       If `key` is not the catch-all key `'*'`:
-                if (! (key instanceof CatchallKey)) {
-                    // spec:          Assert that `key` is a _literal_.
+                // spec: If `key` is not the catch-all key `'*'`:
+                if (!(key instanceof CatchallKey)) {
+                    // spec: Assert that `key` is a _literal_.
                     if (!(key instanceof Literal)) {
                         formattingError("Literal expected");
                     }
-                    // spec:          Let `ks` be the resolved value of `key`.
+                    // spec: Let `ks` be the resolved value of `key`.
                     String ks = ((Literal) key).value;
-                    // spec:          Let `matchpref` be the integer position of `ks` in `matches`.
+                    // spec: Let `matchpref` be the integer position of `ks` in `matches`.
                     matchpref = matches.indexOf(ks);
                 }
-                // spec:       Set the `tuple` integer value as `matchpref`.
+                // spec: Set the `tuple` integer value as `matchpref`.
                 tuple.integer = matchpref;
             }
-            // spec:    Set `sortable` to be the result of calling the method `SortVariants(sortable)`.
+            // spec: Set `sortable` to be the result of calling the method `SortVariants(sortable)`.
             sortable.sort(MFDataModelFormatter::sortVariants);
-            // spec:    Set `i` to be `i` - 1.
+            // spec: Set `i` to be `i` - 1.
             i--;
         }
         // spec: Let `var` be the _variant_ element of the first element of `sortable`.
@@ -304,7 +301,8 @@ class MFDataModelFormatter {
         // And should do that only once, when building the data model.
         if (patternToRender == null) {
             // If there was a case with all entries in the keys `*` this should not happen
-            throw new IllegalArgumentException("The selection went wrong, cannot select any option.");
+            throw new IllegalArgumentException(
+                    "The selection went wrong, cannot select any option.");
         }
 
         return patternToRender;
@@ -316,7 +314,7 @@ class MFDataModelFormatter {
      * It returns a list of (integer, _variant_) tuples.
      * Any implementation of `SortVariants` is acceptable
      * as long as it satisfies the following requirements:
-     * 
+     *
      * 1. Let `sortable` be an arbitrary list of (integer, _variant_) tuples.
      * 1. Let `sorted` be `SortVariants(sortable)`.
      * 1. `sorted` is the result of sorting `sortable` using the following comparator:
@@ -324,7 +322,7 @@ class MFDataModelFormatter {
      * 1. The sort is stable (pairs of tuples from `sortable` that are equal
      *    in their first element have the same relative order in `sorted`).
      */
-    static private int sortVariants(IntVarTuple o1, IntVarTuple o2) {
+    private static int sortVariants(IntVarTuple o1, IntVarTuple o2) {
         int result = Integer.compare(o1.integer, o2.integer);
         if (result != 0) {
             return result;
@@ -365,18 +363,21 @@ class MFDataModelFormatter {
         final Object argument;
         final Map<String, Object> options;
         final Selector selectorFunction;
-        public ResolvedSelector(Object argument, Map<String, Object> options, Selector selectorFunction) {
+
+        public ResolvedSelector(
+                Object argument, Map<String, Object> options, Selector selectorFunction) {
             this.argument = argument;
             this.options = new HashMap<>(options);
             this.selectorFunction = selectorFunction;
         }
     }
 
-    static private void formattingError(String message) {
+    private static void formattingError(String message) {
         throw new IllegalArgumentException(message);
     }
 
-    private FormatterFactory getFormattingFunctionFactoryByName(Object toFormat, String functionName) {
+    private FormatterFactory getFormattingFunctionFactoryByName(
+            Object toFormat, String functionName) {
         // Get a function name from the type of the object to format
         if (functionName == null || functionName.isEmpty()) {
             if (toFormat == null) {
@@ -389,8 +390,9 @@ class MFDataModelFormatter {
                 functionName = customFunctions.getDefaultFormatterNameForType(clazz);
             }
             if (functionName == null) {
-                throw new IllegalArgumentException("Object to format without a function, and unknown type: "
-                        + toFormat.getClass().getName());
+                throw new IllegalArgumentException(
+                        "Object to format without a function, and unknown type: "
+                                + toFormat.getClass().getName());
             }
         }
 
@@ -398,14 +400,17 @@ class MFDataModelFormatter {
         if (func == null) {
             func = customFunctions.getFormatter(functionName);
             if (func == null) {
-                throw new IllegalArgumentException("Can't find an implementation for function: '"
-                        + functionName + "'");
+                throw new IllegalArgumentException(
+                        "Can't find an implementation for function: '" + functionName + "'");
             }
         }
         return func;
     }
 
-    private static Object resolveLiteralOrVariable(LiteralOrVariableRef value, Map<String, Object> localVars, Map<String, Object> arguments) {
+    private static Object resolveLiteralOrVariable(
+            LiteralOrVariableRef value,
+            Map<String, Object> localVars,
+            Map<String, Object> arguments) {
         if (value instanceof Literal) {
             String val = ((Literal) value).value;
             Number nr = OptUtils.asNumber(val);
@@ -427,7 +432,10 @@ class MFDataModelFormatter {
         return value;
     }
 
-    private static Map<String, Object> convertOptions(Map<String, Option> options, Map<String, Object> localVars, Map<String, Object> arguments) {
+    private static Map<String, Object> convertOptions(
+            Map<String, Option> options,
+            Map<String, Object> localVars,
+            Map<String, Object> arguments) {
         Map<String, Object> result = new HashMap<>();
         for (Option option : options.values()) {
             result.put(option.name, resolveLiteralOrVariable(option.value, localVars, arguments));
@@ -435,14 +443,13 @@ class MFDataModelFormatter {
         return result;
     }
 
-    
     /**
      * @param expression the expression to forma
      * @param variables local variables, created from declarations (`.input` and `.local`)
      * @param arguments the arguments passed at runtime to be formatted (`mf.format(arguments)`)
      */
-    private FormattedPlaceholder formatExpression(Expression expression,
-            Map<String, Object> variables, Map<String, Object> arguments) {
+    private FormattedPlaceholder formatExpression(
+            Expression expression, Map<String, Object> variables, Map<String, Object> arguments) {
 
         Annotation annotation = null; // function name
         String functionName = null;
@@ -466,7 +473,8 @@ class MFDataModelFormatter {
             } else {
                 toFormat = resolved;
             }
-        } else if (expression instanceof MFDataModel.FunctionExpression) { // Function without arguments
+        } else if (expression
+                instanceof MFDataModel.FunctionExpression) { // Function without arguments
             MFDataModel.FunctionExpression fe = (FunctionExpression) expression;
             annotation = fe.annotation;
         } else if (expression instanceof MFDataModel.LiteralExpression) {
@@ -483,7 +491,8 @@ class MFDataModelFormatter {
         if (annotation instanceof FunctionAnnotation) {
             FunctionAnnotation fa = (FunctionAnnotation) annotation;
             if (functionName != null && !functionName.equals(fa.name)) {
-                    formattingError("invalid function overrides, '" + functionName + "' <> '" + fa.name + "'");
+                formattingError(
+                        "invalid function overrides, '" + functionName + "' <> '" + fa.name + "'");
             }
             functionName = fa.name;
             Map<String, Object> newOptions = convertOptions(fa.options, variables, arguments);
@@ -503,14 +512,16 @@ class MFDataModelFormatter {
         final String functionName;
         final Map<String, Object> options;
 
-        public ResolvedExpression(Object argument, String functionName, Map<String, Object> options) {
+        public ResolvedExpression(
+                Object argument, String functionName, Map<String, Object> options) {
             this.argument = argument;
             this.functionName = functionName;
             this.options = options;
         }
     }
 
-    private Map<String, Object> resolveDeclarations(List<MFDataModel.Declaration> declarations, Map<String, Object> arguments) {
+    private Map<String, Object> resolveDeclarations(
+            List<MFDataModel.Declaration> declarations, Map<String, Object> arguments) {
         Map<String, Object> variables = new HashMap<>();
         String name;
         Expression value;
@@ -523,7 +534,7 @@ class MFDataModelFormatter {
                     name = ((LocalDeclaration) declaration).name;
                     value = ((LocalDeclaration) declaration).value;
                 } else {
-                    continue; 
+                    continue;
                 }
                 FormattedPlaceholder fmt = formatExpression(value, variables, arguments);
                 variables.put(name, fmt);

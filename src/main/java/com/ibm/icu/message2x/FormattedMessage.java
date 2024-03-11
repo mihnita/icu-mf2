@@ -3,10 +3,9 @@
 
 package com.ibm.icu.message2x;
 
-import java.text.AttributedCharacterIterator;
-
 import com.ibm.icu.text.ConstrainedFieldPosition;
 import com.ibm.icu.text.FormattedValue;
+import java.text.AttributedCharacterIterator;
 
 /**
  * Not yet implemented: The result of a message formatting operation.
@@ -116,5 +115,4 @@ public class FormattedMessage implements FormattedValue {
     public AttributedCharacterIterator toCharacterIterator() {
         throw new RuntimeException("Not yet implemented.");
     }
-
 }

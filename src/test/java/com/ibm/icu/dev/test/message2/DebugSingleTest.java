@@ -3,14 +3,13 @@
 
 package com.ibm.icu.dev.test.message2;
 
+import com.ibm.icu.message2x.MFParser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import com.ibm.icu.message2x.MFParser;
-
 @RunWith(JUnit4.class)
-@SuppressWarnings({ "static-method", "javadoc" })
+@SuppressWarnings({"static-method", "javadoc"})
 public class DebugSingleTest {
     @Test
     public void test() throws Exception {

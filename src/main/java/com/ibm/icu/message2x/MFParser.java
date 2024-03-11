@@ -3,14 +3,13 @@
 
 package com.ibm.icu.message2x;
 
+import com.ibm.icu.message2x.MFDataModel.VariableExpression;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.ibm.icu.message2x.MFDataModel.VariableExpression;
 
 public class MFParser {
     private static final int EOF = -1;
@@ -128,14 +127,10 @@ public class MFParser {
     // abnf: expression = literal-expression
     // abnf: / variable-expression
     // abnf: / annotation-expression
-    // abnf: literal-expression = "{" [s] literal [s annotation] *(s attribute)
-    // [s] "}"
-    // abnf: variable-expression = "{" [s] variable [s annotation] *(s
-    // attribute) [s] "}"
+    // abnf: literal-expression = "{" [s] literal [s annotation] *(s attribute) [s] "}"
+    // abnf: variable-expression = "{" [s] variable [s annotation] *(s attribute) [s] "}"
     // abnf: annotation-expression = "{" [s] annotation *(s attribute) [s] "}"
-
-    // abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s]
-    // ["/"] "}" ; open and standalone
+    // abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s] ["/"] "}" ; open and standalone
     // abnf: / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}" ; close
     private MFDataModel.Expression getPlaceholder() throws MFParseException {
         int cp = input.peekChar();
@@ -151,7 +146,8 @@ public class MFParser {
             result = getMarkup();
         } else if (cp == '$') {
             result = getVariableExpression();
-        } else if (StringUtils.isFunctionSigil(cp) || StringUtils.isPrivateAnnotationSigil(cp)
+        } else if (StringUtils.isFunctionSigil(cp)
+                || StringUtils.isPrivateAnnotationSigil(cp)
                 || StringUtils.isReservedAnnotationSigil(cp)) {
             result = getAnnotationExpression();
         } else {
@@ -185,7 +181,8 @@ public class MFParser {
                 spy("options", options);
                 return new MFDataModel.FunctionAnnotation(identifier, options);
             default: // reserved && private
-                if (StringUtils.isReservedAnnotationSigil(cp) || StringUtils.isPrivateAnnotationSigil(cp)) {
+                if (StringUtils.isReservedAnnotationSigil(cp)
+                        || StringUtils.isPrivateAnnotationSigil(cp)) {
                     identifier = getIdentifier();
                     spy("identifier", identifier);
                     String body = getReservedBody();
@@ -261,9 +258,8 @@ public class MFParser {
         int cp = input.peekChar(); // consume the '{'
         checkCondition(cp == '#' || cp == '/', "Should not happen. Expecting a markup.");
 
-        MFDataModel.Markup.Kind kind = cp == '/'
-                ? MFDataModel.Markup.Kind.CLOSE
-                : MFDataModel.Markup.Kind.OPEN;
+        MFDataModel.Markup.Kind kind =
+                cp == '/' ? MFDataModel.Markup.Kind.CLOSE : MFDataModel.Markup.Kind.OPEN;
 
         MFDataModel.Annotation annotation = getAnnotationOrMarkup();
         List<MFDataModel.Attribute> attributes = getAttributes();
@@ -337,7 +333,8 @@ public class MFParser {
                 result.appendCodePoint(cp);
             } else if (cp == '\\') {
                 cp = input.readCodePoint();
-                checkCondition(cp == '{' || cp == '|' || cp == '}',
+                checkCondition(
+                        cp == '{' || cp == '|' || cp == '}',
                         "Invalid escape sequence. Only \\{, \\| and \\} are valid here.");
                 result.append(cp);
             } else if (cp == '|') {
@@ -478,7 +475,8 @@ public class MFParser {
 
     // abnf: ; number-literal matches JSON number (https://www.rfc-editor.org/rfc/rfc8259#section-6)
     // abnf: number-literal = ["-"] (%x30 / (%x31-39 *DIGIT)) ["." 1*DIGIT] [%i"e" ["-" / "+"] 1*DIGIT]
-    private static final Pattern RE_NUMBER_LITERAL = Pattern.compile("^-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+\\-]?[0-9]+)?");
+    private static final Pattern RE_NUMBER_LITERAL =
+            Pattern.compile("^-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+\\-]?[0-9]+)?");
 
     private MFDataModel.Literal getNumberLiteral() {
         String numberString = peekWithRegExp(RE_NUMBER_LITERAL);
@@ -548,7 +546,8 @@ public class MFParser {
     // abnf: variant = key *(s key) [s] quoted-pattern
     // abnf: key = literal / "*"
     // abnf: match = %s".match"
-    private MFDataModel.SelectMessage getMatch(List<MFDataModel.Declaration> declarations) throws MFParseException {
+    private MFDataModel.SelectMessage getMatch(List<MFDataModel.Declaration> declarations)
+            throws MFParseException {
         // ".match" was already consumed by the caller
         // Look for selectors
         List<MFDataModel.Expression> expressions = new ArrayList<>();
@@ -559,7 +558,8 @@ public class MFParser {
             if (expression == null) {
                 break;
             }
-            checkCondition(! (expression instanceof MFDataModel.Markup), "Cannot do selection on markup");
+            checkCondition(
+                    !(expression instanceof MFDataModel.Markup), "Cannot do selection on markup");
             expressions.add(expression);
         }
 
@@ -593,7 +593,8 @@ public class MFParser {
         spy("keys", keys);
         skipOptionalWhitespaces();
         if (input.atEnd()) {
-            checkCondition(keys.isEmpty(), "After selector keys it is mandatory to have a pattern.");
+            checkCondition(
+                    keys.isEmpty(), "After selector keys it is mandatory to have a pattern.");
             return null;
         }
         MFDataModel.Pattern pattern = getQuotedPattern();
@@ -643,7 +644,8 @@ public class MFParser {
                     inputVarName = ((VariableExpression) expression).arg.name;
                 }
                 if (expression instanceof MFDataModel.VariableExpression) {
-                    return new MFDataModel.InputDeclaration(inputVarName, (MFDataModel.VariableExpression) expression);
+                    return new MFDataModel.InputDeclaration(
+                            inputVarName, (MFDataModel.VariableExpression) expression);
                 }
                 break;
             case "local":
@@ -656,7 +658,8 @@ public class MFParser {
                 skipOptionalWhitespaces();
                 expression = getPlaceholder();
                 if (varName instanceof MFDataModel.VariableRef) {
-                    return new MFDataModel.LocalDeclaration(((MFDataModel.VariableRef) varName).name, expression);
+                    return new MFDataModel.LocalDeclaration(
+                            ((MFDataModel.VariableRef) varName).name, expression);
                 }
                 break;
             case "match":
@@ -768,7 +771,9 @@ public class MFParser {
     private void spy(boolean force, String label, Object obj) {
         if (debug) {
             int position = input.getPosition();
-            String xtras = String.format("%s\u2191\u2191\u2191%s%n", input.buffer.substring(0, position), input.buffer.substring(position));
+            String xtras = String.format(
+                    "%s\u2191\u2191\u2191%s%n",
+                    input.buffer.substring(0, position), input.buffer.substring(position));
             DbgUtil.spy(force, label, obj, xtras);
         }
     }

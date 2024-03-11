@@ -3,6 +3,11 @@
 
 package com.ibm.icu.dev.test.message2;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.ibm.icu.message2x.MFDataModel;
+import com.ibm.icu.message2x.MFParser;
 import java.io.BufferedReader;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
@@ -10,22 +15,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import com.ibm.icu.message2x.MFDataModel;
-import com.ibm.icu.message2x.MFParser;
-
-@SuppressWarnings({ "javadoc" })
+@SuppressWarnings({"javadoc"})
 @RunWith(JUnit4.class)
 public class MFFunctionsTest {
-    final static private Gson GSON = new GsonBuilder().setDateFormat("yyyyMMdd'T'HHmmss").create();
-    final static private String JSON_FILE = "test-functions.json";
+    private static final Gson GSON = new GsonBuilder().setDateFormat("yyyyMMdd'T'HHmmss").create();
+    private static final String JSON_FILE = "test-functions.json";
 
     @Test
     public void test() throws Exception {
