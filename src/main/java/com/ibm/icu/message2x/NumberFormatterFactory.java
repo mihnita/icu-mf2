@@ -141,7 +141,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
     }
 
     private static class PluralSelectorImpl implements Selector {
-        private static final String NO_MATCH = "\u1234NO_MATCH\u5678";
+        private static final String NO_MATCH = "\u27E4NO_MATCH\u27E5"; // Something unlikely to show in a key
         private final PluralRules rules;
         private Map<String, Object> fixedOptions;
         private LocalizedNumberFormatter icuFormatter;
@@ -179,7 +179,9 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
         // There is no need to be very strict, as these are keys that are already equal
         // So we will not get to compare "1" vs "2", or "one" vs "few".
         private static int pluralComparator(String o1, String o2) {
-            if (o1.equals(o2)) return 0;
+            if (o1.equals(o2)) {
+                return 0;
+            }
             if (NO_MATCH.equals(o1)) {
                 return 1;
             }

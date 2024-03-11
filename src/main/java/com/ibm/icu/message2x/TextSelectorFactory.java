@@ -42,6 +42,7 @@ class TextSelectorFactory implements SelectorFactory {
             return result;
         }
 
+        @SuppressWarnings("static-method")
         private boolean matches(Object value, String key) {
             if ("*".equals(key)) {
                 return true;

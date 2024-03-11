@@ -99,8 +99,8 @@ class MFDataModelFormatter {
         StringBuilder result = new StringBuilder();
         for (MFDataModel.PatternPart part : patternToRender.parts) {
             if (part instanceof MFDataModel.StringPart) {
-                MFDataModel.StringPart sPart = (StringPart) part;
-                result.append(sPart.value);
+                MFDataModel.StringPart strPart = (StringPart) part;
+                result.append(strPart.value);
             } else if (part instanceof MFDataModel.Expression) {
                 FormattedPlaceholder formattedExpression =
                         formatExpression((Expression) part, variables, arguments);
@@ -355,6 +355,7 @@ class MFDataModelFormatter {
      * The most-preferred key is first,
      * with each successive key appearing in order by decreasing preference.
      */
+    @SuppressWarnings("static-method")
     private List<String> matchSelectorKeys(ResolvedSelector rv, List<String> keys) {
         return rv.selectorFunction.matches(rv.argument, keys, rv.options);
     }
@@ -444,7 +445,9 @@ class MFDataModelFormatter {
     }
 
     /**
-     * @param expression the expression to forma
+     * Formats an expression.
+     *
+     * @param expression the expression to format
      * @param variables local variables, created from declarations (`.input` and `.local`)
      * @param arguments the arguments passed at runtime to be formatted (`mf.format(arguments)`)
      */

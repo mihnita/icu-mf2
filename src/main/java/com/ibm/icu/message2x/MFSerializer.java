@@ -10,7 +10,7 @@ class MFSerializer {
         return null;
     }
 
-    public MFDataModel build() {
+    public static MFDataModel build() {
         return null;
     }
 }

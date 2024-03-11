@@ -59,7 +59,10 @@ public class NumberFormatTest {
                 .setPattern(testCase.message)
                 .build();
         String result = mf.formatToString(testCase.arguments);
-        if (!testCase.expected.isEmpty()) assertEquals(testCase.expected, result);
-        else System.out.println("GOT : '" + result + "'");
+        if (!testCase.expected.isEmpty()) {
+            assertEquals(testCase.expected, result);
+        } else {
+            System.out.println("GOT : '" + result + "'");
+        }
     }
 }

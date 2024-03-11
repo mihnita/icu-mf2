@@ -10,8 +10,8 @@ import com.ibm.icu.message2x.MFFunctionRegistry;
 import com.ibm.icu.message2x.MessageFormatter;
 import org.junit.Ignore;
 
-@Ignore("Utility class, has no test methods.")
 /** Utility class, has no test methods. */
+@Ignore("Utility class, has no test methods.")
 public class TestUtils {
 
     static void runTestCase(TestCase testCase) {

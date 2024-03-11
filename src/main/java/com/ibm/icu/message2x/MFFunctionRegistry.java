@@ -196,7 +196,7 @@ public class MFFunctionRegistry {
         }
 
         /**
-         * Adds a mapping from a formatter name to a {@link FormatterFactory}
+         * Adds a mapping from a formatter name to a {@link FormatterFactory}.
          *
          * @param formatterName the function name (as used in the MessageFormat 2 syntax).
          * @param formatterFactory the factory that handles the name.
@@ -286,7 +286,7 @@ public class MFFunctionRegistry {
         }
 
         /**
-         * Adds a mapping from a selector name to a {@link SelectorFactory}
+         * Adds a mapping from a selector name to a {@link SelectorFactory}.
          *
          * @param selectorName the function name (as used in the MessageFormat 2 syntax).
          * @param selectorFactory the factory that handles the name.

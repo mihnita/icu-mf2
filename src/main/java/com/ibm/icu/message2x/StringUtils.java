@@ -5,7 +5,7 @@ package com.ibm.icu.message2x;
 
 class StringUtils {
 
-    /**
+    /*
      * abnf: content-char = %x01-08        ; omit NULL (%x00), HTAB (%x09) and LF (%x0A)
      * abnf:              / %x0B-0C        ; omit CR (%x0D)
      * abnf:              / %x0E-1F        ; omit SP (%x20)
@@ -28,21 +28,17 @@ class StringUtils {
                 || (cp >= 0xE000 && cp <= 0x10FFFF);
     }
 
-    /*
-     * abnf: text-char = content-char / s / "." / "@" / "|"
-     */
+    // abnf: text-char = content-char / s / "." / "@" / "|"
     static boolean isTextChar(int c) {
         return isContentChar(c) || isWhitespace(c) || c == '.' || c == '@' || c == '|';
     }
 
-    /**
-     * abnf: backslash = %x5C ; U+005C REVERSE SOLIDUS "\"
-     */
+    // abnf: backslash = %x5C ; U+005C REVERSE SOLIDUS "\"
     static boolean isBackslash(int c) {
         return c == '\\';
     }
 
-    /**
+    /*
      * ; Whitespace
      * abnf: s = 1*( SP / HTAB / CR / LF / %x3000 )
      */
@@ -50,7 +46,7 @@ class StringUtils {
         return cp == ' ' || cp == '\t' || cp == '\r' || cp == '\n' || cp == '\u3000';
     }
 
-    /**
+    /*
      * abnf: name-start = ALPHA / "_"
      * abnf:            / %xC0-D6 / %xD8-F6 / %xF8-2FF
      * abnf:            / %x370-37D / %x37F-1FFF / %x200C-200D
@@ -74,7 +70,7 @@ class StringUtils {
                 || (cp >= 0x10000 && cp <= 0xEFFFF);
     }
 
-    /**
+    /*
      * abnf: name-char = name-start / DIGIT / "-" / "."
      * abnf:           / %xB7 / %x300-36F / %x203F-2040
      */
@@ -88,16 +84,12 @@ class StringUtils {
                 || (cp >= 0x203F && cp <= 0x2040);
     }
 
-    /*
-     * abnf: private-start = "^" / "&"
-     */
+    // abnf: private-start = "^" / "&"
     static boolean isPrivateStart(int codePoint) {
         return codePoint == '^' || codePoint == '&';
     }
 
-    /*
-     * abnf: quoted-char = content-char / s / "." / "@" / "{" / "}"
-     */
+    // abnf: quoted-char = content-char / s / "." / "@" / "{" / "}"
     static boolean isQuotedChar(int cp) {
         return isContentChar(cp)
                 || isWhitespace(cp)
@@ -107,9 +99,7 @@ class StringUtils {
                 || cp == '}';
     }
 
-    /*
-     * abnf: reserved-char = content-char / "."
-     */
+    // abnf: reserved-char = content-char / "."
     static boolean isReservedChar(int cp) {
         return isContentChar(cp) || cp == '.';
     }

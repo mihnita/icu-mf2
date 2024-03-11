@@ -391,7 +391,9 @@ public class FromJsonTest { // extends CoreTestFmwk {
     public void test() {
         int ignoreCount = 0;
         for (TestCase testCase : TEST_CASES) {
-            if (testCase.ignore) ignoreCount++;
+            if (testCase.ignore) {
+                ignoreCount++;
+            }
             TestUtils.runTestCase(testCase);
         }
         System.out.printf(

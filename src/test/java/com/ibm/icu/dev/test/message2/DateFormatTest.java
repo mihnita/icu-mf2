@@ -89,7 +89,10 @@ public class DateFormatTest {
         MessageFormatter mf =
                 MessageFormatter.builder().setLocale(Locale.US).setPattern(pattern).build();
         String result = mf.formatToString(ARGS);
-        if (!expected.isEmpty()) assertEquals(expected, result);
-        else System.out.println("GOT : '" + result + "'");
+        if (!expected.isEmpty()) {
+            assertEquals(expected, result);
+        } else {
+            System.out.println("GOT : '" + result + "'");
+        }
     }
 }

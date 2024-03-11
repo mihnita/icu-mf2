@@ -266,6 +266,7 @@ public class MessageFormatter {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
+    @SuppressWarnings("static-method")
     public FormattedMessage format(Map<String, Object> arguments) {
         throw new RuntimeException("Not yet implemented.");
     }

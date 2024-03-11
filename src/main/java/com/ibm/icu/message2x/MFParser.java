@@ -11,6 +11,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * This class parses a {@code MessageFormat 2} syntax into a datamodel {@link MFDataModel.Message}.
+ *
+ * <p>It is used by {@link MessageFormatter}, but it might be handy for various tools.</p>
+ *
+ * @internal ICU 75 technology preview
+ * TzuAt deprecated This API is for technology preview only.
+ */
+// TZUAT Deprecated
 public class MFParser {
     private static final int EOF = -1;
     private final InputSource input;
@@ -19,6 +28,18 @@ public class MFParser {
         this.input = new InputSource(text);
     }
 
+    /**
+     * Parses a {@code MessageFormat 2} syntax into a {@link MFDataModel.Message}.
+     *
+     * <p>It is used by {@link MessageFormatter}, but it might be handy for various tools.</p>
+     * @param input the text to parse 
+     * @return the parsed {@code MFDataModel.Message}
+     * @throws MFParseException if errors are detected
+     *
+     * @internal ICU 75 technology preview
+     * TzuAt deprecated This API is for technology preview only.
+     */
+    // TZUAT Deprecated
     public static MFDataModel.Message parse(String input) throws MFParseException {
         return new MFParser(input).parseImpl();
     }
@@ -760,8 +781,7 @@ public class MFParser {
         return null;
     }
 
-    // TODO: Debug utilities, to remove
-
+    /** TODO: Debug utilities, to remove. */
     public static boolean debug = true;
 
     private void spy(String label, Object obj) {
