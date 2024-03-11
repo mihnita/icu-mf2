@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TimeZone;
 
 import com.ibm.icu.text.DateFormat;
@@ -44,18 +43,17 @@ class DateTimeFormatterFactory implements FormatterFactory {
      */
     @Override
     public Formatter createFormatter(Locale locale, Map<String, Object> fixedOptions) {
-//        DateFormat df;
         String opt;
 
         int dateStyle = DateFormat.NONE;
-        opt = getOptionAsString(fixedOptions, "dateStyle");
-        if (!opt.isEmpty()) {
+        opt = OptUtils.getString(fixedOptions, "dateStyle");
+        if (opt != null) {
             dateStyle = stringToStyle(opt);
         }
 
         int timeStyle = DateFormat.NONE;
-        opt = getOptionAsString(fixedOptions, "timeStyle");
-        if (!opt.isEmpty()) {
+        opt = OptUtils.getString(fixedOptions, "timeStyle");
+        if (opt != null) {
             timeStyle = stringToStyle(opt);
         }
 
@@ -64,7 +62,7 @@ class DateTimeFormatterFactory implements FormatterFactory {
             String skeleton = checkForFieldOptions(fixedOptions);
             if (skeleton.isEmpty()) {
                 // Custom option, icu namespace
-                skeleton = getOptionAsString(fixedOptions, "icu:skeleton");
+                skeleton = OptUtils.getString(fixedOptions, "icu:skeleton", "");
             }
             if (!skeleton.isEmpty()) {
                 DateFormat df = DateFormat.getInstanceForSkeleton(skeleton, locale);
@@ -80,39 +78,31 @@ class DateTimeFormatterFactory implements FormatterFactory {
         return new DateTimeFormatter(locale, df);
     }
 
-    private static String getOptionAsString(Map<String, Object> fixedOptions, String key) {
-        Object opt = fixedOptions.get(key);
-        if (opt != null) {
-            return Objects.toString(opt);
-        }
-        return "";
-    }
-
     private static String checkForFieldOptions(Map<String, Object> options) {
         StringBuilder skeleton = new StringBuilder();
         String opt;
 
-        opt = getOptionAsString(options, "weekday");
+        opt = OptUtils.getString(options, "weekday", "");
         switch (opt) {
             case "long": skeleton.append("EEEE"); break;
             case "short": skeleton.append("E"); break;
             case "narrow": skeleton.append("EEEEEE"); break;
         }
 
-        opt = getOptionAsString(options, "era");
+        opt = OptUtils.getString(options, "era", "");
         switch (opt) {
             case "long": skeleton.append("GGGG"); break;
             case "short": skeleton.append("G"); break;
             case "narrow": skeleton.append("GGGGG"); break;
         }
 
-        opt = getOptionAsString(options, "year");
+        opt = OptUtils.getString(options, "year", "");
         switch (opt) {
             case "numeric": skeleton.append("y"); break;
             case "2-digit": skeleton.append("yy"); break;
         }
 
-        opt = getOptionAsString(options, "month");
+        opt = OptUtils.getString(options, "month", "");
         switch (opt) {
             case "numeric": skeleton.append("M"); break;
             case "2-digit": skeleton.append("MM"); break;
@@ -121,21 +111,21 @@ class DateTimeFormatterFactory implements FormatterFactory {
             case "narrow": skeleton.append("MMMMM"); break;
         }
 
-        opt = getOptionAsString(options, "day");
+        opt = OptUtils.getString(options, "day", "");
         switch (opt) {
             case "numeric": skeleton.append("d"); break;
             case "2-digit": skeleton.append("dd"); break;
         }
 
         int showHour = 0; 
-        opt = getOptionAsString(options, "hour");
+        opt = OptUtils.getString(options, "hour", "");
         switch (opt) {
             case "numeric": showHour = 1; break;
             case "2-digit": showHour = 2; break;
         }
         if (showHour > 0) {
             String hourCycle = "";
-            opt = getOptionAsString(options, "hourCycle");
+            opt = OptUtils.getString(options, "hourCycle", "");
             switch (opt) {
                 case "h11": hourCycle = "K"; break;
                 case "h12": hourCycle = "h"; break;
@@ -150,26 +140,26 @@ class DateTimeFormatterFactory implements FormatterFactory {
             }
         }
 
-        opt = getOptionAsString(options, "minute");
+        opt = OptUtils.getString(options, "minute", "");
         switch (opt) {
             case "numeric": skeleton.append("m"); break;
             case "2-digit": skeleton.append("mm"); break;
         }
 
-        opt = getOptionAsString(options, "second");
+        opt = OptUtils.getString(options, "second", "");
         switch (opt) {
             case "numeric": skeleton.append("s"); break;
             case "2-digit": skeleton.append("ss"); break;
         }
 
-        opt = getOptionAsString(options, "fractionalSecondDigits");
+        opt = OptUtils.getString(options, "fractionalSecondDigits", "");
         switch (opt) {
             case "1": skeleton.append("S"); break;
             case "2": skeleton.append("SS"); break;
             case "3": skeleton.append("SSS"); break;
         }
 
-        opt = getOptionAsString(options, "timeZoneName");
+        opt = OptUtils.getString(options, "timeZoneName", "");
         switch (opt) {
             case "long": skeleton.append("z"); break;
             case "short": skeleton.append("zzzz"); break;

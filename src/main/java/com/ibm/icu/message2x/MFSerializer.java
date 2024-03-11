@@ -6,7 +6,7 @@ package com.ibm.icu.message2x;
 // TODO: find a better name for this class
 class MFSerializer {
 
-    public static String dataModelToString(MFDataModel dataModel) {
+    public static String dataModelToString(@SuppressWarnings("unused") MFDataModel dataModel) {
         return null;
     }
 

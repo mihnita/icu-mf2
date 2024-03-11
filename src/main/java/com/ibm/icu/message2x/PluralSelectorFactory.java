@@ -5,7 +5,6 @@ package com.ibm.icu.message2x;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import com.ibm.icu.number.FormattedNumber;
 import com.ibm.icu.text.FormattedValue;
@@ -28,7 +27,7 @@ class PluralSelectorFactory implements SelectorFactory {
      */
     @Override
     public Selector createSelector(Locale locale, Map<String, Object> fixedOptions) {
-        String type = Objects.toString(fixedOptions.get("select"));
+        String type = OptUtils.getString(fixedOptions, "select", "");
         PluralType pluralType;
         switch (type) {
             case "ordinal":
@@ -91,7 +90,10 @@ class PluralSelectorFactory implements SelectorFactory {
             // If there is nothing "tricky" about the formatter part we compare values directly.
             // Right now ICU4J checks if the formatter is a DecimalFormt, which also feels "hacky".
             // We need something better.
-            if (!fixedOptions.containsKey("skeleton") && !variableOptions.containsKey("skeleton")) {
+
+            Integer vo = OptUtils.getInteger(variableOptions, "minimumFractionDigits");
+            Integer fo = OptUtils.getInteger(fixedOptions, "minimumFractionDigits");
+            if (vo == null || fo == null) {
                 try { // for match exact.
                     if (Double.parseDouble(key) == valToCheck) {
                         return true;

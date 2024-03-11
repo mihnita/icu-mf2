@@ -29,7 +29,6 @@ import com.ibm.icu.message2x.MFDataModel.SelectMessage;
 import com.ibm.icu.message2x.MFDataModel.StringPart;
 import com.ibm.icu.message2x.MFDataModel.VariableRef;
 import com.ibm.icu.message2x.MFDataModel.Variant;
-import com.ibm.icu.text.FormattedValue;
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.CurrencyAmount;
 
@@ -147,7 +146,7 @@ class MFDataModelFormatter {
             }
             if (funcFactory != null) {
                 Selector selectorFunction = funcFactory.createSelector(locale, options);
-                ResolvedSelector rs = new ResolvedSelector(argument, functionName, options, selectorFunction);
+                ResolvedSelector rs = new ResolvedSelector(argument, options, selectorFunction);
                 selectorFunctions.add(rs);
             } else {
                 throw new IllegalArgumentException("Unknown selector type: " + functionName);
@@ -180,7 +179,6 @@ class MFDataModelFormatter {
                 DbgUtil.spy("valToCheck", keyToCheck);
                 System.out.println("==================");
 //                Map<String, Object> options = mf2OptToVariableOptions(selector.getOptions(), arguments);
-                Map<String, Object> options = new HashMap<>();
                 Object operand = resolvedSelector.argument;
                 String realKey = "?";
                 if (keyToCheck instanceof Literal) {
@@ -212,12 +210,10 @@ class MFDataModelFormatter {
     
     private static class ResolvedSelector {
         final Object argument;
-        final String functionName;
         final Map<String, Object> options;
         final Selector selectorFunction;
-        public ResolvedSelector(Object argument, String functionName, Map<String, Object> options, Selector selectorFunction) {
+        public ResolvedSelector(Object argument, Map<String, Object> options, Selector selectorFunction) {
             this.argument = argument;
-            this.functionName = functionName;
             this.options = new HashMap<>(options);
             this.selectorFunction = selectorFunction;
         }

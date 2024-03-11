@@ -11,6 +11,8 @@ import java.util.Objects;
 import com.ibm.icu.math.BigDecimal;
 import com.ibm.icu.number.LocalizedNumberFormatter;
 import com.ibm.icu.number.NumberFormatter;
+import com.ibm.icu.number.NumberFormatter.GroupingStrategy;
+import com.ibm.icu.number.NumberFormatter.SignDisplay;
 import com.ibm.icu.number.Precision;
 import com.ibm.icu.number.UnlocalizedNumberFormatter;
 import com.ibm.icu.text.FormattedValue;
@@ -44,10 +46,56 @@ class NumberFormatterFactory implements FormatterFactory {
                 nf = NumberFormatter.forSkeleton(skeleton);
             } else {
                 nf = NumberFormatter.with();
-                Integer minFractionDigits = OptUtils.getInteger(fixedOptions, "minimumFractionDigits");
-                if (minFractionDigits != null) {
-                    nf = nf.precision(Precision.minFraction(minFractionDigits));
+                Integer option = OptUtils.getInteger(fixedOptions, "minimumFractionDigits");
+                if (option != null) {
+                    nf = nf.precision(Precision.minFraction(option));
                 }
+
+                option = OptUtils.getInteger(fixedOptions, "minimumIntegerDigits");
+                if (option != null) {
+                    // TODO! Ask Shane.
+                }
+                option = OptUtils.getInteger(fixedOptions, "minimumFractionDigits");
+                if (option != null) {
+                    nf = nf.precision(Precision.minFraction(option));
+                }
+                option = OptUtils.getInteger(fixedOptions, "maximumFractionDigits");
+                if (option != null) {
+                    nf = nf.precision(Precision.maxFraction(option));
+                }
+                option = OptUtils.getInteger(fixedOptions, "minimumSignificantDigits");
+                if (option != null) {
+                    nf = nf.precision(Precision.minSignificantDigits(option));
+                }
+                option = OptUtils.getInteger(fixedOptions, "maximumSignificantDigits");
+                if (option != null) {
+                    nf = nf.precision(Precision.maxSignificantDigits(option));
+                }
+
+                String strOption = OptUtils.getString(fixedOptions, "signDisplay", "auto");
+                SignDisplay signDisplay;
+                switch (strOption) { 
+                    case "always": signDisplay = SignDisplay.ALWAYS; break;
+                    case "exceptZero": signDisplay = SignDisplay.EXCEPT_ZERO; break;
+                    case "negative": signDisplay = SignDisplay.NEGATIVE; break;
+                    case "never": signDisplay = SignDisplay.NEVER; break;
+                    case "auto": // intentional fall-through
+                    default:
+                        signDisplay = SignDisplay.AUTO;
+                }
+                nf = nf.sign(signDisplay);
+
+                GroupingStrategy grp;
+                strOption = OptUtils.getString(fixedOptions, "useGrouping", "auto");
+                switch (strOption) { 
+                    case "always": grp = GroupingStrategy.ON_ALIGNED; break; // TODO: check
+                    case "never": grp = GroupingStrategy.OFF; break;
+                    case "min2": grp = GroupingStrategy.MIN2; break;
+                    case "auto": // intentional fall-through
+                    default:
+                        grp = GroupingStrategy.AUTO;
+                }
+                nf = nf.grouping(grp);
             }
             return nf.locale(locale);
         }
@@ -90,9 +138,9 @@ class NumberFormatterFactory implements FormatterFactory {
                 realFormatter = formatterForOptions(locale, mergedOptions);
             }
 
-            Integer offset = OptUtils.getInteger(variableOptions, "offset");
+            Integer offset = OptUtils.getInteger(variableOptions, "icu:offset");
             if (offset == null && fixedOptions != null) {
-                offset = OptUtils.getInteger(fixedOptions, "offset");
+                offset = OptUtils.getInteger(fixedOptions, "icu:offset");
             }
             if (offset == null) {
                 offset = 0;

@@ -38,15 +38,18 @@ class OptUtils {
         return null;
     }
 
-    static String getString(Map<String, Object> options, String key) {
+    static String getString(Map<String, Object> options, String key, String defaultVal) {
         Object value = options.get(key);
         if (value == null) {
-            return null;
+            return defaultVal;
         }
         if (value instanceof CharSequence) {
             return value.toString();
         }
-        return null;
+        return defaultVal;
     }
 
+    static String getString(Map<String, Object> options, String key) {
+        return getString(options, key, null);
+    }
 }
