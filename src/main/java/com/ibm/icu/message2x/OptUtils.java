@@ -13,14 +13,10 @@ class OptUtils {
             return (Number) value;
         }
         if (value instanceof CharSequence) {
-            String strValue = value.toString();
             try {
-                return Double.parseDouble(strValue);
+                return Double.parseDouble(value.toString());
             } catch (NumberFormatException e) {
-            }
-            try {
-                return Integer.decode(strValue);
-            } catch (NumberFormatException e) {
+                /* just ignore, we want to try more */
             }
         }
         return null;

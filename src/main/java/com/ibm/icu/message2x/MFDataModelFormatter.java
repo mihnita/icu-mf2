@@ -3,7 +3,6 @@
 
 package com.ibm.icu.message2x;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -184,15 +183,16 @@ class MFDataModelFormatter {
                 // spec: Let `key` be the `var` key at position `i`.
                 LiteralOrCatchallKey key = var.keys.get(i);
                 // spec: If `key` is not the catch-all key `'*'`:
-                if (! (key instanceof CatchallKey)) {
+                if (key instanceof CatchallKey) {
+                    keys.add("*");
+                } else if (key instanceof Literal) {
                     // spec: Assert that `key` is a _literal_.
-                    if (! (key instanceof Literal)) {
-                        formattingError("Literal expected, but got " + key);                        
-                    }
                     // spec: Let `ks` be the resolved value of `key`.
                     String ks = ((Literal) key).value;
                     // spec: Append `ks` as the last element of the list `keys`.
                     keys.add(ks);   
+                } else {
+                    formattingError("Literal expected, but got " + key);                        
                 }
             }
             // spec: Let `rv` be the resolved value at index `i` of `res`.
@@ -212,14 +212,14 @@ class MFDataModelFormatter {
         // spec: For each _variant_ `var` of the message:
         for (Variant var : sm.variants) {
             // spec:    For each index `i` in `pref`:
+            int found = 0;
             for (int i = 0; i < pref.size(); i++) {
                 // spec:       Let `key` be the `var` key at position `i`.
                 LiteralOrCatchallKey key = var.keys.get(i);
                 // spec:       If `key` is the catch-all key `'*'`:
                 if (key instanceof CatchallKey) {
                     // spec:          Continue the inner loop on `pref`.
-                    // MOVED IN THE LOOP
-                    vars.add(var);
+                    found++;
                     continue;
                 }
                 // spec:       1. Assert that `key` is a _literal_.
@@ -233,8 +233,7 @@ class MFDataModelFormatter {
                 // spec: If `matches` includes `ks`:
                 if (matches.contains(ks)) {
                     // spec:          1. Continue the inner loop on `pref`.
-                    // MOVED IN THE LOOP
-                    vars.add(var);
+                    found++;
                     continue;
                 } else {
                     // spec: Else:
@@ -242,8 +241,10 @@ class MFDataModelFormatter {
                     break;
                 }
             }
-//            // MOVED IN THE LOOP
-//            vars.add(var);
+            if (found == pref.size()) {
+                // spec: Append `var` as the last element of the list `vars`.
+                vars.add(var);
+            }
         }
 
         
@@ -407,7 +408,7 @@ class MFDataModelFormatter {
     private static Object resolveLiteralOrVariable(LiteralOrVariableRef value, Map<String, Object> localVars, Map<String, Object> arguments) {
         if (value instanceof Literal) {
             String val = ((Literal) value).value;
-            Number nr = tryParsingAsNumber(val);
+            Number nr = OptUtils.asNumber(val);
             if (nr != null) {
                 return nr;
             }
@@ -424,20 +425,6 @@ class MFDataModelFormatter {
             return val;
         }
         return value;
-    }
-
-    private static Number tryParsingAsNumber(String text) {
-        Number result = null;
-        try {
-            result = Long.parseLong(text);
-        } catch (NumberFormatException e) {}
-        try {
-            result = Double.parseDouble(text);
-        } catch (NumberFormatException e) {}
-        try {
-            result = new BigDecimal(text);
-        } catch (NumberFormatException e) {}
-        return result;
     }
 
     private static Map<String, Object> convertOptions(Map<String, Option> options, Map<String, Object> localVars, Map<String, Object> arguments) {

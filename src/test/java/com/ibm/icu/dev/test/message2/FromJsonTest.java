@@ -16,7 +16,7 @@ import org.junit.runners.JUnit4;
  * <a href="https://github.com/messageformat/messageformat/blob/master/packages/mf2-messageformat/src/__fixtures/test-messages.json">here</a>.</p>
  */
 @RunWith(JUnit4.class)
-@SuppressWarnings("javadoc")
+@SuppressWarnings({ "static-method", "javadoc" })
 public class FromJsonTest { // extends CoreTestFmwk {
 
     static final TestCase[] TEST_CASES = {
@@ -37,10 +37,9 @@ public class FromJsonTest { // extends CoreTestFmwk {
                 .arguments(Args.of("place", "world"))
                 .expected("hello world")
                 .build(),
-            new TestCase.Builder()
+            new TestCase.Builder().ignore("TODO: fallback changed?")
                 .pattern("hello {$place}")
                 .expected("hello {$place}")
-                .ignore("TODO: fallback changed?")
                 // errorsJs: ["missing-var"]
                 .build(),
             new TestCase.Builder()
@@ -125,7 +124,7 @@ public class FromJsonTest { // extends CoreTestFmwk {
                 .expected("bar 4.2")
                 .errors("invalid-type")
                 .build(),
-            new TestCase.Builder().ignore("Maybe. Function specific behavior.")
+            new TestCase.Builder()
                 .pattern(".local $foo = {$bar :number} {{bar {$foo}}}")
                 .arguments(Args.of("bar", "foo"))
                 .expected("bar NaN")
@@ -190,7 +189,7 @@ public class FromJsonTest { // extends CoreTestFmwk {
                 .patternJs(".match {$foo} one {{one}} 1 {{=1}} * {{other}}")
                 .pattern(".match {$foo :number} one {{one}} 1 {{=1}} * {{other}}")
                 .arguments(Args.of("foo", 1))
-                .expected("one")
+                .expected("=1")
                 .build(),
             new TestCase.Builder()
                 .patternJs(".match {$foo} {$bar} one one {{one one}} one * {{one other}} * * {{other}}")
@@ -258,9 +257,9 @@ public class FromJsonTest { // extends CoreTestFmwk {
                 .pattern("{#tag}")
                 .expected("")
                 .build(),
-            new TestCase.Builder().ignore("no markup support")
-                .pattern("{{+tag}content}")
-                .expected("{+tag}content")
+            new TestCase.Builder()
+                .pattern("{#tag}content")
+                .expected("content")
                 .build(),
             new TestCase.Builder()
                 .pattern("{#tag}content{/tag}")
@@ -301,7 +300,7 @@ public class FromJsonTest { // extends CoreTestFmwk {
                 .expected("no braces 2")
 //                .errors("parse-error", "junk-element")
                 .build(),
-            new TestCase.Builder().ignore("infinite loop!")
+            new TestCase.Builder()
                 .pattern("{missing end brace")
                 .expected("missing end brace")
                 .errors("missing-char")

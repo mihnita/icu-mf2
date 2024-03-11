@@ -143,6 +143,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
     }
 
     private static class PluralSelectorImpl implements Selector {
+        private final static String NO_MATCH = "\u1234NO_MATCH\u5678";
         private final PluralRules rules;
         private Map<String, Object> fixedOptions;
         private LocalizedNumberFormatter icuFormatter;
@@ -165,6 +166,8 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
             for (String key : keys) {
                 if (matches(value, key, variableOptions)) {
                     result.add(key);
+                } else {
+                    result.add(NO_MATCH);
                 }
             }
 
@@ -178,6 +181,12 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
         private static int pluralComparator(String o1, String o2) {
             if (o1.equals(o2))
                 return 0;
+            if (NO_MATCH.equals(o1)) {
+                return 1;
+            }
+            if (NO_MATCH.equals(o2)) {
+                return -1;
+            }
             // * sorts last
             if ("*".equals(o1)) {
                 return 1;
@@ -186,10 +195,10 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
                 return -1;
             }
             // Numbers sort first
-            if (tryParsingAsNumber(o1) != null) {
+            if (OptUtils.asNumber(o1) != null) {
                 return -1;
             }
-            if (tryParsingAsNumber(o2) != null) {
+            if (OptUtils.asNumber(o2) != null) {
                 return 1;
             }
             // At this point they are both strings
@@ -197,7 +206,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
             return o1.compareTo(o2);
         }
 
-        public boolean matches(Object value, String key, Map<String, Object> variableOptions) {
+        private boolean matches(Object value, String key, Map<String, Object> variableOptions) {
             if ("*".equals(key)) {
                 return true;
             }
@@ -216,23 +225,18 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
                 value = fph.getInput();
             }
 
-            Number valToCheckOffset = Double.MIN_VALUE;
-            if (value instanceof Double) {
-                valToCheck = (double) value;
-                valToCheckOffset = (double) value - offset;
-            } else if (value instanceof Integer) {
-                valToCheck = (Integer) value;
-                valToCheckOffset = (Integer) value - offset;
+            if (value instanceof Number) {
+                valToCheck = ((Number) value).doubleValue();
             } else {
                 return false;
             }
 
-            Number keyNrVal = tryParsingAsNumber(key);
+            Number keyNrVal = OptUtils.asNumber(key);
             if (keyNrVal != null && valToCheck.doubleValue() == keyNrVal.doubleValue()) {
                 return true;
             }
 
-            FormattedNumber formatted = icuFormatter.format(valToCheckOffset);
+            FormattedNumber formatted = icuFormatter.format(valToCheck.doubleValue() - offset);
             String match = rules.select(formatted);
             if (match.equals("other")) {
                 match = "*";
@@ -301,19 +305,4 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
         }
         return nf.locale(locale);
     }
-
-    private static Number tryParsingAsNumber(String text) {
-        Number result = null;
-        try {
-            result = Long.parseLong(text);
-        } catch (NumberFormatException e) {}
-        try {
-            result = Double.parseDouble(text);
-        } catch (NumberFormatException e) {}
-        try {
-            result = new BigDecimal(text);
-        } catch (NumberFormatException e) {}
-        return result;
-    }
-
 }

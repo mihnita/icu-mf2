@@ -33,7 +33,7 @@ class TextSelectorFactory implements SelectorFactory {
                 return result;
             }
             for (String key : keys) {
-                if (matches(value, key, variableOptions)) {
+                if (matches(value, key)) {
                     result.add(key);
                 }
             }
@@ -41,7 +41,7 @@ class TextSelectorFactory implements SelectorFactory {
             return result;
         }
 
-        public boolean matches(Object value, String key, Map<String, Object> variableOptions) {
+        private boolean matches(Object value, String key) {
             if ("*".equals(key)) {
                 return true;
             }
