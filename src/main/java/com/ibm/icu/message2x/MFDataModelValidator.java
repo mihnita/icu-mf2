@@ -11,6 +11,7 @@ import com.ibm.icu.message2x.MFDataModel.FunctionAnnotation;
 import com.ibm.icu.message2x.MFDataModel.FunctionExpression;
 import com.ibm.icu.message2x.MFDataModel.InputDeclaration;
 import com.ibm.icu.message2x.MFDataModel.Literal;
+import com.ibm.icu.message2x.MFDataModel.LiteralExpression;
 import com.ibm.icu.message2x.MFDataModel.LiteralOrCatchallKey;
 import com.ibm.icu.message2x.MFDataModel.LiteralOrVariableRef;
 import com.ibm.icu.message2x.MFDataModel.LocalDeclaration;
@@ -27,13 +28,13 @@ import java.util.StringJoiner;
 
 class MFDataModelValidator {
     private final MFDataModel.Message message;
+    private final Set<String> declaredVars = new HashSet<>();
 
     MFDataModelValidator(MFDataModel.Message message) {
         this.message = message;
     }
 
     boolean validate() throws MFParseException {
-        DbgUtil.spy("validate model", message);
         if (message instanceof PatternMessage) {
             validateDeclarations(((PatternMessage) message).declarations);
         } else if (message instanceof SelectMessage) {
@@ -72,7 +73,11 @@ class MFDataModelValidator {
                     fakeKey.add(((Literal) key).value);
                 }
             }
-            addWithoutDoubles(fakeKeys, fakeKey.toString(), "Dumplicate combination of keys");
+            if (fakeKeys.contains(fakeKey.toString())) {
+                error("Dumplicate combination of keys");
+            } else {
+                fakeKeys.add(fakeKey.toString());
+            }
             if (catchAllCount == selectorCount) {
                 hasUltimateFallback = true;
             }
@@ -101,45 +106,59 @@ class MFDataModelValidator {
         if (declarations == null || declarations.isEmpty()) {
             return true;
         }
-        Set<String> declared = new HashSet<>();
         for (Declaration declaration : declarations) {
-            DbgUtil.spy("   declaration", declaration);
             if (declaration instanceof LocalDeclaration) {
                 LocalDeclaration ld = (LocalDeclaration) declaration;
-                addWithoutDoubles(declared, ld.name, "'" + ld.name + "' was already declared");
-                validateExpression(ld.value, declared, /*is input*/ false);
+                validateExpression(ld.value, false);
+                addVariableDeclaration(ld.name);
             } else if (declaration instanceof InputDeclaration) {
                 InputDeclaration id = (InputDeclaration) declaration;
-                validateExpression(id.value, declared, /*is input*/ true);
+                validateExpression(id.value, true);
             }
         }
         return true;
     }
 
-    private void validateExpression(Expression expression, Set<String> declared, boolean isInput)
+    /*
+     * One might also consider checking if the same variable is used with more than one type:
+     *   .local $a = {$foo :number}
+     *   .local $b = {$foo :string}
+     *   .local $c = {$foo :datetime}
+     *
+     * But this is not necesarily an error.
+     * If $foo is a number, then it might be formatter as a number, or as date (epoch time),
+     * or something else.
+     *
+     * So it is not safe to complain. Especially with custom functions:
+     *   # get the first name from a `Person` object
+     *   .local $b = {$person :getField fieldName=firstName}
+     *   # get formats a `Person` object
+     *   .local $b = {$person :person}
+     */
+    private void validateExpression(Expression expression, boolean fromInput)
             throws MFParseException {
+        String argName = null;
         Annotation annotation = null;
         if (expression instanceof Literal) {
             // ...{foo}... or ...{|foo|}... or ...{123}...
             // does not declare anything
+        } else if (expression instanceof LiteralExpression) {
+            LiteralExpression le = (LiteralExpression) expression;
+            argName = le.arg.value;
+            annotation = le.annotation;
         } else if (expression instanceof VariableExpression) {
             VariableExpression ve = (VariableExpression) expression;
             // ...{$foo :bar opt1=|str| opt2=$x opt3=$y}...
             // .input {$foo :number} => declares `foo`, if already declared is an error
             // .local $a={$foo} => declares `a`, but only used `foo`, does not declare it
-            String argName = ve.arg.name;
-            if (isInput) {
-                addWithoutDoubles(declared, argName, "'" + argName + "' already declared.");
-            } else {
-                // Remember that we've seen it, to complain if there is a declaration later
-                declared.add(ve.arg.name);
-            }
+            argName = ve.arg.name;
             annotation = ve.annotation;
         } else if (expression instanceof FunctionExpression) {
             // ...{$foo :bar opt1=|str| opt2=$x opt3=$y}...
             FunctionExpression fe = (FunctionExpression) expression;
             annotation = fe.annotation;
         }
+
         if (annotation instanceof FunctionAnnotation) {
             FunctionAnnotation fa = (FunctionAnnotation) annotation;
             if (fa.options != null) {
@@ -148,41 +167,36 @@ class MFDataModelValidator {
                     if (val instanceof VariableRef) {
                         // We had something like {:f option=$val}, it means we's seen `val`
                         // It is not a declaration, so not an error.
-                        declared.add(((VariableRef) val).name);
+                        addVariableDeclaration(((VariableRef) val).name);
                     }
                 }
             }
         }
-        /* One might also consider checking if the same variable is used with more than one type:
-         *   .local $a = {$foo :number}
-         *   .local $b = {$foo :string}
-         *   .local $c = {$foo :datetime}
-         *
-         * But this is not necesarily an error.
-         * If $foo is a number, then it might be formatter as a number, or as date (epoch time),
-         * or something else.
-         *
-         * So it is not safe to complain. Especially with custom functions:
-         *   # get the first name from a `Person` object
-         *   .local $b = {$person :getField fieldName=firstName}
-         *   # get formats a `Person` object
-         *   .local $b = {$person :person}
-         */
+
+        // We chech the argument name after options to prevent errors like this:
+        // .local $foo = {$a :b option=$foo}
+        if (argName != null) {
+            // if we come from `.input {$foo :function}` then `varName` is null
+            // and `argName` is `foo` 
+            if (fromInput) {
+                addVariableDeclaration(argName);
+            } else {
+                // Remember that we've seen it, to complain if there is a declaration later
+                declaredVars.add(argName);
+            }
+        }
     }
 
-    private boolean addWithoutDoubles(Set<String> container, String newValue, String errorMessage)
-            throws MFParseException {
-        if (container.contains(newValue)) {
-            error(errorMessage);
+    private boolean addVariableDeclaration(String varName) throws MFParseException {
+        if (declaredVars.contains(varName)) {
+            error("Variable '" + varName + "' already declared");
             return false;
         }
-        container.add(newValue);
+        declaredVars.add(varName);
         return true;
     }
 
     private void error(String text) throws MFParseException {
-        DbgUtil.spy("VALIDATION FAILED", message);
-        System.out.println("VALIDATION FAILED: " + message);
         throw new MFParseException(text, -1);
     }
 }
