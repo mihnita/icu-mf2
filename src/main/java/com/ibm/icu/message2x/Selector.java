@@ -3,6 +3,7 @@
 
 package com.ibm.icu.message2x;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,7 +26,7 @@ public interface Selector {
      * for {@code matches(1, "1")}, {@code matches(1, "one")}, and {@code matches(1, "*")}.</p>
      *
      * @param value the value to select on.
-     * @param key the key to test for matching.
+     * @param keys the key to test for matching.
      * @param variableOptions options that are not know at build time.
      * @return the formatted string.
      *
@@ -33,5 +34,5 @@ public interface Selector {
      * TzuAt deprecated This API is for technology preview only.
      */
     // TZUAT Deprecated
-    boolean matches(Object value, String key, Map<String, Object> variableOptions);
+    List<String> matches(Object value, List<String> keys, Map<String, Object> variableOptions);
 }

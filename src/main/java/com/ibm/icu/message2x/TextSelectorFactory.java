@@ -3,9 +3,10 @@
 
 package com.ibm.icu.message2x;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
 
 /**
  * Creates a {@link Selector} doing literal selection, similar to <code>{exp, select}</code>
@@ -26,6 +27,20 @@ class TextSelectorFactory implements SelectorFactory {
          * {@inheritDoc}
          */
         @Override
+        public List<String> matches(Object value, List<String> keys, Map<String, Object> variableOptions) {
+            List<String> result = new ArrayList<>();
+            if (value == null) {
+                return result;
+            }
+            for (String key : keys) {
+                if (matches(value, key, variableOptions)) {
+                    result.add(key);
+                }
+            }
+            result.sort(String::compareTo);
+            return result;
+        }
+
         public boolean matches(Object value, String key, Map<String, Object> variableOptions) {
             if ("*".equals(key)) {
                 return true;

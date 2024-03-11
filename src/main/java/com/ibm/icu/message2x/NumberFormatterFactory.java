@@ -3,7 +3,9 @@
 
 package com.ibm.icu.message2x;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -155,41 +157,82 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
          * {@inheritDoc}
          */
         @Override
-        public boolean matches(Object value, String key, Map<String, Object> variableOptions) {
+        public List<String> matches(Object value, List<String> keys, Map<String, Object> variableOptions) {
+            List<String> result = new ArrayList<>();
             if (value == null) {
-                return false;
+                return result;
             }
+            for (String key : keys) {
+                if (matches(value, key, variableOptions)) {
+                    result.add(key);
+                }
+            }
+
+            result.sort(PluralSelectorImpl::pluralComparator);
+            return result;
+        }
+
+        // The order is exact values, key, other
+        // There is no need to be very strict, as these are keys that are already equal
+        // So we will not get to compare "1" vs "2", or "one" vs "few".
+        private static int pluralComparator(String o1, String o2) {
+            if (o1.equals(o2))
+                return 0;
+            // * sorts last
+            if ("*".equals(o1)) {
+                return 1;
+            }
+            if ("*".equals(o2)) {
+                return -1;
+            }
+            // Numbers sort first
+            if (tryParsingAsNumber(o1) != null) {
+                return -1;
+            }
+            if (tryParsingAsNumber(o2) != null) {
+                return 1;
+            }
+            // At this point they are both strings
+            // We should never get here, so the order does not really matter
+            return o1.compareTo(o2);
+        }
+
+        public boolean matches(Object value, String key, Map<String, Object> variableOptions) {
             if ("*".equals(key)) {
                 return true;
             }
 
-            Integer offset = OptUtils.getInteger(variableOptions, "offset");
+            Integer offset = OptUtils.getInteger(variableOptions, "icu:offset");
             if (offset == null && fixedOptions != null) {
-                offset = OptUtils.getInteger(fixedOptions, "offset");
+                offset = OptUtils.getInteger(fixedOptions, "icu:offset");
             }
             if (offset == null) {
                 offset = 0;
             }
 
-            double valToCheck = Double.MIN_VALUE;
+            Number valToCheck = Double.MIN_VALUE;
             if (value instanceof FormattedPlaceholder) {
                 FormattedPlaceholder fph = (FormattedPlaceholder) value;
                 value = fph.getInput();
             }
 
+            Number valToCheckOffset = Double.MIN_VALUE;
             if (value instanceof Double) {
                 valToCheck = (double) value;
+                valToCheckOffset = (double) value - offset;
             } else if (value instanceof Integer) {
                 valToCheck = (Integer) value;
+                valToCheckOffset = (Integer) value - offset;
             } else {
                 return false;
             }
 
-            // If there is nothing "tricky" about the formatter part we compare values directly.
-            // Right now ICU4J checks if the formatter is a DecimalFormt, which also feels "hacky".
-            // We need something better.
+            Number keyNrVal = tryParsingAsNumber(key);
+            if (keyNrVal != null && valToCheck.doubleValue() == keyNrVal.doubleValue()) {
+                return true;
+            }
 
-            FormattedNumber formatted = icuFormatter.format(valToCheck - offset);
+            FormattedNumber formatted = icuFormatter.format(valToCheckOffset);
             String match = rules.select(formatted);
             if (match.equals("other")) {
                 match = "*";
@@ -258,4 +301,19 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
         }
         return nf.locale(locale);
     }
+
+    private static Number tryParsingAsNumber(String text) {
+        Number result = null;
+        try {
+            result = Long.parseLong(text);
+        } catch (NumberFormatException e) {}
+        try {
+            result = Double.parseDouble(text);
+        } catch (NumberFormatException e) {}
+        try {
+            result = new BigDecimal(text);
+        } catch (NumberFormatException e) {}
+        return result;
+    }
+
 }

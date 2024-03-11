@@ -125,11 +125,18 @@ class MFDataModelFormatter {
             Map<String, Object> arguments) {
         Pattern patternToRender = null;
 
+        // ====================================
+        // spec: ### Resolve Selectors
+        // ====================================
+
         // Collect all the selector functions in an array, to reuse
         List<Expression> selectors = sm.selectors;
-        List<ResolvedSelector> selectorFunctions = new ArrayList<>(selectors.size());
-        for (Expression selector : selectors) {
-            FormattedPlaceholder fph = formatExpression(selector, variables, arguments);
+        // spec: Let `res` be a new empty list of resolved values that support selection.
+        List<ResolvedSelector> res = new ArrayList<>(selectors.size());
+        // spec: For each _selector_ `sel`, in source order,
+        for (Expression sel : selectors) {
+            // spec: Let `rv` be the resolved value of `sel`.
+            FormattedPlaceholder fph = formatExpression(sel, variables, arguments);
             String functionName = null;
             Object argument = null;
             Map<String, Object> options = new HashMap<>();
@@ -144,59 +151,153 @@ class MFDataModelFormatter {
             if (funcFactory == null) {
                 funcFactory = customFunctions.getSelector(functionName);
             }
+            // spec: If selection is supported for `rv`:
             if (funcFactory != null) {
                 Selector selectorFunction = funcFactory.createSelector(locale, options);
                 ResolvedSelector rs = new ResolvedSelector(argument, options, selectorFunction);
-                selectorFunctions.add(rs);
+                // spec: Append `rv` as the last element of the list `res`.
+                res.add(rs);
             } else {
                 throw new IllegalArgumentException("Unknown selector type: " + functionName);
             }
         }
+
         // This should not be possible, we added one function for each selector, or we have thrown an exception.
         // But just in case someone removes the throw above?
-        if (selectorFunctions.size() != selectors.size()) {
+        if (res.size() != selectors.size()) {
             throw new IllegalArgumentException("Something went wrong, not enough selector functions, "
-                    + selectorFunctions.size() + " vs. " + selectors.size());
+                    + res.size() + " vs. " + selectors.size());
         }
 
-        // Iterate "vertically", through all variants
-        for (Variant variant : sm.variants) {
-            int maxCount = selectors.size();
-            List<LiteralOrCatchallKey> keysToCheck = variant.keys;
-            if (selectors.size() != keysToCheck.size()) {
-                throw new IllegalArgumentException("Mismatch between the number of selectors and the number of keys: "
-                        + selectors.size() + " vs. " + keysToCheck.size());
-            }
+        // ====================================
+        // spec: ### Resolve Preferences
+        // ====================================
 
-            boolean matches = true;
-            // Iterate "horizontally", through all matching functions and keys
-            for (int i = 0; i < maxCount; i++) {
-//                Expression selector = selectors.get(i);
-                LiteralOrCatchallKey keyToCheck = keysToCheck.get(i);
-                ResolvedSelector resolvedSelector = selectorFunctions.get(i);
-//                DbgUtil.spy("selector", selector);
-                DbgUtil.spy("func", resolvedSelector);
-                DbgUtil.spy("valToCheck", keyToCheck);
-                System.out.println("==================");
-//                Map<String, Object> options = mf2OptToVariableOptions(selector.getOptions(), arguments);
-                Object operand = resolvedSelector.argument;
-                String realKey = "?";
-                if (keyToCheck instanceof Literal) {
-                    realKey = ((Literal) keyToCheck).value;
-                } else if (keyToCheck instanceof CatchallKey){
-                    realKey = "*";
+        // spec: Let `pref` be a new empty list of lists of strings.
+        List<List<String>> pref = new ArrayList<>();
+        // spec: For each index `i` in `res`:
+        for (int i = 0; i < res.size(); i++) {
+            // spec: Let `keys` be a new empty list of strings.
+            List<String> keys = new ArrayList<>();
+            // spec: For each _variant_ `var` of the message:
+            for (Variant var : sm.variants) {
+                // spec: Let `key` be the `var` key at position `i`.
+                LiteralOrCatchallKey key = var.keys.get(i);
+                // spec: If `key` is not the catch-all key `'*'`:
+                if (! (key instanceof CatchallKey)) {
+                    // spec: Assert that `key` is a _literal_.
+                    if (! (key instanceof Literal)) {
+                        formattingError("Literal expected, but got " + key);                        
+                    }
+                    // spec: Let `ks` be the resolved value of `key`.
+                    String ks = ((Literal) key).value;
+                    // spec: Append `ks` as the last element of the list `keys`.
+                    keys.add(ks);   
+                }
+            }
+            // spec: Let `rv` be the resolved value at index `i` of `res`.
+            ResolvedSelector rv = res.get(i);
+            // spec: Let `matches` be the result of calling the method MatchSelectorKeys(`rv`, `keys`)
+            List<String> matches = matchSelectorKeys(rv, keys);
+            // spec: Append `matches` as the last element of the list `pref`.
+            pref.add(matches);
+        }
+
+        // ====================================
+        // spec: ### Filter Variants
+        // ====================================
+
+        // spec: Let `vars` be a new empty list of _variants_.
+        List<Variant> vars = new ArrayList<>();
+        // spec: For each _variant_ `var` of the message:
+        for (Variant var : sm.variants) {
+            // spec:    For each index `i` in `pref`:
+            for (int i = 0; i < pref.size(); i++) {
+                // spec:       Let `key` be the `var` key at position `i`.
+                LiteralOrCatchallKey key = var.keys.get(i);
+                // spec:       If `key` is the catch-all key `'*'`:
+                if (key instanceof CatchallKey) {
+                    // spec:          Continue the inner loop on `pref`.
+                    // MOVED IN THE LOOP
+                    vars.add(var);
                     continue;
                 }
-                if (!resolvedSelector.selectorFunction.matches(operand, realKey, resolvedSelector.options)) {
-                    matches = false;
+                // spec:       1. Assert that `key` is a _literal_.
+                if (!(key instanceof Literal)) {
+                    formattingError("Literal expected");
+                }
+                // spec:       Let `ks` be the resolved value of `key`.
+                String ks = ((Literal) key).value;
+                // spec:       Let `matches` be the list of strings at index `i` of `pref`.
+                List<String> matches = pref.get(i);
+                // spec: If `matches` includes `ks`:
+                if (matches.contains(ks)) {
+                    // spec:          1. Continue the inner loop on `pref`.
+                    // MOVED IN THE LOOP
+                    vars.add(var);
+                    continue;
+                } else {
+                    // spec: Else:
+                    // spec: Continue the outer loop on message _variants_.
                     break;
                 }
             }
-            if (matches) {
-                patternToRender = variant.value;
-                break;
-            }
+//            // MOVED IN THE LOOP
+//            vars.add(var);
         }
+
+        
+        // ====================================
+        // spec: ### Sort Variants
+        // ====================================
+        // spec: Let `sortable` be a new empty list of (integer, _variant_) tuples.
+        List<IntVarTuple> sortable = new ArrayList<>();
+        // spec: For each _variant_ `var` of `vars`:
+        for (Variant var : vars) {
+            // spec:    Let `tuple` be a new tuple (-1, `var`).
+            IntVarTuple tuple = new IntVarTuple(-1, var);
+            // spec:    Append `tuple` as the last element of the list `sortable`.
+            sortable.add(tuple);
+        }
+        // spec: Let `len` be the integer count of items in `pref`.
+        int len = pref.size();
+        // spec: Let `i` be `len` - 1.
+        int i = len - 1;
+        // spec: While `i` >= 0:
+        while (i >= 0) {
+            // spec:    Let `matches` be the list of strings at index `i` of `pref`.
+            List<String> matches = pref.get(i);
+            // spec:    Let `minpref` be the integer count of items in `matches`.
+            int minpref = matches.size();
+            // spec:    For each tuple `tuple` of `sortable`:
+            for (IntVarTuple tuple : sortable) {
+                // spec:       Let `matchpref` be an integer with the value `minpref`.
+                int matchpref = minpref;
+                // spec:       Let `key` be the `tuple` _variant_ key at position `i`.
+                LiteralOrCatchallKey key = tuple.variant.keys.get(i);
+                // spec:       If `key` is not the catch-all key `'*'`:
+                if (! (key instanceof CatchallKey)) {
+                    // spec:          Assert that `key` is a _literal_.
+                    if (!(key instanceof Literal)) {
+                        formattingError("Literal expected");
+                    }
+                    // spec:          Let `ks` be the resolved value of `key`.
+                    String ks = ((Literal) key).value;
+                    // spec:          Let `matchpref` be the integer position of `ks` in `matches`.
+                    matchpref = matches.indexOf(ks);
+                }
+                // spec:       Set the `tuple` integer value as `matchpref`.
+                tuple.integer = matchpref;
+            }
+            // spec:    Set `sortable` to be the result of calling the method `SortVariants(sortable)`.
+            sortable.sort(MFDataModelFormatter::sortVariants);
+            // spec:    Set `i` to be `i` - 1.
+            i--;
+        }
+        // spec: Let `var` be the _variant_ element of the first element of `sortable`.
+        IntVarTuple var = sortable.get(0);
+        // spec: Select the _pattern_ of `var`.
+        patternToRender = var.variant.value;
 
         // TODO: check that there was an entry with all the keys set to `*`
         // And should do that only once, when building the data model.
@@ -207,7 +308,58 @@ class MFDataModelFormatter {
 
         return patternToRender;
     }
-    
+
+    /* spec:
+     * `SortVariants` is a method whose single argument is
+     * a list of (integer, _variant_) tuples.
+     * It returns a list of (integer, _variant_) tuples.
+     * Any implementation of `SortVariants` is acceptable
+     * as long as it satisfies the following requirements:
+     * 
+     * 1. Let `sortable` be an arbitrary list of (integer, _variant_) tuples.
+     * 1. Let `sorted` be `SortVariants(sortable)`.
+     * 1. `sorted` is the result of sorting `sortable` using the following comparator:
+     *    1. `(i1, v1)` <= `(i2, v2)` if and only if `i1 <= i2`.
+     * 1. The sort is stable (pairs of tuples from `sortable` that are equal
+     *    in their first element have the same relative order in `sorted`).
+     */
+    static private int sortVariants(IntVarTuple o1, IntVarTuple o2) {
+        int result = Integer.compare(o1.integer, o2.integer);
+        if (result != 0) {
+            return result;
+        }
+        List<LiteralOrCatchallKey> v1 = o1.variant.keys;
+        List<LiteralOrCatchallKey> v2 = o1.variant.keys;
+        if (v1.size() != v2.size()) {
+            formattingError("The number of keys is not equal.");
+        }
+        for (int i = 0; i < v1.size(); i++) {
+            LiteralOrCatchallKey k1 = v1.get(i);
+            LiteralOrCatchallKey k2 = v2.get(i);
+            String s1 = k1 instanceof Literal ? ((Literal) k1).value : "*";
+            String s2 = k2 instanceof Literal ? ((Literal) k2).value : "*";
+            int cmp = s1.compareTo(s2);
+            if (cmp != 0) {
+                return cmp;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * spec:
+     * The method MatchSelectorKeys is determined by the implementation.
+     * It takes as arguments a resolved _selector_ value `rv` and a list of string keys `keys`,
+     * and returns a list of string keys in preferential order.
+     * The returned list MUST contain only unique elements of the input list `keys`.
+     * The returned list MAY be empty.
+     * The most-preferred key is first,
+     * with each successive key appearing in order by decreasing preference.
+     */
+    private List<String> matchSelectorKeys(ResolvedSelector rv, List<String> keys) {
+        return rv.selectorFunction.matches(rv.argument, keys, rv.options);
+    }
+
     private static class ResolvedSelector {
         final Object argument;
         final Map<String, Object> options;
@@ -391,5 +543,15 @@ class MFDataModelFormatter {
             }
         }
         return variables;
+    }
+
+    private static class IntVarTuple {
+        int integer;
+        final Variant variant;
+
+        public IntVarTuple(int integer, Variant variant) {
+            this.integer = integer;
+            this.variant = variant;
+        }
     }
 }

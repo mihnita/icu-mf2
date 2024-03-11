@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import com.ibm.icu.message2x.MFParser;
 import com.ibm.icu.message2x.MessageFormatter;
 
 @RunWith(JUnit4.class)
@@ -18,8 +19,8 @@ import com.ibm.icu.message2x.MessageFormatter;
 public class SingleFormatTest {
     static private final Map<String, Object> ARGS = new HashMap<>();
     static {
-        ARGS.put("count", 1);
-        ARGS.put("place", 27);
+        ARGS.put("count", 21);
+        ARGS.put("place", 4);
         ARGS.put("fileCount", 12);
         ARGS.put("folderCount", 5);
     }
@@ -27,32 +28,37 @@ public class SingleFormatTest {
     @Test
     public void test() {
         String[] testStrings = {
-//                ""
-//                        + ".match {$count :number}\n" + "one {{You deleted {$count} file}}\n"
+//                ".match {$count :number}\n"
+//                        + "one {{You deleted {$count} file}}\n"
 //                        + "*   {{You deleted {$count} files}}",
-//                "" + ".match {$place :number select=ordinal}\n" + "1 {{You got the gold medal}}\n"
-//                        + "2 {{You got the silver medal}}\n" + "3 {{You got the bronze medal}}\n"
-//                        + "one {{You fininshed in the {$place}st place}}\n"
+                ".match {$count :number}\n"
+                        + "one {{You deleted {$count} file}}"
+                        + "*   {{You deleted {$count} files}}",
+//                ".match {$place :number select=ordinal}\n"
+//                        + "*   {{You fininshed in the {$place}th place}}\n"
 //                        + "two {{You fininshed in the {$place}nd place}}\n"
+//                        + "one {{You fininshed in the {$place}st place}}\n"
+//                        + "1   {{You got the gold medal}}\n"
+//                        + "2   {{You got the silver medal}}\n" + "3 {{You got the bronze medal}}\n"
 //                        + "few {{You fininshed in the {$place}rd place}}\n"
-//                        + "*   {{You fininshed in the {$place}th place}}\n",
-//                ""
-//                        + ".match {$fileCount :number} {$folderCount :number}\n"
-//                        + "one one {{You deleted {$fileCount} file in {$folderCount} folder}}\n"
-//                        + "one *   {{You deleted {$fileCount} file in {$folderCount} folders}}\n"
-//                        + "*   one {{You deleted {$fileCount} files in {$folderCount} folder}}\n"
-//                        + "*   *   {{You deleted {$fileCount} files in {$folderCount} folders}}\n",
+//                        ,
+                ".match {$fileCount :number} {$folderCount :number}\n"
+                        + "one one {{You deleted {$fileCount} file in {$folderCount} folder}}\n"
+                        + "one *   {{You deleted {$fileCount} file in {$folderCount} folders}}\n"
+                        + "*   one {{You deleted {$fileCount} files in {$folderCount} folder}}\n"
+                        + "*   *   {{You deleted {$fileCount} files in {$folderCount} folders}}\n",
 //                "{$count :number minimumFractionDigits=2} dollars",
 //                "{$count :number minimumFractionDigits=3} dollars",
 //                "{|3.1415| :number minimumFractionDigits=5} dollars",
 //                "{|3.1415| :number maximumFractionDigits=2} dollars",
-                ""
-                        + ".local $c = {$count :number minimumFractionDigits=2}\n"
-                        + ".match {$c}\n"
-                        + "one {{{$c} dollar}}\n"
-                        + "*   {{{$c} dollars}}",
+//                ""
+//                        + ".local $c = {$count :number minimumFractionDigits=2}\n"
+//                        + ".match {$c}\n"
+//                        + "one {{{$c} dollar}}\n"
+//                        + "*   {{{$c} dollars}}",
         };
         for (String test : testStrings) {
+            MFParser.debug = false;
             checkOneString(test);
         }
     }
