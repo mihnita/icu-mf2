@@ -20,16 +20,24 @@ import org.junit.runners.JUnit4;
 public class FromJsonTest { // extends CoreTestFmwk {
 
     static final TestCase[] TEST_CASES = {
-        new TestCase.Builder().pattern("hello").expected("hello").build(),
-        new TestCase.Builder().pattern("hello {|world|}").expected("hello world").build(),
-        new TestCase.Builder().pattern("hello {||}").expected("hello ").build(),
+        new TestCase.Builder()
+                .pattern("hello")
+                .expected("hello")
+                .build(),
+        new TestCase.Builder()
+                .pattern("hello {|world|}")
+                .expected("hello world")
+                .build(),
+        new TestCase.Builder()
+                .pattern("hello {||}")
+                .expected("hello ")
+                .build(),
         new TestCase.Builder()
                 .pattern("hello {$place}")
                 .arguments(Args.of("place", "world"))
                 .expected("hello world")
                 .build(),
-        new TestCase.Builder()
-                .ignore("TODO: fallback changed?")
+        new TestCase.Builder().ignore("TODO: fallback changed?")
                 .pattern("hello {$place}")
                 .expected("hello {$place}")
                 // errorsJs: ["missing-var"]
@@ -45,13 +53,19 @@ public class FromJsonTest { // extends CoreTestFmwk {
                 .arguments(Args.of("one", 1.3, "two", 4.2))
                 .expected("1,3 et 4,2")
                 .build(),
-        new TestCase.Builder().pattern("hello {|4.2| :number}").expected("hello 4.2").build(),
+        new TestCase.Builder()
+                .pattern("hello {|4.2| :number}")
+                .expected("hello 4.2")
+                .build(),
         new TestCase.Builder() // not in the original JSON
                 .locale("ar-EG")
                 .pattern("hello {|4.2| :number}")
                 .expected("hello \u0664\u066B\u0662")
                 .build(),
-        new TestCase.Builder().pattern("hello {|foo| :number}").expected("hello {|foo|}").build(),
+        new TestCase.Builder()
+                .pattern("hello {|foo| :number}")
+                .expected("hello {|foo|}")
+                .build(),
         new TestCase.Builder()
                 .pattern("{hello {:number}}")
                 .expected("hello {|foo|}")
@@ -85,8 +99,7 @@ public class FromJsonTest { // extends CoreTestFmwk {
                 .pattern(".local $foo = {bar} {{bar {$foo}}}")
                 .arguments(Args.of("foo", "foo"))
                 // expectedJs: "bar foo"
-                // It is undefined if we allow arguments to override local variables, or it is an
-                // error.
+                // It is undefined if we allow arguments to override local variables, or it is an error.
                 // And undefined who wins if that happens, the local variable of the argument.
                 .expected("bar bar")
                 .build(),
@@ -150,8 +163,7 @@ public class FromJsonTest { // extends CoreTestFmwk {
                 .arguments(Args.of("foo", 1))
                 .expected("one")
                 .build(),
-        new TestCase.Builder()
-                .ignore("not possible to put a null in a map")
+        new TestCase.Builder().ignore("not possible to put a null in a map")
                 .pattern(".match {$foo} 1 {{one}} * {{other}}")
                 .arguments(Args.of("foo", null))
                 .expected("other")
@@ -181,26 +193,20 @@ public class FromJsonTest { // extends CoreTestFmwk {
                 .expected("=1")
                 .build(),
         new TestCase.Builder()
-                .patternJs(
-                        ".match {$foo} {$bar} one one {{one one}} one * {{one other}} * * {{other}}")
-                .pattern(
-                        ".match {$foo :number} {$bar :number} one one {{one one}} one * {{one other}} * * {{other}}")
+                .patternJs(".match {$foo} {$bar} one one {{one one}} one * {{one other}} * * {{other}}")
+                .pattern(".match {$foo :number} {$bar :number} one one {{one one}} one * {{one other}} * * {{other}}")
                 .arguments(Args.of("foo", 1, "bar", 1))
                 .expected("one one")
                 .build(),
         new TestCase.Builder()
-                .patternJs(
-                        ".match {$foo} {$bar} one one {{one one}} one * {{one other}} * * {{other}}")
-                .pattern(
-                        ".match {$foo :number} {$bar :number} one one {{one one}} one * {{one other}} * * {{other}}")
+                .patternJs(".match {$foo} {$bar} one one {{one one}} one * {{one other}} * * {{other}}")
+                .pattern(".match {$foo :number} {$bar :number} one one {{one one}} one * {{one other}} * * {{other}}")
                 .arguments(Args.of("foo", 1, "bar", 2))
                 .expected("one other")
                 .build(),
         new TestCase.Builder()
-                .patternJs(
-                        ".match {$foo} {$bar} one one {{one one}} one * {{one other}} * * {{other}}")
-                .pattern(
-                        ".match {$foo :number} {$bar :number} one one {{one one}} one * {{one other}} * * {{other}}")
+                .patternJs(".match {$foo} {$bar} one one {{one one}} one * {{one other}} * * {{other}}")
+                .pattern(".match {$foo :number} {$bar :number} one one {{one one}} one * {{one other}} * * {{other}}")
                 .arguments(Args.of("foo", 2, "bar", 2))
                 .expected("other")
                 .build(),
@@ -230,25 +236,40 @@ public class FromJsonTest { // extends CoreTestFmwk {
                 .errors("missing-var")
                 .build(),
         new TestCase.Builder()
-                .pattern(".local bar = {(foo)} {{$bar}}")
+                .pattern(".local bar = {|foo|} {{$bar}}")
                 .expected("{$bar}")
                 .errors("missing-char", "missing-var")
                 .build(),
         new TestCase.Builder()
-                .pattern(".local $bar {(foo)} {{$bar}}")
+                .pattern(".local $bar {|foo|} {{$bar}}")
                 .expected("foo")
                 .errors("missing-char")
                 .build(),
         new TestCase.Builder()
-                .pattern(".local $bar = (foo) {{$bar}}")
+                .pattern(".local $bar = |foo| {{$bar}}")
                 .expected("{$bar}")
                 .errors("missing-char", "junk-element")
                 .build(),
-        new TestCase.Builder().pattern("{{#tag}}").expected("#tag").build(),
-        new TestCase.Builder().pattern("{#tag}").expected("").build(),
-        new TestCase.Builder().pattern("{#tag}content").expected("content").build(),
-        new TestCase.Builder().pattern("{#tag}content{/tag}").expected("content").build(),
-        new TestCase.Builder().pattern("{#tag}content").expected("content").build(),
+        new TestCase.Builder()
+                .pattern("{{#tag}}")
+                .expected("#tag")
+                .build(),
+        new TestCase.Builder()
+                .pattern("{#tag}")
+                .expected("")
+                .build(),
+        new TestCase.Builder()
+                .pattern("{#tag}content")
+                .expected("content")
+                .build(),
+        new TestCase.Builder()
+                .pattern("{#tag}content{/tag}")
+                .expected("content")
+                .build(),
+        new TestCase.Builder()
+                .pattern("{#tag}content")
+                .expected("content")
+                .build(),
         new TestCase.Builder()
                 // When we format markup to string we generate no output
                 .pattern("{#tag foo=bar}")
@@ -262,23 +283,23 @@ public class FromJsonTest { // extends CoreTestFmwk {
         new TestCase.Builder()
                 .pattern("bad {#markup/} test")
                 .expected("bad  test")
-                //                .errors("extra-content")
+                // .errors("extra-content")
                 .build(),
         new TestCase.Builder()
                 .pattern("{#tag foo=bar}")
                 .expected("")
-                //                .errors("extra-content")
+                // .errors("extra-content")
                 .build(),
         new TestCase.Builder()
                 .pattern("no braces")
                 .expected("no braces")
-                //                .errors("parse-error", "junk-element")
+                // .errors("parse-error", "junk-element")
                 .build(),
         new TestCase.Builder()
                 .pattern("no braces {$foo}")
                 .arguments(Args.of("foo", 2))
                 .expected("no braces 2")
-                //                .errors("parse-error", "junk-element")
+                // .errors("parse-error", "junk-element")
                 .build(),
         new TestCase.Builder()
                 .pattern("{missing end brace")
@@ -308,7 +329,7 @@ public class FromJsonTest { // extends CoreTestFmwk {
         new TestCase.Builder()
                 .pattern("bad {placeholder}")
                 .expected("bad placeholder")
-                //                .errors("parse-error", "extra-content", "junk-element")
+                // .errors("parse-error", "extra-content", "junk-element")
                 .build(),
         new TestCase.Builder()
                 .pattern("no-equal {|42| :number minimumFractionDigits 2}")
@@ -341,47 +362,47 @@ public class FromJsonTest { // extends CoreTestFmwk {
                 .errors("extra-content", "missing-var")
                 .build(),
         new TestCase.Builder()
-                .pattern(".match {} * {foo}")
+                .pattern(".match {} * {{foo}}")
                 .expected("foo")
                 .errors("parse-error", "bad-selector", "junk-element")
                 .build(),
         new TestCase.Builder()
-                .pattern(".match {+foo} * {foo}")
+                .pattern(".match {#foo} * {{foo}}")
                 .expected("foo")
                 .errors("bad-selector")
                 .build(),
         new TestCase.Builder()
-                .pattern(".match {(foo)} when*{foo}")
+                .pattern(".match {|foo|} *{{foo}}")
                 .expected("foo")
                 .errors("missing-char")
                 .build(),
         new TestCase.Builder()
-                .pattern(".match * {foo}")
+                .pattern(".match * {{foo}}")
                 .expected("foo")
                 .errors("empty-token")
                 .build(),
         new TestCase.Builder()
-                .pattern(".match {(x)} * foo")
+                .pattern(".match {|x|} * foo")
                 .expected("")
                 .errors("key-mismatch", "missing-char")
                 .build(),
         new TestCase.Builder()
-                .pattern(".match {(x)} * {foo} extra")
+                .pattern(".match {|x|} * {{foo}} extra")
                 .expected("foo")
                 .errors("extra-content")
                 .build(),
         new TestCase.Builder()
-                .pattern(".match (x) * {foo}")
+                .pattern(".match |x| * {{foo}}")
                 .expected("")
                 .errors("empty-token", "extra-content")
                 .build(),
         new TestCase.Builder()
-                .pattern(".match {$foo} * * {foo}")
+                .pattern(".match {$foo} * * {{foo}}")
                 .expected("foo")
                 .errors("key-mismatch", "missing-var")
                 .build(),
         new TestCase.Builder()
-                .pattern(".match {$foo} {$bar} * {foo}")
+                .pattern(".match {$foo} {$bar} * {{foo}}")
                 .expected("foo")
                 .errors("key-mismatch", "missing-var", "missing-var")
                 .build()
@@ -396,8 +417,7 @@ public class FromJsonTest { // extends CoreTestFmwk {
             }
             TestUtils.runTestCase(testCase);
         }
-        System.out.printf(
-                "Executed %d test cases out of %d, skipped %d%n",
+        System.out.printf("Executed %d test cases out of %d, skipped %d%n",
                 TEST_CASES.length - ignoreCount, TEST_CASES.length, ignoreCount);
     }
 }
