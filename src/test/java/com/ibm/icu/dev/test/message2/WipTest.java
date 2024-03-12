@@ -60,8 +60,8 @@ public class WipTest {
             "Hello world {$exp :date @valid @attr=aaaa @attrb=123 @atrn=|foo bar|}",
             "Hello world {$exp :date year=numeric month=long day=numeric int=12 @valid @attr=a @attrb=123 @atrn=|foo bar|}",
             // Reserved
-            "Reserved {$exp &foo something more protected} and more", // private
-            "Reserved {$exp %foo something |quoted \\| inside| more protected} and more", // reserved
+            "Reserved {$exp &foo |something more protected|} and more", // private
+            "Reserved {$exp %foo |something quoted \\| inside|} and more", // reserved
             "{{.starting with dot is OK here}}",
             "{{Some string pattern, with {$foo} and {$exp :date style=long}!}}",
             // Simple messages, with declarations
@@ -71,13 +71,13 @@ public class WipTest {
             ".local $foo = {$exp :date}",
             ".local $foo = {$exp :date year=numeric month=long day=numeric}",
             ".local $bar = {$foo :date month=medium}",
-            ".someting reserved = {$foo :date}",
+            ".someting |reserved=| {$foo :date}",
             // Several declarations in one message
             ""
                     + ".input {$a :date}\n"
                     + ".local $b = {$a :date year=numeric month=long day=numeric}\n"
                     + ".local $c = {$b :date month=medium}\n"
-                    + ".someting reserved = {$x :date} {$y :date} {$z :number}",
+                    + ".someting |reserved = \\| and more| {$x :date} {$y :date} {$z :number}",
             ""
                     + ".input {$a :date}\n"
                     + ".local $exp = {$a :date style=full}\n"

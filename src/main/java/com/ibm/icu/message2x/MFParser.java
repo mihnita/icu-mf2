@@ -204,11 +204,13 @@ public class MFParser {
             default: // reserved && private
                 if (StringUtils.isReservedAnnotationSigil(cp)
                         || StringUtils.isPrivateAnnotationSigil(cp)) {
-                    identifier = getIdentifier();
+                    cp = input.readCodePoint();
+                    // The sigil is part of the body.
+                    // Safe to cast to char, the code point is in BMP 
+                    identifier = (char) cp + getIdentifier();
                     spy("identifier", identifier);
                     String body = getReservedBody();
                     spy("reserved-body", body);
-                    // The sigil is part of the body.
                     return new MFDataModel.UnsupportedAnnotation(body);
                 }
         }
@@ -260,14 +262,17 @@ public class MFParser {
 
     // abnf: annotation-expression = "{" [s] annotation *(s attribute) [s] "}"
     private MFDataModel.Expression getAnnotationExpression() throws MFParseException {
-        MFDataModel.FunctionAnnotation fa = null;
         MFDataModel.Annotation annotation = getAnnotationOrMarkup();
-        if (annotation instanceof MFDataModel.FunctionAnnotation) {
-            fa = (MFDataModel.FunctionAnnotation) annotation;
-            skipOptionalWhitespaces();
-        }
         List<MFDataModel.Attribute> attributes = getAttributes();
-        return new MFDataModel.FunctionExpression(fa, attributes);
+
+        if (annotation instanceof MFDataModel.FunctionAnnotation) {
+            return new MFDataModel.FunctionExpression((MFDataModel.FunctionAnnotation) annotation, attributes);
+        } else if (annotation instanceof MFDataModel.UnsupportedAnnotation) {
+            return new MFDataModel.UnsupportedExpression((MFDataModel.UnsupportedAnnotation) annotation, attributes);
+        } else {
+            error("Unexpected annotation : " + annotation);
+        }
+        return null;
     }
 
     // abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s] ["/"] "}" ; open and standalone
@@ -342,12 +347,13 @@ public class MFParser {
     // abnf: reserved-body = *([s] 1*(reserved-char / reserved-escape / quoted))
     // abnf: reserved-escape = backslash ( backslash / "{" / "|" / "}" )
     private String getReservedBody() throws MFParseException {
+        int spaceCount = skipWhitespaces();
         StringBuilder result = new StringBuilder();
         // TODO Auto-generated method stub
         while (true) {
             int cp = input.readCodePoint();
             // TODO: whitespace is problematic in the grammar
-            if (StringUtils.isReservedChar(cp) || StringUtils.isWhitespace(cp)) {
+            if (StringUtils.isReservedChar(cp)) {
                 result.appendCodePoint(cp);
             } else if (cp == '\\') {
                 cp = input.readCodePoint();
@@ -362,8 +368,13 @@ public class MFParser {
             } else if (cp == EOF) {
                 return result.toString();
             } else {
-                input.backup(1);
-                return result.toString();
+                if (result.length() == 0) {
+                    input.backup(spaceCount + 1);
+                    return "";
+                } else {
+                    input.backup(1);
+                    return result.toString();
+                }
             }
         }
     }

@@ -65,7 +65,7 @@ public class SerializationTest {
                     + ".match {$c}\n"
                     + "one {{{$c} dollar}}\n"
                     + "*   {{{$c} dollars}}",
-            ".local $c = {$count} .foobar asd asd asd asd {$bar1} {$bar2} {$bar3} .local $b = {$bar} {{Foo bar}}\n",
+            ".local $c = {$count} .foobar |asd asd asd asd| {$bar1} {$bar2} {$bar3} .local $b = {$bar} {{Foo bar}}\n",
             ".local $c = {1 :number minimumFractionDigits=2}\n"
                     + ".match {$c}\n"
                     + "one {{{$c} dollar}}\n"

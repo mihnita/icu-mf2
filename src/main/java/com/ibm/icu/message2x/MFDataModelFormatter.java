@@ -19,6 +19,7 @@ import com.ibm.icu.message2x.MFDataModel.Option;
 import com.ibm.icu.message2x.MFDataModel.Pattern;
 import com.ibm.icu.message2x.MFDataModel.SelectMessage;
 import com.ibm.icu.message2x.MFDataModel.StringPart;
+import com.ibm.icu.message2x.MFDataModel.UnsupportedAnnotation;
 import com.ibm.icu.message2x.MFDataModel.VariableRef;
 import com.ibm.icu.message2x.MFDataModel.Variant;
 import com.ibm.icu.util.Calendar;
@@ -500,6 +501,9 @@ class MFDataModelFormatter {
             functionName = fa.name;
             Map<String, Object> newOptions = convertOptions(fa.options, variables, arguments);
             options.putAll(newOptions);
+        } else if (annotation instanceof UnsupportedAnnotation) {
+            // We don't know how to format unsupported annotations
+            return new FormattedPlaceholder(expression, new PlainStringFormattedValue("{\uFFFD}"));
         }
 
         FormatterFactory funcFactory = getFormattingFunctionFactoryByName(toFormat, functionName);
