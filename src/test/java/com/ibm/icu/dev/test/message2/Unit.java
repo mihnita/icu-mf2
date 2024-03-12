@@ -9,19 +9,20 @@ import java.util.StringJoiner;
 
 class Unit {
     final String src;
+    final List<String> srcs;
     final String exp;
-    final String cleanSrc;
+    final String locale;
     final Map<String, Object> params;
-    final List<Part> parts;
+    final String ignore;
     final List<Error> errors;
 
-    Unit(String src, String cleanSrc, Map<String, Object> params, String exp, List<Part> parts, List<Error> errors) {
-
+    Unit(String src, List<String> srcs, String locale, Map<String, Object> params, String exp, String ignore, List<Error> errors) {
         this.src = src;
-        this.cleanSrc = cleanSrc;
+        this.srcs = srcs;
+        this.locale = locale;
         this.params = params;
         this.exp = exp;
-        this.parts = parts;
+        this.ignore = ignore;
         this.errors = errors;
     }
 
@@ -42,17 +43,11 @@ class Unit {
     public String toString() {
         StringJoiner result = new StringJoiner(", ", "UnitTest {", "}");
         result.add("src=" + Utilities.str(src));
-        if (cleanSrc != null) {
-            result.add("cleanSrc=" + Utilities.str(cleanSrc));
-        }
         if (params != null) {
             result.add("params=" + params);
         }
         if (exp != null) {
             result.add("exp=" + Utilities.str(exp));
-        }
-        if (parts != null) {
-            result.add("parts=" + parts);
         }
         return result.toString();
     }

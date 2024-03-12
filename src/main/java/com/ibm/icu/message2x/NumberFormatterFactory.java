@@ -36,7 +36,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
 
     public NumberFormatterFactory(String kind) {
         switch (kind) {
-            case "number": // intentional fall-through
+            case "number": //$FALL-THROUGH$
             case "integer":
                 break;
             default:
@@ -65,7 +65,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
             case "ordinal":
                 pluralType = PluralType.ORDINAL;
                 break;
-            case "cardinal": // intentional fallthrough
+            case "cardinal": //$FALL-THROUGH$
             default:
                 pluralType = PluralType.CARDINAL;
         }
@@ -295,13 +295,13 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
                             case "long":
                                 notation = Notation.compactLong();
                                 break;
-                            case "short": // intentional fallthrough
+                            case "short": //$FALL-THROUGH$
                             default:
                                 notation = Notation.compactShort();
                         }
                     }
                     break;
-                case "standard": // intentional fallthrough
+                case "standard": //$FALL-THROUGH$
                 default:
                     notation = Notation.simple();
             }
@@ -325,7 +325,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
                 nf = nf.precision(Precision.minSignificantDigits(option));
             }
         } // end of `:number` specific options
-        
+
         strOption = OptUtils.getString(fixedOptions, "numberingSystem", "");
         if (!strOption.isEmpty()) {
             strOption = strOption.toLowerCase(Locale.US);
@@ -333,7 +333,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
             NumberingSystem ns = NumberingSystem.getInstanceByName(strOption);
             nf = nf.symbols(ns);
         }
-        
+
         // The options below apply to both `:number` and `:integer` 
         option = OptUtils.getInteger(fixedOptions, "minimumIntegerDigits");
         if (option != null) {
@@ -359,7 +359,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
             case "never":
                 signDisplay = SignDisplay.NEVER;
                 break;
-            case "auto": // intentional fall-through
+            case "auto": //$FALL-THROUGH$
             default:
                 signDisplay = SignDisplay.AUTO;
         }
@@ -377,11 +377,15 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
             case "min2":
                 grp = GroupingStrategy.MIN2;
                 break;
-            case "auto": // intentional fall-through
+            case "auto": //$FALL-THROUGH$
             default:
                 grp = GroupingStrategy.AUTO;
         }
         nf = nf.grouping(grp);
+        
+        if (kind.equals("integer")) {
+            nf = nf.precision(Precision.integer());
+        }
 
         return nf.locale(locale);
     }

@@ -3,7 +3,6 @@
 
 package com.ibm.icu.dev.test.message2;
 
-import com.ibm.icu.message2x.MFParser;
 import com.ibm.icu.message2x.MessageFormatter;
 import java.util.HashMap;
 import java.util.Locale;
@@ -73,20 +72,16 @@ public class SingleFormatTest {
             ".match {$count :number} 1 {{one}} * {{other}}",
         };
         for (String test : testStrings) {
-            MFParser.debug = false;
             checkOneString(test);
         }
     }
 
     void checkOneString(String pattern) {
-        System.out.println("========================");
-        System.out.println(Utilities.str(pattern));
-
         MessageFormatter mf = MessageFormatter.builder()
                 .setLocale(Locale.US)
                 .setPattern(pattern)
                 .build();
         String result = mf.formatToString(ARGS);
-        System.out.println("RESULT: " + result);
+        // TODO!
     }
 }

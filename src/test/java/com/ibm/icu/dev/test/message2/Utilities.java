@@ -44,8 +44,8 @@ class Utilities {
     static Path getTestFile(Class<?> cls, String fileName) throws URISyntaxException {
         URI getPath = cls.getClassLoader().getResource("").toURI();
         Path filePath = Paths.get(getPath);
-        System.out.println(getPath);
-        System.out.println(filePath);
+        // System.out.println(getPath);
+        // System.out.println(filePath);
         Path json = Paths.get(fileName);
         return filePath.resolve(json);
     }

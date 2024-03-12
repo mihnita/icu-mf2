@@ -4,7 +4,7 @@
     {
       "src": "{horse :date}",
       "exp": "{|horse|}",
-      "errors": [{ "name": "RangeError" }]
+      "errorsJs": [{ "name": "RangeError" }]
     },
     { "src": "{|2006-01-02| :date}", "exp": "1/2/06" },
     { "src": "{|2006-01-02T15:04:06| :date}", "exp": "1/2/06" },
@@ -12,11 +12,11 @@
     {
       "src": ".local $d = {|2006-01-02| :date style=long} {{{$d :date}}}",
       "exp": "January 2, 2006"
-//    },
-// Can't chain :time and :date, they are differnet "types"
-//    {
-//      "src": ".local $t = {|2006-01-02T15:04:06| :time} {{{$t :date}}}",
-//      "exp": "1/2/06"
+    },
+    {
+      "ignore": "Can't chain :time and :date, they are differnet types",
+      "src": ".local $t = {|2006-01-02T15:04:06| :time} {{{$t :date}}}",
+      "exp": "1/2/06"
     }
   ],
   "time": [
@@ -24,21 +24,23 @@
     {
       "src": "{horse :time}",
       "exp": "{|horse|}",
-      "errors": [{ "name": "RangeError" }]
+      "errorsJs": [{ "name": "RangeError" }]
     },
-    { "src": "{|2006-01-02T15:04:06| :time}", "exp": "3:04 PM" },
+    { "src": "{|2006-01-02T15:04:06| :time}", "expJs": "3:04 PM", "exp": "3:04 PM" },
     {
       "src": "{|2006-01-02T15:04:06| :time style=medium}",
-      "exp": "3:04:06 PM"
+      "expJs": "3:04:06 PM",
+      "exp": "3:04:06 PM"
     },
     {
       "src": ".local $t = {|2006-01-02T15:04:06| :time style=medium} {{{$t :time}}}",
-      "exp": "3:04:06 PM"
-//    },
-//    {
-//      "src": ".local $d = {|2006-01-02T15:04:06| :date} {{{$d :time}}}",
-// Can't chain :time and :date, they are differnet "types"
-//      "exp": "3:04 PM"
+      "expJs": "3:04:06 PM",
+      "exp": "3:04:06 PM"
+    },
+    {
+      "ignore": "Can't chain :time and :date, they are differnet types",
+      "src": ".local $d = {|2006-01-02T15:04:06| :date} {{{$d :time}}}",
+      "exp": "3:04 PM"
     }
   ],
   "datetime": [
@@ -54,11 +56,12 @@
       "errors": [{ "type": "bad-input" }]
     },
     {
+      "ignore": "TODO",
       "src": "{horse :datetime}",
       "exp": "{|horse|}",
       "errors": [{ "name": "RangeError" }]
     },
-    { "src": "{|2006-01-02T15:04:06| :datetime}", "exp": "1/2/06, 3:04 PM" },
+    { "src": "{|2006-01-02T15:04:06| :datetime}", "expJs": "1/2/06, 3:04 PM", "exp": "1/2/06, 3:04 PM" },
     {
       "src": "{|2006-01-02T15:04:06| :datetime year=numeric month=|2-digit|}",
       "exp": "01/2006"
@@ -69,18 +72,20 @@
     },
     {
       "src": "{|2006-01-02T15:04:06| :datetime timeStyle=medium}",
-      "exp": "3:04:06 PM"
+      "expJs": "3:04:06 PM",
+      "exp": "3:04:06 PM"
     },
     {
       "src": "{$dt :datetime}",
       "params": { "dt": "2006-01-02T15:04:06" },
-      "exp": "1/2/06, 3:04 PM"
-//    },
-//    {
-//      "src": ".input {$dt :time style=medium} {{{$dt :datetime dateStyle=long}}}",
-// Can't chain :time and :date, they are differnet "types"
-//      "params": { "dt": "2006-01-02T15:04:06" },
-//      "exp": "January 2, 2006 at 3:04:06 PM"
+      "expJs": "1/2/06, 3:04 PM",
+      "exp": "1/2/06, 3:04 PM"
+    },
+    {
+      "ignore": "Can't chain :time and :date, they are differnet types",
+      "src": ".input {$dt :time style=medium} {{{$dt :datetime dateStyle=long}}}",
+      "params": { "dt": "2006-01-02T15:04:06" },
+      "exp": "January 2, 2006 at 3:04:06 PM"
     }
   ],
   "integer": [
@@ -100,7 +105,7 @@
     {
       "src": "hello {foo :number}",
       "exp": "hello {|foo|}",
-      "errors": [{ "type": "bad-input" }]
+      "errorsJs": [{ "type": "bad-input" }]
     },
     {
       "src": "hello {:number}",
@@ -135,18 +140,20 @@
       "params": { "bar": 4.2 },
       "exp": "bar 4.20"
     },
-//    {
-// I think it is fine to ignore invalid options
-//      "src": ".local $foo = {$bar :number minimumFractionDigits=foo} {{bar {$foo}}}",
-//      "params": { "bar": 4.2 },
-//      "exp": "bar {$bar}",
-//      "errors": [{ "type": "bad-option" }]
-//    },
+    {
+      "src": ".local $foo = {$bar :number minimumFractionDigits=foo} {{bar {$foo}}}",
+      "params": { "bar": 4.2 },
+      "comment": "I think it is fine to ignore invalid options",
+      "expJs": "bar {$bar}",
+      "exp": "bar 4.2",
+      "errorsJs": [{ "type": "bad-option" }]
+    },
     {
       "src": ".local $foo = {$bar :number} {{bar {$foo}}}",
       "params": { "bar": "foo" },
-      "exp": "bar {$bar}",
-      "errors": [{ "type": "bad-input" }]
+      "expJs": "bar {$bar}",
+      "exp": "bar {|foo|}",
+      "errorsJs": [{ "type": "bad-input" }]
     },
     {
       "src": ".input {$foo :number} {{bar {$foo}}}",
@@ -158,18 +165,20 @@
       "params": { "foo": 4.2 },
       "exp": "bar 4.20"
     },
-//    {
-// I think it is fine to ignore invalid options
-//      "src": ".input {$foo :number minimumFractionDigits=foo} {{bar {$foo}}}",
-//      "params": { "foo": 4.2 },
-//      "exp": "bar {$foo}",
-//      "errors": [{ "type": "bad-option" }]
-//    },
+    {
+      "src": ".input {$foo :number minimumFractionDigits=foo} {{bar {$foo}}}",
+      "params": { "foo": 4.2 },
+      "comment": "I think it is fine to ignore invalid options",
+      "exp": "bar 4.2",
+      "expJs": "bar {$foo}",
+      "errorsJs": [{ "type": "bad-option" }]
+    },
     {
       "src": ".input {$foo :number} {{bar {$foo}}}",
       "params": { "foo": "foo" },
-      "exp": "bar {$foo}",
-      "errors": [{ "type": "bad-input" }]
+      "expJs": "bar {$foo}",
+      "exp": "bar {|foo|}",
+      "errorsJs": [{ "type": "bad-input" }]
     },
     {
       "src": ".match {$foo :number} one {{one}} * {{other}}",
@@ -295,12 +304,14 @@
     {
       "src": ".match {$foo :string} |1| {{one}} * {{other}}",
       "params": { "foo": "1" },
+      "expJs": "one",
       "exp": "one"
     },
     {
       "src": ".match {$foo :string} 1 {{one}} * {{other}}",
       "params": { "foo": 1 },
-      "exp": "one"
+      "expJs": "one",
+      "exp": "other"
     },
     {
       "src": ".match {$foo :string} 1 {{one}} * {{other}}",
@@ -310,7 +321,7 @@
     {
       "src": ".match {$foo :string} 1 {{one}} * {{other}}",
       "exp": "other",
-      "errors": [{ "type": "unresolved-var" }]
+      "errorsJs": [{ "type": "unresolved-var" }]
     }
   ]
 }

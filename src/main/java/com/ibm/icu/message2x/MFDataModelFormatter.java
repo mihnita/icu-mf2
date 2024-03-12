@@ -20,6 +20,7 @@ import com.ibm.icu.message2x.MFDataModel.Pattern;
 import com.ibm.icu.message2x.MFDataModel.SelectMessage;
 import com.ibm.icu.message2x.MFDataModel.StringPart;
 import com.ibm.icu.message2x.MFDataModel.UnsupportedAnnotation;
+import com.ibm.icu.message2x.MFDataModel.UnsupportedExpression;
 import com.ibm.icu.message2x.MFDataModel.VariableRef;
 import com.ibm.icu.message2x.MFDataModel.Variant;
 import com.ibm.icu.util.Calendar;
@@ -494,7 +495,9 @@ class MFDataModelFormatter {
             // No output on markup, for now (we only format to string)
             return new FormattedPlaceholder(expression, new PlainStringFormattedValue(""));
         } else {
-            return new FormattedPlaceholder(expression, new PlainStringFormattedValue("{\uFFFD}"));
+            UnsupportedExpression ue = (UnsupportedExpression) expression;
+            char sigil = ue.annotation.source.charAt(0); 
+            return new FormattedPlaceholder(expression, new PlainStringFormattedValue("{" + sigil + "}"));
         }
 
         if (annotation instanceof FunctionAnnotation) {

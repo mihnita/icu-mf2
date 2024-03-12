@@ -6,8 +6,6 @@ package com.ibm.icu.dev.test.message2;
 import com.ibm.icu.message2x.MFDataModel.Message;
 import com.ibm.icu.message2x.MFParser;
 import com.ibm.icu.message2x.MFSerializer;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -15,14 +13,6 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 @SuppressWarnings({"static-method", "javadoc"})
 public class SerializationTest {
-    private static final Map<String, Object> ARGS = new HashMap<>();
-
-    static {
-        ARGS.put("count", 1);
-        ARGS.put("place", 7);
-        ARGS.put("fileCount", 1);
-        ARGS.put("folderCount", 1);
-    }
 
     @Test
     public void test() throws Exception {
@@ -85,7 +75,6 @@ public class SerializationTest {
             ".match {$count :number} 1 {{one}} * {{other}}",
         };
         for (String test : testStrings) {
-            MFParser.debug = false;
             checkOneString(test);
         }
     }
@@ -94,7 +83,14 @@ public class SerializationTest {
         Message dm = MFParser.parse(pattern);
         String parsed = MFSerializer.dataModelToString(dm);
 
-        pattern = pattern.replace('\n', ' ').replaceAll("  +", " ").trim();
+        pattern = pattern.replace('\n', ' ')
+                .replaceAll("  +", " ")
+                // Naive normalization for `|1234.56|` to `1234.56` 
+                .replaceAll("\\|([\\d\\.]+)\\|", "$1")
+                // Naive normalization for `|asBaC12|` to `asBaC12` 
+                .replaceAll("\\|([a-zA-Z\\d]+)\\|", "$1")
+                .replaceAll(" }", "}")
+                .trim();
         if (!pattern.equals(parsed)) {
             System.out.println("========================");
             System.out.println(Utilities.str(pattern));

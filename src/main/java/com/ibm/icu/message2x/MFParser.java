@@ -49,29 +49,24 @@ public class MFParser {
         int cp = input.peekChar();
         if (cp == '.') { // declarations or .match
             result = getComplexMessage();
-            spy("complexMessage", result);
         } else if (cp == '{') { // `{` or `{{`
             cp = input.readCodePoint();
             cp = input.peekChar();
             if (cp == '{') { // `{{`, complex body without declarations
                 input.backup(1); // let complexBody deal with the wrapping {{ and }}
                 MFDataModel.Pattern pattern = getQuotedPattern();
-                spy("simpleMessage wrapped in {{...}}", pattern);
                 result = new MFDataModel.PatternMessage(new ArrayList<>(), pattern);
             } else { // placeholder
                 input.backup(1); // We want the '{' present, to detect the part as placeholder.
                 MFDataModel.Pattern pattern = getPattern();
-                spy("simpleMessage starting with a placeholder", pattern);
                 result = new MFDataModel.PatternMessage(new ArrayList<>(), pattern);
             }
         } else {
             MFDataModel.Pattern pattern = getPattern();
-            spy("simpleMessage2", pattern);
             result = new MFDataModel.PatternMessage(new ArrayList<>(), pattern);
         }
         skipOptionalWhitespaces();
         checkCondition(input.atEnd(), "Content detected after the end of the message.");
-        spy(true, "message", result);
         new MFDataModelValidator(result).validate();
         return result;
     }
@@ -86,7 +81,6 @@ public class MFParser {
             if (part == null) {
                 break;
             }
-            spy("part", part);
             pattern.parts.add(part);
         }
         // checkCondition(!pattern.parts.isEmpty(), "Empty pattern");
@@ -102,12 +96,10 @@ public class MFParser {
                 return null;
             case '{':
                 MFDataModel.Expression ph = getPlaceholder();
-                spy("placeholder", ph);
                 return ph;
             default:
                 String plainText = getText();
                 MFDataModel.StringPart sp = new MFDataModel.StringPart(plainText);
-                spy("plainText", plainText);
                 return sp;
         }
     }
@@ -196,10 +188,8 @@ public class MFParser {
                 // abnf: function = ":" identifier *(s option)
                 input.readCodePoint(); // Consume the sigil
                 String identifier = getIdentifier();
-                spy("identifier", identifier);
                 checkCondition(identifier != null, "Annotation / function name missing");
                 Map<String, MFDataModel.Option> options = getOptions();
-                spy("options", options);
                 return new MFDataModel.FunctionAnnotation(identifier, options);
             default: // reserved && private
                 if (StringUtils.isReservedAnnotationSigil(cp)
@@ -208,10 +198,8 @@ public class MFParser {
                     // The sigil is part of the body.
                     // Safe to cast to char, the code point is in BMP 
                     identifier = (char) cp + getIdentifier();
-                    spy("identifier", identifier);
                     String body = getReservedBody();
-                    spy("reserved-body", body);
-                    return new MFDataModel.UnsupportedAnnotation(body);
+                    return new MFDataModel.UnsupportedAnnotation(identifier + " " + body);
                 }
         }
         input.gotoPosition(position);
@@ -221,7 +209,6 @@ public class MFParser {
     // abnf: literal-expression = "{" [s] literal [s annotation] *(s attribute) [s] "}"
     private MFDataModel.Expression getLiteralExpression() throws MFParseException {
         MFDataModel.Literal literal = getLiteral();
-        spy("literal", literal);
         checkCondition(literal != null, "Literal expression expected.");
 
         MFDataModel.Annotation annotation = null;
@@ -237,8 +224,6 @@ public class MFParser {
 
         List<MFDataModel.Attribute> attributes = getAttributes();
 
-        // skipOptionalWhitespaces();
-
         // Literal without a function, for example {|hello|} or {123}
         return new MFDataModel.LiteralExpression(literal, annotation, attributes);
     }
@@ -246,16 +231,8 @@ public class MFParser {
     // abnf: variable-expression = "{" [s] variable [s annotation] *(s attribute) [s] "}"
     private MFDataModel.VariableExpression getVariableExpression() throws MFParseException {
         MFDataModel.VariableRef variableRef = getVariableRef();
-        spy("variableRef", variableRef);
-        // skipOptionalWhitespaces();
-
         MFDataModel.Annotation annotation = getAnnotationOrMarkup();
-        spy("annotation", annotation);
-        // skipOptionalWhitespaces();
-
         List<MFDataModel.Attribute> attributes = getAttributes();
-        spy("attributes", attributes);
-        // skipOptionalWhitespaces();
         // Variable without a function, for example {$foo}
         return new MFDataModel.VariableExpression(variableRef, annotation, attributes);
     }
@@ -308,7 +285,6 @@ public class MFParser {
             if (attribute == null) {
                 break;
             }
-            spy("    attribute", attribute);
             result.add(attribute);
         }
         return result;
@@ -445,12 +421,10 @@ public class MFParser {
                 // abnf: quoted = "|" *(quoted-char / quoted-escape) "|"
                 input.backup(1);
                 MFDataModel.Literal ql = getQuotedLiteral();
-                spy("QuotedLiteral", ql);
                 return ql;
             default: // unquoted
                 input.backup(1);
                 MFDataModel.Literal unql = getUnQuotedLiteral();
-                spy("UnQuotedLiteral", unql);
                 return unql;
         }
     }
@@ -463,7 +437,6 @@ public class MFParser {
 
         // abnf: variable = "$" name
         String name = getName();
-        spy("varName", name);
         checkCondition(name != null, "Invalid variable reference following $");
         return new MFDataModel.VariableRef(name);
     }
@@ -508,7 +481,6 @@ public class MFParser {
     private MFDataModel.Literal getNumberLiteral() {
         String numberString = peekWithRegExp(RE_NUMBER_LITERAL);
         if (numberString != null) {
-            spy("numberString", numberString);
             return new MFDataModel.Literal(numberString);
         }
         return null;
@@ -581,7 +553,6 @@ public class MFParser {
         while (true) {
             skipMandatoryWhitespaces();
             MFDataModel.Expression expression = getPlaceholder();
-            spy("selector expression", expression);
             if (expression == null) {
                 break;
             }
@@ -596,7 +567,6 @@ public class MFParser {
         List<MFDataModel.Variant> variants = new ArrayList<>();
         while (true) {
             MFDataModel.Variant variant = getVariant();
-            spy("variant", variant);
             if (variant == null) {
                 break;
             }
@@ -611,13 +581,11 @@ public class MFParser {
         List<MFDataModel.LiteralOrCatchallKey> keys = new ArrayList<>();
         while (true) {
             MFDataModel.LiteralOrCatchallKey key = getKey();
-            spy("key", key);
             if (key == null) {
                 break;
             }
             keys.add(key);
         }
-        spy("keys", keys);
         skipOptionalWhitespaces();
         if (input.atEnd()) {
             checkCondition(
@@ -625,7 +593,6 @@ public class MFParser {
             return null;
         }
         MFDataModel.Pattern pattern = getQuotedPattern();
-        spy("quoted pattern", pattern);
         return new MFDataModel.Variant(keys, pattern);
     }
 
@@ -718,7 +685,6 @@ public class MFParser {
         cp = input.readCodePoint();
         checkCondition(cp == '{', "Expected second { for a complex body");
         MFDataModel.Pattern pattern = getPattern();
-        spy("pattern in complex body", pattern);
         cp = input.readCodePoint();
         checkCondition(cp == '}', "Expected } to end a complex body");
         cp = input.readCodePoint();
@@ -786,22 +752,5 @@ public class MFParser {
             return m.group();
         }
         return null;
-    }
-
-    /** TODO: Debug utilities, to remove. */
-    public static boolean debug = true;
-
-    private void spy(String label, Object obj) {
-        spy(false, label, obj);
-    }
-
-    private void spy(boolean force, String label, Object obj) {
-        if (debug) {
-            int position = input.getPosition();
-            String xtras = String.format(
-                    "%s\u2191\u2191\u2191%s%n",
-                    input.buffer.substring(0, position), input.buffer.substring(position));
-            DbgUtil.spy(force, label, obj, xtras);
-        }
     }
 }

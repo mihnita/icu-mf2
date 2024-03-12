@@ -3,12 +3,14 @@
 
 package com.ibm.icu.dev.test.message2;
 
-import com.ibm.icu.message2x.MFDataModel;
 import com.ibm.icu.message2x.MFParser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+/*
+ * A list of tests for the parser.
+ */
 @RunWith(JUnit4.class)
 @SuppressWarnings({"static-method", "javadoc"})
 public class WipTest {
@@ -71,7 +73,7 @@ public class WipTest {
             ".local $foo = {$exp :date}",
             ".local $foo = {$exp :date year=numeric month=long day=numeric}",
             ".local $bar = {$foo :date month=medium}",
-            ".someting |reserved=| {$foo :date}",
+            ".something |reserved=| {$foo :date}",
             // Several declarations in one message
             ""
                     + ".input {$a :date}\n"
@@ -88,11 +90,7 @@ public class WipTest {
                     + "  * {{You deleted {$count} files}}   ",
         };
         for (String test : someTests) {
-            System.out.println("======================");
-            System.out.println(Utilities.str(test));
-            MFDataModel.Message z = MFParser.parse(test);
-            System.out.println("======================");
-            System.out.println(z);
+            MFParser.parse(test);
         }
     }
 }

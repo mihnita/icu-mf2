@@ -66,15 +66,16 @@ class DateTimeFormatterFactory implements FormatterFactory {
         int dateStyle = DateFormat.NONE;
         int timeStyle = DateFormat.NONE;
         switch (kind) {
-            case "datetime":
-                dateStyle = getDateTimeStyle(fixedOptions, "dateStyle");
-                timeStyle = getDateTimeStyle(fixedOptions, "timeStyle");
-                break;
             case "date":
                 dateStyle = getDateTimeStyle(fixedOptions, "style");
                 break;
             case "time":
                 timeStyle = getDateTimeStyle(fixedOptions, "style");
+                break;
+            case "datetime": //$FALL-THROUGH$
+            default:
+                dateStyle = getDateTimeStyle(fixedOptions, "dateStyle");
+                timeStyle = getDateTimeStyle(fixedOptions, "timeStyle");
                 break;
         }
 
@@ -82,15 +83,16 @@ class DateTimeFormatterFactory implements FormatterFactory {
         if (dateStyle == DateFormat.NONE && timeStyle == DateFormat.NONE) {
             String skeleton = "";
             switch (kind) {
-                case "datetime":
-                    skeleton = getDateFieldOptions(fixedOptions);
-                    skeleton += getTimeFieldOptions(fixedOptions);
-                    break;
                 case "date":
                     skeleton = getDateFieldOptions(fixedOptions);
                     break;
                 case "time":
                     skeleton = getTimeFieldOptions(fixedOptions);
+                    break;
+                case "datetime": //$FALL-THROUGH$
+                default:
+                    skeleton = getDateFieldOptions(fixedOptions);
+                    skeleton += getTimeFieldOptions(fixedOptions);
                     break;
             }
 
@@ -105,16 +107,17 @@ class DateTimeFormatterFactory implements FormatterFactory {
 
             // No skeletons, custom or otherwise, match fallback to short / short as per spec.
             switch (kind) {
-                case "datetime":
-                    dateStyle = DateFormat.SHORT;
-                    timeStyle = DateFormat.SHORT;
-                    break;
                 case "date":
                     dateStyle = DateFormat.SHORT;
                     timeStyle = DateFormat.NONE;
                     break;
                 case "time":
                     dateStyle = DateFormat.NONE;
+                    timeStyle = DateFormat.SHORT;
+                    break;
+                case "datetime": //$FALL-THROUGH$
+                default:
+                    dateStyle = DateFormat.SHORT;
                     timeStyle = DateFormat.SHORT;
             }
         }

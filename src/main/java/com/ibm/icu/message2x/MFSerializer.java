@@ -298,13 +298,15 @@ public class MFSerializer {
         if (!declaration.body.isEmpty()) {
             result.append(' ');
         }
+        result.append('|');
         result.append(declaration.body);
+        result.append('|');
+        needSpace = true;
         for (Expression expression : declaration.expressions) {
             addSpaceIfNeeded();
             expressionToString(expression);
             needSpace = true;
         }
-        needSpace = true;
     }
 
     private void inputDeclarationToString(InputDeclaration declaration) {

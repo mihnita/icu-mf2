@@ -169,7 +169,7 @@
       { "type": "literal", "value": "foo " },
       { "type": "fallback", "source": "+" }
     ],
-    "errors": [{ "type": "unsupported-annotation" }]
+    "errorsJs": [{ "type": "unsupported-annotation" }]
   },
   {
     "src": "foo {&private}",
@@ -178,7 +178,7 @@
       { "type": "literal", "value": "foo " },
       { "type": "fallback", "source": "&" }
     ],
-    "errors": [{ "type": "unsupported-annotation" }]
+    "errorsJs": [{ "type": "unsupported-annotation" }]
   },
   {
     "src": "foo {?reserved @a @b=$c}",
@@ -187,26 +187,26 @@
       { "type": "literal", "value": "foo " },
       { "type": "fallback", "source": "?" }
     ],
-    "errors": [{ "type": "unsupported-annotation" }]
+    "errorsJs": [{ "type": "unsupported-annotation" }]
   },
   {
     "src": ".foo {42} {{bar}}",
     "exp": "bar",
     "parts": [{ "type": "literal", "value": "bar" }],
-    "errors": [{ "type": "unsupported-statement" }]
+    "errorsJs": [{ "type": "unsupported-statement" }]
   },
   {
     "src": ".foo{42}{{bar}}",
     "cleanSrc": ".foo {42} {{bar}}",
     "exp": "bar",
     "parts": [{ "type": "literal", "value": "bar" }],
-    "errors": [{ "type": "unsupported-statement" }]
+    "errorsJs": [{ "type": "unsupported-statement" }]
   },
   {
     "src": ".foo |}lit{| {42}{{bar}}",
     "cleanSrc": ".foo |}lit{| {42} {{bar}}",
     "exp": "bar",
     "parts": [{ "type": "literal", "value": "bar" }],
-    "errors": [{ "type": "unsupported-statement" }]
+    "errorsJs": [{ "type": "unsupported-statement" }]
   }
 ]
