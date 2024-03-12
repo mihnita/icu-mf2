@@ -6,15 +6,20 @@ package com.ibm.icu.message2x;
 import com.ibm.icu.math.BigDecimal;
 import com.ibm.icu.number.FormattedNumber;
 import com.ibm.icu.number.LocalizedNumberFormatter;
+import com.ibm.icu.number.Notation;
 import com.ibm.icu.number.NumberFormatter;
 import com.ibm.icu.number.NumberFormatter.GroupingStrategy;
 import com.ibm.icu.number.NumberFormatter.SignDisplay;
 import com.ibm.icu.number.Precision;
+import com.ibm.icu.number.Scale;
 import com.ibm.icu.number.UnlocalizedNumberFormatter;
 import com.ibm.icu.text.FormattedValue;
+import com.ibm.icu.text.NumberingSystem;
 import com.ibm.icu.text.PluralRules;
 import com.ibm.icu.text.PluralRules.PluralType;
 import com.ibm.icu.util.CurrencyAmount;
+import com.ibm.icu.util.MeasureUnit;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,13 +32,26 @@ import java.util.Objects;
  * in {@link com.ibm.icu.text.MessageFormat}.
  */
 class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
+    private final String kind; 
+
+    public NumberFormatterFactory(String kind) {
+        switch (kind) {
+            case "number": // intentional fall-through
+            case "integer":
+                break;
+            default:
+                // Default to number
+                kind = "number";
+        }
+        this.kind = kind;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Formatter createFormatter(Locale locale, Map<String, Object> fixedOptions) {
-        return new NumberFormatterImpl(locale, fixedOptions);
+        return new NumberFormatterImpl(locale, fixedOptions, kind);
     }
 
     /**
@@ -53,22 +71,24 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
         }
 
         PluralRules rules = PluralRules.forLocale(locale, pluralType);
-        return new PluralSelectorImpl(locale, rules, fixedOptions);
+        return new PluralSelectorImpl(locale, rules, fixedOptions, kind);
     }
 
     static class NumberFormatterImpl implements Formatter {
         private final Locale locale;
         private final Map<String, Object> fixedOptions;
         private final LocalizedNumberFormatter icuFormatter;
+        private final String kind;
         final boolean advanced;
 
-        NumberFormatterImpl(Locale locale, Map<String, Object> fixedOptions) {
+        NumberFormatterImpl(Locale locale, Map<String, Object> fixedOptions, String kind) {
             this.locale = locale;
             this.fixedOptions = new HashMap<>(fixedOptions);
-            String skeleton = OptUtils.getString(fixedOptions, "skeleton");
+            String skeleton = OptUtils.getString(fixedOptions, "icu:skeleton");
             boolean fancy = skeleton != null;
-            this.icuFormatter = formatterForOptions(locale, fixedOptions);
+            this.icuFormatter = formatterForOptions(locale, fixedOptions, kind);
             this.advanced = fancy;
+            this.kind = kind;
         }
 
         LocalizedNumberFormatter getIcuFormatter() {
@@ -97,7 +117,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
                 // This is really wasteful, as we don't use the existing
                 // formatter if even one option is variable.
                 // We can optimize, but for now will have to do.
-                realFormatter = formatterForOptions(locale, mergedOptions);
+                realFormatter = formatterForOptions(locale, mergedOptions, kind);
             }
 
             Integer offset = OptUtils.getInteger(variableOptions, "icu:offset");
@@ -147,10 +167,10 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
         private LocalizedNumberFormatter icuFormatter;
 
         private PluralSelectorImpl(
-                Locale locale, PluralRules rules, Map<String, Object> fixedOptions) {
+                Locale locale, PluralRules rules, Map<String, Object> fixedOptions, String kind) {
             this.rules = rules;
             this.fixedOptions = fixedOptions;
-            this.icuFormatter = formatterForOptions(locale, fixedOptions);
+            this.icuFormatter = formatterForOptions(locale, fixedOptions, kind);
         }
 
         /**
@@ -178,6 +198,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
         // The order is exact values, key, other
         // There is no need to be very strict, as these are keys that are already equal
         // So we will not get to compare "1" vs "2", or "one" vs "few".
+        // TODO: This is quite ugly, change when time. 
         private static int pluralComparator(String o1, String o2) {
             if (o1.equals(o2)) {
                 return 0;
@@ -247,22 +268,50 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
     }
 
     private static LocalizedNumberFormatter formatterForOptions(
-            Locale locale, Map<String, Object> fixedOptions) {
+            Locale locale, Map<String, Object> fixedOptions, String kind) {
         UnlocalizedNumberFormatter nf;
-        String skeleton = OptUtils.getString(fixedOptions, "skeleton");
+        String skeleton = OptUtils.getString(fixedOptions, "icu:skeleton");
         if (skeleton != null) {
-            nf = NumberFormatter.forSkeleton(skeleton);
-        } else {
-            nf = NumberFormatter.with();
-            Integer option = OptUtils.getInteger(fixedOptions, "minimumFractionDigits");
-            if (option != null) {
-                nf = nf.precision(Precision.minFraction(option));
+            return NumberFormatter.forSkeleton(skeleton).locale(locale);
+        }
+
+        Integer option;
+        String strOption;
+        nf = NumberFormatter.with();
+
+        // These options don't apply to `:integer`
+        if ("number".equals(kind)) {
+            Notation notation;
+            switch (OptUtils.getString(fixedOptions, "notation", "standard")) {
+                case "scientific":
+                    notation = Notation.scientific();
+                    break;
+                case "engineering":
+                    notation = Notation.engineering();
+                    break;
+                case "compact":
+                    {
+                        switch (OptUtils.getString(fixedOptions, "compactDisplay", "short")) {
+                            case "long":
+                                notation = Notation.compactLong();
+                                break;
+                            case "short": // intentional fallthrough
+                            default:
+                                notation = Notation.compactShort();
+                        }
+                    }
+                    break;
+                case "standard": // intentional fallthrough
+                default:
+                    notation = Notation.simple();
+            }
+            nf = nf.notation(notation);
+            
+            strOption = OptUtils.getString(fixedOptions, "style", "decimal");
+            if (strOption.equals("percent")) {
+                nf = nf.unit(MeasureUnit.PERCENT).scale(Scale.powerOfTen(2));
             }
 
-            option = OptUtils.getInteger(fixedOptions, "minimumIntegerDigits");
-            if (option != null) {
-                // TODO! Ask Shane.
-            }
             option = OptUtils.getInteger(fixedOptions, "minimumFractionDigits");
             if (option != null) {
                 nf = nf.precision(Precision.minFraction(option));
@@ -275,50 +324,65 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
             if (option != null) {
                 nf = nf.precision(Precision.minSignificantDigits(option));
             }
-            option = OptUtils.getInteger(fixedOptions, "maximumSignificantDigits");
-            if (option != null) {
-                nf = nf.precision(Precision.maxSignificantDigits(option));
-            }
-
-            String strOption = OptUtils.getString(fixedOptions, "signDisplay", "auto");
-            SignDisplay signDisplay;
-            switch (strOption) {
-                case "always":
-                    signDisplay = SignDisplay.ALWAYS;
-                    break;
-                case "exceptZero":
-                    signDisplay = SignDisplay.EXCEPT_ZERO;
-                    break;
-                case "negative":
-                    signDisplay = SignDisplay.NEGATIVE;
-                    break;
-                case "never":
-                    signDisplay = SignDisplay.NEVER;
-                    break;
-                case "auto": // intentional fall-through
-                default:
-                    signDisplay = SignDisplay.AUTO;
-            }
-            nf = nf.sign(signDisplay);
-
-            GroupingStrategy grp;
-            strOption = OptUtils.getString(fixedOptions, "useGrouping", "auto");
-            switch (strOption) {
-                case "always":
-                    grp = GroupingStrategy.ON_ALIGNED;
-                    break; // TODO: check
-                case "never":
-                    grp = GroupingStrategy.OFF;
-                    break;
-                case "min2":
-                    grp = GroupingStrategy.MIN2;
-                    break;
-                case "auto": // intentional fall-through
-                default:
-                    grp = GroupingStrategy.AUTO;
-            }
-            nf = nf.grouping(grp);
+        } // end of `:number` specific options
+        
+        strOption = OptUtils.getString(fixedOptions, "numberingSystem", "");
+        if (!strOption.isEmpty()) {
+            strOption = strOption.toLowerCase(Locale.US);
+            // No good way to validate, there are too many.
+            NumberingSystem ns = NumberingSystem.getInstanceByName(strOption);
+            nf = nf.symbols(ns);
         }
+        
+        // The options below apply to both `:number` and `:integer` 
+        option = OptUtils.getInteger(fixedOptions, "minimumIntegerDigits");
+        if (option != null) {
+            // TODO! Ask Shane. nf.integerWidth(null) ?
+        }
+        option = OptUtils.getInteger(fixedOptions, "maximumSignificantDigits");
+        if (option != null) {
+            nf = nf.precision(Precision.maxSignificantDigits(option));
+        }
+
+        strOption = OptUtils.getString(fixedOptions, "signDisplay", "auto");
+        SignDisplay signDisplay;
+        switch (strOption) {
+            case "always":
+                signDisplay = SignDisplay.ALWAYS;
+                break;
+            case "exceptZero":
+                signDisplay = SignDisplay.EXCEPT_ZERO;
+                break;
+            case "negative":
+                signDisplay = SignDisplay.NEGATIVE;
+                break;
+            case "never":
+                signDisplay = SignDisplay.NEVER;
+                break;
+            case "auto": // intentional fall-through
+            default:
+                signDisplay = SignDisplay.AUTO;
+        }
+        nf = nf.sign(signDisplay);
+
+        GroupingStrategy grp;
+        strOption = OptUtils.getString(fixedOptions, "useGrouping", "auto");
+        switch (strOption) {
+            case "always":
+                grp = GroupingStrategy.ON_ALIGNED;
+                break; // TODO: check
+            case "never":
+                grp = GroupingStrategy.OFF;
+                break;
+            case "min2":
+                grp = GroupingStrategy.MIN2;
+                break;
+            case "auto": // intentional fall-through
+            default:
+                grp = GroupingStrategy.AUTO;
+        }
+        nf = nf.grouping(grp);
+
         return nf.locale(locale);
     }
 }

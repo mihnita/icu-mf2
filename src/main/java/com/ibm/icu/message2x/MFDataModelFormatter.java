@@ -63,18 +63,22 @@ class MFDataModelFormatter {
 
                 // Number formatting
                 // TODO: `:integer` ?
-                .setFormatter("number", new NumberFormatterFactory())
+                .setFormatter("number", new NumberFormatterFactory("number"))
+                .setFormatter("integer", new NumberFormatterFactory("integer"))
                 .setDefaultFormatterNameForType(Integer.class, "number")
                 .setDefaultFormatterNameForType(Double.class, "number")
                 .setDefaultFormatterNameForType(Number.class, "number")
                 .setDefaultFormatterNameForType(CurrencyAmount.class, "number")
+
                 // Format that returns "to string"
                 .setFormatter("string", new IdentityFormatterFactory())
                 .setDefaultFormatterNameForType(String.class, "string")
                 .setDefaultFormatterNameForType(CharSequence.class, "string")
+
                 // Register the standard selectors
                 // TODO: update this to spec
-                .setSelector("number", new NumberFormatterFactory())
+                .setSelector("number", new NumberFormatterFactory("number"))
+                .setSelector("integer", new NumberFormatterFactory("integer"))
                 .setSelector("string", new TextSelectorFactory())
                 .build();
     }
@@ -555,9 +559,10 @@ class MFDataModelFormatter {
                     // .local $a = {$b :number}
                     // {{ Hello {$user}! }}
                     FormattedPlaceholder fmt = formatExpression(value, variables, arguments);
+                    // If it works, all good
                     variables.put(name, fmt);
                 } catch (Exception e) {
-                    System.out.println("Ssss");
+                    // It's OK to ignore the failure in this context, see comment above.
                 }
             }
         }

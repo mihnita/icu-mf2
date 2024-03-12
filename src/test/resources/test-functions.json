@@ -83,17 +83,16 @@
 //      "exp": "January 2, 2006 at 3:04:06 PM"
     }
   ],
-// :integer is not in the spec
-//  "integer": [
-//    { "src": "hello {4.2 :integer}", "exp": "hello 4" },
-//    { "src": "hello {-4.20 :integer}", "exp": "hello -4" },
-//    { "src": "hello {0.42e+1 :integer}", "exp": "hello 4" },
-//    {
-//      "src": ".match {$foo :integer} one {{one}} * {{other}}",
-//      "params": { "foo": 1.2 },
-//      "exp": "one"
-//    }
-//  ],
+  "integer": [
+    { "src": "hello {4.2 :integer}", "exp": "hello 4" },
+    { "src": "hello {-4.20 :integer}", "exp": "hello -4" },
+    { "src": "hello {0.42e+1 :integer}", "exp": "hello 4" },
+    {
+      "src": ".match {$foo :integer} one {{one}} * {{other}}",
+      "params": { "foo": 1.2 },
+      "exp": "one"
+    }
+  ],
   "number": [
     { "src": "hello {4.2 :number}", "exp": "hello 4.2" },
     { "src": "hello {-4.20 :number}", "exp": "hello -4.2" },

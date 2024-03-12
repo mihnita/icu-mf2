@@ -76,7 +76,7 @@ class DateTimeFormatterFactory implements FormatterFactory {
             case "time":
                 timeStyle = getDateTimeStyle(fixedOptions, "style");
                 break;
-        } 
+        }
 
         // TODO: how to handle conflicts. What if we have both skeleton and style, or pattern?
         if (dateStyle == DateFormat.NONE && timeStyle == DateFormat.NONE) {
@@ -93,7 +93,7 @@ class DateTimeFormatterFactory implements FormatterFactory {
                     skeleton = getTimeFieldOptions(fixedOptions);
                     break;
             }
-            
+
             if (skeleton.isEmpty()) {
                 // Custom option, icu namespace
                 skeleton = OptUtils.getString(fixedOptions, "icu:skeleton", "");
@@ -123,7 +123,6 @@ class DateTimeFormatterFactory implements FormatterFactory {
         return new DateTimeFormatter(locale, df);
     }
 
-    
     private static int getDateTimeStyle(Map<String, Object> options, String key) {
         String opt = OptUtils.getString(options, key);
         if (opt != null) {
@@ -131,7 +130,7 @@ class DateTimeFormatterFactory implements FormatterFactory {
         }
         return DateFormat.NONE;
     }
-    
+
     private static String getDateFieldOptions(Map<String, Object> options) {
         StringBuilder skeleton = new StringBuilder();
         String opt;
