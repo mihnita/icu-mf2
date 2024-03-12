@@ -53,7 +53,6 @@ class MFDataModelFormatter {
 
         standardFunctions = MFFunctionRegistry.builder()
                 // Date/time formatting
-                // TODO: `:date`, `:time` ?
                 .setFormatter("datetime", new DateTimeFormatterFactory("datetime"))
                 .setFormatter("date", new DateTimeFormatterFactory("date"))
                 .setFormatter("time", new DateTimeFormatterFactory("time"))
@@ -62,7 +61,6 @@ class MFDataModelFormatter {
                 .setDefaultFormatterNameForType(java.util.Calendar.class, "datetime")
 
                 // Number formatting
-                // TODO: `:integer` ?
                 .setFormatter("number", new NumberFormatterFactory("number"))
                 .setFormatter("integer", new NumberFormatterFactory("integer"))
                 .setDefaultFormatterNameForType(Integer.class, "number")
@@ -76,7 +74,6 @@ class MFDataModelFormatter {
                 .setDefaultFormatterNameForType(CharSequence.class, "string")
 
                 // Register the standard selectors
-                // TODO: update this to spec
                 .setSelector("number", new NumberFormatterFactory("number"))
                 .setSelector("integer", new NumberFormatterFactory("integer"))
                 .setSelector("string", new TextSelectorFactory())
@@ -150,7 +147,6 @@ class MFDataModelFormatter {
                 ResolvedExpression re = (ResolvedExpression) fph.getInput();
                 argument = re.argument;
                 functionName = re.functionName;
-                // re.argument; // TODO: ????
                 options.putAll(re.options);
             }
             SelectorFactory funcFactory = standardFunctions.getSelector(functionName);
@@ -308,7 +304,6 @@ class MFDataModelFormatter {
         // spec: Select the _pattern_ of `var`.
         patternToRender = var.variant.value;
 
-        // TODO: check that there was an entry with all the keys set to `*`
         // And should do that only once, when building the data model.
         if (patternToRender == null) {
             // If there was a case with all entries in the keys `*` this should not happen

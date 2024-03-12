@@ -370,7 +370,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
         switch (strOption) {
             case "always":
                 grp = GroupingStrategy.ON_ALIGNED;
-                break; // TODO: check
+                break; // TODO: check with Shane
             case "never":
                 grp = GroupingStrategy.OFF;
                 break;

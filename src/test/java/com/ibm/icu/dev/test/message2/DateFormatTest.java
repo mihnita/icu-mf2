@@ -63,19 +63,18 @@ public class DateFormatTest {
             "Expires on August 3, 2024", // expected
             // Literals
             "Expires on {|2025-02-27| :datetime dateStyle=full}",
-            "Expires on Thursday, February 27, 2025",
+            "Expires on Thursday, February 27, 2025", // expected
             "Expires at {|19:23:45| :datetime timeStyle=full}",
-            "Expires at 7:23:45 PM Pacific Daylight Time",
+            "Expires at 7:23:45 PM Pacific Daylight Time", // expected
             "Expires at {|19:23:45.123| :datetime timeStyle=full}",
-            "Expires at 7:23:45 PM Pacific Daylight Time",
+            "Expires at 7:23:45 PM Pacific Daylight Time", // expected
             "Expires on {|2025-02-27T19:23:45| :datetime dateStyle=full}",
-            "Expires on Thursday, February 27, 2025",
+            "Expires on Thursday, February 27, 2025", // expected
             // TODO: better ISO 8601 parsing
             "Expires at {|19:23:45Z| :datetime timeStyle=full}",
-            "Expires at {|19:23:45Z|}",
+            "Expires at {|19:23:45Z|}", // expected
             "Expires at {|19:23:45+03:30:00| :datetime timeStyle=full}",
-            "Expires at {|19:23:45+03:30:00|}",
-
+            "Expires at {|19:23:45+03:30:00|}", // expected
             // Chaining
             ""
                     + ".input {$exp :datetime timeStyle=short}\n"

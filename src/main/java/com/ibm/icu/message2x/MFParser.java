@@ -123,7 +123,7 @@ public class MFParser {
                     cp = input.readCodePoint();
                     if (cp == '\\' || cp == '{' || cp == '|' | cp == '}') {
                         result.appendCodePoint(cp);
-                    } else { // TODO: Error, invalid escape
+                    } else { // TODO: Error, treat invalid escape?
                         result.appendCodePoint('\\');
                         result.appendCodePoint(cp);
                     }
@@ -349,10 +349,8 @@ public class MFParser {
     private String getReservedBody() throws MFParseException {
         int spaceCount = skipWhitespaces();
         StringBuilder result = new StringBuilder();
-        // TODO Auto-generated method stub
         while (true) {
             int cp = input.readCodePoint();
-            // TODO: whitespace is problematic in the grammar
             if (StringUtils.isReservedChar(cp)) {
                 result.appendCodePoint(cp);
             } else if (cp == '\\') {
@@ -645,7 +643,8 @@ public class MFParser {
     }
 
     private static class MatchDeclaration implements MFDataModel.Declaration {
-        // Provides a common type for XXX
+        // Provides a common type that extends MFDataModel.Declaration but for match.
+        // There is no such thing in the data model.
     }
 
     // abnf: input-declaration = input [s] variable-expression

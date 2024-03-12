@@ -30,7 +30,7 @@ class InputSource {
     }
 
     int readCodePoint() {
-        // TODO: REMOVE
+        // TODO: remove this?
         // START Detect possible infinite loop
         if (lastReadCursor != cursor) {
             lastReadCursor = cursor;
@@ -41,7 +41,7 @@ class InputSource {
                 throw new RuntimeException("Stuck in a loop!");
             }
         }
-        // TODO: END Detect possible infinite loop
+        // END Detect possible infinite loop
 
         if (atEnd()) {
             return -1;
