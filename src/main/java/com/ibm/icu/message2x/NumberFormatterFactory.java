@@ -133,7 +133,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
                 if (nrValue != null) {
                     result = realFormatter.format(nrValue.doubleValue() - offset);
                 } else {
-                    result = new PlainStringFormattedValue("NaN");
+                    result = new PlainStringFormattedValue("{|" + strValue + "|}");
                 }
             }
             return new FormattedPlaceholder(toFormat, result);

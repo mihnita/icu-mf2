@@ -159,7 +159,7 @@ public class MessageFormatter {
         if (builder.dataModel != null) {
             this.dataModel = builder.dataModel;
             // this.pattern = MFSerializer.dataModelToString(this.dataModel);
-            this.pattern = "TODO!";
+            this.pattern = MFSerializer.dataModelToString(dataModel);
         } else {
             this.pattern = builder.pattern;
             try {

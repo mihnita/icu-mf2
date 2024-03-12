@@ -51,10 +51,10 @@ public class FromJsonTest { // extends CoreTestFmwk {
                 .pattern("hello {|4.2| :number}")
                 .expected("hello \u0664\u066B\u0662")
                 .build(),
-        new TestCase.Builder().pattern("hello {|foo| :number}").expected("hello NaN").build(),
+        new TestCase.Builder().pattern("hello {|foo| :number}").expected("hello {|foo|}").build(),
         new TestCase.Builder()
                 .pattern("{hello {:number}}")
-                .expected("hello NaN")
+                .expected("hello {|foo|}")
                 // This is different from JS, should be an error.
                 .errors("ICU4J: exception.")
                 .build(),
@@ -115,7 +115,7 @@ public class FromJsonTest { // extends CoreTestFmwk {
         new TestCase.Builder()
                 .pattern(".local $foo = {$bar :number} {{bar {$foo}}}")
                 .arguments(Args.of("bar", "foo"))
-                .expected("bar NaN")
+                .expected("bar {|foo|}")
                 .build(),
         new TestCase.Builder()
                 .pattern(".local $bar = {$baz} .local $foo = {$bar} {{bar {$foo}}}")

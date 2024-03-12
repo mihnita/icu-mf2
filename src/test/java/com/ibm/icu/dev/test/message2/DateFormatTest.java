@@ -52,19 +52,29 @@ public class DateFormatTest {
             "Expires on August 2024", // expected
             "Expires on {$exp :datetime year=numeric month=medium day=numeric weekday=long hour=numeric minute=numeric}",
             "Expires on 3 Saturday 2024, 9:43 PM", // expected
+            // Make sure we ignore date / time fields if needed
+            "Expires on {$exp :date year=numeric month=medium day=numeric weekday=long hour=numeric minute=numeric}",
+            "Expires on 3 Saturday 2024", // expected
+            "Expires at {$exp :time year=numeric month=medium day=numeric weekday=long hour=numeric minute=numeric}",
+            "Expires at 9:43 PM", // expected
+            "Expires at {$exp :time style=long dateStyle=full timeStyle=medium}",
+            "Expires at 9:43:57 PM PDT", // expected
+            "Expires on {$exp :date style=long dateStyle=full timeStyle=medium}",
+            "Expires on August 3, 2024", // expected
             // Literals
             "Expires on {|2025-02-27| :datetime dateStyle=full}",
-            "Expires on Thursday, March 27, 2025",
+            "Expires on Thursday, February 27, 2025",
             "Expires at {|19:23:45| :datetime timeStyle=full}",
             "Expires at 7:23:45 PM Pacific Daylight Time",
             "Expires at {|19:23:45.123| :datetime timeStyle=full}",
             "Expires at 7:23:45 PM Pacific Daylight Time",
             "Expires on {|2025-02-27T19:23:45| :datetime dateStyle=full}",
-            "Expires on Thursday, March 27, 2025",
+            "Expires on Thursday, February 27, 2025",
+            // TODO: better ISO 8601 parsing
             "Expires at {|19:23:45Z| :datetime timeStyle=full}",
-            "Expires at 19:23:45Z",
+            "Expires at {|19:23:45Z|}",
             "Expires at {|19:23:45+03:30:00| :datetime timeStyle=full}",
-            "Expires at 19:23:45+03:30:00",
+            "Expires at {|19:23:45+03:30:00|}",
 
             // Chaining
             ""

@@ -13,14 +13,29 @@ class Unit {
     final String cleanSrc;
     final Map<String, Object> params;
     final List<Part> parts;
+    final List<Error> errors;
 
-    Unit(String src, String cleanSrc, Map<String, Object> params, String exp, List<Part> parts) {
-        super();
+    Unit(String src, String cleanSrc, Map<String, Object> params, String exp, List<Part> parts, List<Error> errors) {
+
         this.src = src;
         this.cleanSrc = cleanSrc;
         this.params = params;
         this.exp = exp;
         this.parts = parts;
+        this.errors = errors;
+    }
+
+    class Error {
+        final String name;
+        final String type;
+        Error(String name, String type) {
+            this.name = name;
+            this.type = type;
+        }
+        @Override
+        public String toString() {
+            return "Error [" + (name != null ? "name=" + name + ", " : "") + (type != null ? "type=" + type : "") + "]";
+        }
     }
 
     @Override

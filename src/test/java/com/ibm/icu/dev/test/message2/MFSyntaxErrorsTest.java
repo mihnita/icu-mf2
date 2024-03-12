@@ -38,10 +38,9 @@ public class MFSyntaxErrorsTest {
                 System.out.println(Utilities.str(unit));
                 try {
                     MFParser.parse(unit);
-                    System.out.println("UNDETECTED (BAD) : " + unit);
                     errors.add(unit);
                 } catch (MFParseException e) {
-                    System.out.println("DETECTED (GOOD)  : " + e.getMessage());
+                    // We expected an error, so it's all good
                 }
             }
         }

@@ -23,6 +23,22 @@ import java.util.TimeZone;
  * <code>{exp, date}</code> and <code>{exp, time}</code> in {@link com.ibm.icu.text.MessageFormat}.
  */
 class DateTimeFormatterFactory implements FormatterFactory {
+    private final String kind;
+
+    // "datetime", "date", "time"
+    DateTimeFormatterFactory(String kind) {
+        switch (kind) {
+            case "date":
+                break;
+            case "time":
+                break;
+            case "datetime":
+                break;
+            default:
+                kind = "datetime";
+        }
+        this.kind = kind;
+    }
 
     private static int stringToStyle(String option) {
         switch (option) {
@@ -47,23 +63,37 @@ class DateTimeFormatterFactory implements FormatterFactory {
      */
     @Override
     public Formatter createFormatter(Locale locale, Map<String, Object> fixedOptions) {
-        String opt;
-
         int dateStyle = DateFormat.NONE;
-        opt = OptUtils.getString(fixedOptions, "dateStyle");
-        if (opt != null) {
-            dateStyle = stringToStyle(opt);
-        }
-
         int timeStyle = DateFormat.NONE;
-        opt = OptUtils.getString(fixedOptions, "timeStyle");
-        if (opt != null) {
-            timeStyle = stringToStyle(opt);
-        }
+        switch (kind) {
+            case "datetime":
+                dateStyle = getDateTimeStyle(fixedOptions, "dateStyle");
+                timeStyle = getDateTimeStyle(fixedOptions, "timeStyle");
+                break;
+            case "date":
+                dateStyle = getDateTimeStyle(fixedOptions, "style");
+                break;
+            case "time":
+                timeStyle = getDateTimeStyle(fixedOptions, "style");
+                break;
+        } 
 
         // TODO: how to handle conflicts. What if we have both skeleton and style, or pattern?
         if (dateStyle == DateFormat.NONE && timeStyle == DateFormat.NONE) {
-            String skeleton = checkForFieldOptions(fixedOptions);
+            String skeleton = "";
+            switch (kind) {
+                case "datetime":
+                    skeleton = getDateFieldOptions(fixedOptions);
+                    skeleton += getTimeFieldOptions(fixedOptions);
+                    break;
+                case "date":
+                    skeleton = getDateFieldOptions(fixedOptions);
+                    break;
+                case "time":
+                    skeleton = getTimeFieldOptions(fixedOptions);
+                    break;
+            }
+            
             if (skeleton.isEmpty()) {
                 // Custom option, icu namespace
                 skeleton = OptUtils.getString(fixedOptions, "icu:skeleton", "");
@@ -74,15 +104,35 @@ class DateTimeFormatterFactory implements FormatterFactory {
             }
 
             // No skeletons, custom or otherwise, match fallback to short / short as per spec.
-            dateStyle = DateFormat.SHORT;
-            timeStyle = DateFormat.SHORT;
+            switch (kind) {
+                case "datetime":
+                    dateStyle = DateFormat.SHORT;
+                    timeStyle = DateFormat.SHORT;
+                    break;
+                case "date":
+                    dateStyle = DateFormat.SHORT;
+                    timeStyle = DateFormat.NONE;
+                    break;
+                case "time":
+                    dateStyle = DateFormat.NONE;
+                    timeStyle = DateFormat.SHORT;
+            }
         }
 
         DateFormat df = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
         return new DateTimeFormatter(locale, df);
     }
 
-    private static String checkForFieldOptions(Map<String, Object> options) {
+    
+    private static int getDateTimeStyle(Map<String, Object> options, String key) {
+        String opt = OptUtils.getString(options, key);
+        if (opt != null) {
+            return stringToStyle(opt);
+        }
+        return DateFormat.NONE;
+    }
+    
+    private static String getDateFieldOptions(Map<String, Object> options) {
         StringBuilder skeleton = new StringBuilder();
         String opt;
 
@@ -164,6 +214,16 @@ class DateTimeFormatterFactory implements FormatterFactory {
             default:
                 // invalid value, we just ignore it.
         }
+        return skeleton.toString();
+    }
+
+    private static String getTimeFieldOptions(Map<String, Object> options) {
+        StringBuilder skeleton = new StringBuilder();
+        String opt;
+
+        // In all the switches below we just ignore invalid options.
+        // Would be nice to report (log?), but ICU does not have a clear policy on how to do that.
+        // But we don't want to throw, that is too drastic.
 
         int showHour = 0;
         opt = OptUtils.getString(options, "hour", "");
@@ -288,9 +348,10 @@ class DateTimeFormatterFactory implements FormatterFactory {
             }
             if (toFormat instanceof CharSequence) {
                 toFormat = parseIso8601(toFormat.toString());
+                // We were unable to parse the input as iso date
                 if (toFormat instanceof CharSequence) {
                     return new FormattedPlaceholder(
-                            toFormat, new PlainStringFormattedValue(toFormat.toString()));
+                            toFormat, new PlainStringFormattedValue("{|" + toFormat + "|}"));
                 }
             }
             if (toFormat instanceof Calendar) {
@@ -323,7 +384,7 @@ class DateTimeFormatterFactory implements FormatterFactory {
 
         try {
             LocalDate ld = LocalDate.parse(text);
-            return new Date(ld.getYear() - 1900, ld.getMonthValue(), ld.getDayOfMonth());
+            return new Date(ld.getYear() - 1900, ld.getMonthValue() - 1, ld.getDayOfMonth());
         } catch (Exception e) {
             // just ignore, we want to try more
         }
@@ -332,7 +393,7 @@ class DateTimeFormatterFactory implements FormatterFactory {
             LocalDateTime ldt = LocalDateTime.parse(text);
             return new Date(
                     ldt.getYear() - 1900,
-                    ldt.getMonthValue(),
+                    ldt.getMonthValue() - 1,
                     ldt.getDayOfMonth(),
                     ldt.getHour(),
                     ldt.getMinute(),
@@ -346,7 +407,7 @@ class DateTimeFormatterFactory implements FormatterFactory {
             LocalDateTime ldt = LocalDateTime.of(LocalDate.now(), lt);
             return new Date(
                     ldt.getYear() - 1900,
-                    ldt.getMonthValue(),
+                    ldt.getMonthValue() - 1,
                     ldt.getDayOfMonth(),
                     ldt.getHour(),
                     ldt.getMinute(),

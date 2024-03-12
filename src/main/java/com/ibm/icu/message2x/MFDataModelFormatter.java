@@ -54,10 +54,13 @@ class MFDataModelFormatter {
         standardFunctions = MFFunctionRegistry.builder()
                 // Date/time formatting
                 // TODO: `:date`, `:time` ?
-                .setFormatter("datetime", new DateTimeFormatterFactory())
+                .setFormatter("datetime", new DateTimeFormatterFactory("datetime"))
+                .setFormatter("date", new DateTimeFormatterFactory("date"))
+                .setFormatter("time", new DateTimeFormatterFactory("time"))
                 .setDefaultFormatterNameForType(Date.class, "datetime")
                 .setDefaultFormatterNameForType(Calendar.class, "datetime")
                 .setDefaultFormatterNameForType(java.util.Calendar.class, "datetime")
+
                 // Number formatting
                 // TODO: `:integer` ?
                 .setFormatter("number", new NumberFormatterFactory())
@@ -78,6 +81,9 @@ class MFDataModelFormatter {
 
     String format(Map<String, Object> arguments) {
         MFDataModel.Pattern patternToRender = null;
+        if (arguments == null) {
+            arguments = new HashMap<>();
+        }
 
         Map<String, Object> variables;
         if (dm instanceof MFDataModel.PatternMessage) {
@@ -543,8 +549,16 @@ class MFDataModelFormatter {
                 } else {
                     continue;
                 }
-                FormattedPlaceholder fmt = formatExpression(value, variables, arguments);
-                variables.put(name, fmt);
+                try {
+                    // There it no need to succeed in solving everything.
+                    // For example there is no problem is `$b` is not defined below:
+                    // .local $a = {$b :number}
+                    // {{ Hello {$user}! }}
+                    FormattedPlaceholder fmt = formatExpression(value, variables, arguments);
+                    variables.put(name, fmt);
+                } catch (Exception e) {
+                    System.out.println("Ssss");
+                }
             }
         }
         return variables;
