@@ -16,7 +16,14 @@ class Unit {
     final String ignore;
     final List<Error> errors;
 
-    Unit(String src, List<String> srcs, String locale, Map<String, Object> params, String exp, String ignore, List<Error> errors) {
+    Unit(
+            String src,
+            List<String> srcs,
+            String locale,
+            Map<String, Object> params,
+            String exp,
+            String ignore,
+            List<Error> errors) {
         this.src = src;
         this.srcs = srcs;
         this.locale = locale;
@@ -29,13 +36,18 @@ class Unit {
     class Error {
         final String name;
         final String type;
+
         Error(String name, String type) {
             this.name = name;
             this.type = type;
         }
+
         @Override
         public String toString() {
-            return "Error [" + (name != null ? "name=" + name + ", " : "") + (type != null ? "type=" + type : "") + "]";
+            return "Error ["
+                    + (name != null ? "name=" + name + ", " : "")
+                    + (type != null ? "type=" + type : "")
+                    + "]";
         }
     }
 

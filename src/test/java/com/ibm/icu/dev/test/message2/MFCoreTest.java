@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-@SuppressWarnings({ "static-method", "javadoc" })
+@SuppressWarnings({"static-method", "javadoc"})
 @RunWith(JUnit4.class)
 public class MFCoreTest {
     private static final String JSON_FILE = "test-core.json";

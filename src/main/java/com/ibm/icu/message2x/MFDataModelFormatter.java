@@ -49,36 +49,37 @@ class MFDataModelFormatter {
             MFDataModel.Message dm, Locale locale, MFFunctionRegistry customFunctionRegistry) {
         this.locale = locale;
         this.dm = dm;
-        this.customFunctions = 
+        this.customFunctions =
                 customFunctionRegistry == null ? EMPTY_REGISTY : customFunctionRegistry;
 
-        standardFunctions = MFFunctionRegistry.builder()
-                // Date/time formatting
-                .setFormatter("datetime", new DateTimeFormatterFactory("datetime"))
-                .setFormatter("date", new DateTimeFormatterFactory("date"))
-                .setFormatter("time", new DateTimeFormatterFactory("time"))
-                .setDefaultFormatterNameForType(Date.class, "datetime")
-                .setDefaultFormatterNameForType(Calendar.class, "datetime")
-                .setDefaultFormatterNameForType(java.util.Calendar.class, "datetime")
+        standardFunctions =
+                MFFunctionRegistry.builder()
+                        // Date/time formatting
+                        .setFormatter("datetime", new DateTimeFormatterFactory("datetime"))
+                        .setFormatter("date", new DateTimeFormatterFactory("date"))
+                        .setFormatter("time", new DateTimeFormatterFactory("time"))
+                        .setDefaultFormatterNameForType(Date.class, "datetime")
+                        .setDefaultFormatterNameForType(Calendar.class, "datetime")
+                        .setDefaultFormatterNameForType(java.util.Calendar.class, "datetime")
 
-                // Number formatting
-                .setFormatter("number", new NumberFormatterFactory("number"))
-                .setFormatter("integer", new NumberFormatterFactory("integer"))
-                .setDefaultFormatterNameForType(Integer.class, "number")
-                .setDefaultFormatterNameForType(Double.class, "number")
-                .setDefaultFormatterNameForType(Number.class, "number")
-                .setDefaultFormatterNameForType(CurrencyAmount.class, "number")
+                        // Number formatting
+                        .setFormatter("number", new NumberFormatterFactory("number"))
+                        .setFormatter("integer", new NumberFormatterFactory("integer"))
+                        .setDefaultFormatterNameForType(Integer.class, "number")
+                        .setDefaultFormatterNameForType(Double.class, "number")
+                        .setDefaultFormatterNameForType(Number.class, "number")
+                        .setDefaultFormatterNameForType(CurrencyAmount.class, "number")
 
-                // Format that returns "to string"
-                .setFormatter("string", new IdentityFormatterFactory())
-                .setDefaultFormatterNameForType(String.class, "string")
-                .setDefaultFormatterNameForType(CharSequence.class, "string")
+                        // Format that returns "to string"
+                        .setFormatter("string", new IdentityFormatterFactory())
+                        .setDefaultFormatterNameForType(String.class, "string")
+                        .setDefaultFormatterNameForType(CharSequence.class, "string")
 
-                // Register the standard selectors
-                .setSelector("number", new NumberFormatterFactory("number"))
-                .setSelector("integer", new NumberFormatterFactory("integer"))
-                .setSelector("string", new TextSelectorFactory())
-                .build();
+                        // Register the standard selectors
+                        .setSelector("number", new NumberFormatterFactory("number"))
+                        .setSelector("integer", new NumberFormatterFactory("integer"))
+                        .setSelector("string", new TextSelectorFactory())
+                        .build();
     }
 
     String format(Map<String, Object> arguments) {
@@ -496,8 +497,9 @@ class MFDataModelFormatter {
             return new FormattedPlaceholder(expression, new PlainStringFormattedValue(""));
         } else {
             UnsupportedExpression ue = (UnsupportedExpression) expression;
-            char sigil = ue.annotation.source.charAt(0); 
-            return new FormattedPlaceholder(expression, new PlainStringFormattedValue("{" + sigil + "}"));
+            char sigil = ue.annotation.source.charAt(0);
+            return new FormattedPlaceholder(
+                    expression, new PlainStringFormattedValue("{" + sigil + "}"));
         }
 
         if (annotation instanceof FunctionAnnotation) {

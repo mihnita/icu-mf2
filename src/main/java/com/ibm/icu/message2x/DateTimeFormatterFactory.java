@@ -72,7 +72,7 @@ class DateTimeFormatterFactory implements FormatterFactory {
             case "time":
                 timeStyle = getDateTimeStyle(fixedOptions, "style");
                 break;
-            case "datetime": //$FALL-THROUGH$
+            case "datetime": // $FALL-THROUGH$
             default:
                 dateStyle = getDateTimeStyle(fixedOptions, "dateStyle");
                 timeStyle = getDateTimeStyle(fixedOptions, "timeStyle");
@@ -89,7 +89,7 @@ class DateTimeFormatterFactory implements FormatterFactory {
                 case "time":
                     skeleton = getTimeFieldOptions(fixedOptions);
                     break;
-                case "datetime": //$FALL-THROUGH$
+                case "datetime": // $FALL-THROUGH$
                 default:
                     skeleton = getDateFieldOptions(fixedOptions);
                     skeleton += getTimeFieldOptions(fixedOptions);
@@ -115,7 +115,7 @@ class DateTimeFormatterFactory implements FormatterFactory {
                     dateStyle = DateFormat.NONE;
                     timeStyle = DateFormat.SHORT;
                     break;
-                case "datetime": //$FALL-THROUGH$
+                case "datetime": // $FALL-THROUGH$
                 default:
                     dateStyle = DateFormat.SHORT;
                     timeStyle = DateFormat.SHORT;

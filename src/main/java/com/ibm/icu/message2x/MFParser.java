@@ -196,7 +196,7 @@ public class MFParser {
                         || StringUtils.isPrivateAnnotationSigil(cp)) {
                     cp = input.readCodePoint();
                     // The sigil is part of the body.
-                    // Safe to cast to char, the code point is in BMP 
+                    // Safe to cast to char, the code point is in BMP
                     identifier = (char) cp + getIdentifier();
                     String body = getReservedBody();
                     return new MFDataModel.UnsupportedAnnotation(identifier + body);
@@ -243,9 +243,11 @@ public class MFParser {
         List<MFDataModel.Attribute> attributes = getAttributes();
 
         if (annotation instanceof MFDataModel.FunctionAnnotation) {
-            return new MFDataModel.FunctionExpression((MFDataModel.FunctionAnnotation) annotation, attributes);
+            return new MFDataModel.FunctionExpression(
+                    (MFDataModel.FunctionAnnotation) annotation, attributes);
         } else if (annotation instanceof MFDataModel.UnsupportedAnnotation) {
-            return new MFDataModel.UnsupportedExpression((MFDataModel.UnsupportedAnnotation) annotation, attributes);
+            return new MFDataModel.UnsupportedExpression(
+                    (MFDataModel.UnsupportedAnnotation) annotation, attributes);
         } else {
             error("Unexpected annotation : " + annotation);
         }

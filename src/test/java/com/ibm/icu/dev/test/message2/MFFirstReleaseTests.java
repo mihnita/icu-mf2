@@ -4,7 +4,6 @@
 package com.ibm.icu.dev.test.message2;
 
 import java.io.Reader;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -14,7 +13,7 @@ import org.junit.runners.JUnit4;
  * That class was originally a json file, converted to some hard-coded tests in the Java class.
  * Now that we can use gson for testing we reverted those tests back to json, tested in this class.
  */
-@SuppressWarnings({ "static-method", "javadoc" })
+@SuppressWarnings({"static-method", "javadoc"})
 @RunWith(JUnit4.class)
 public class MFFirstReleaseTests {
     private static final String JSON_FILE = "icu-test-previous-release.json";

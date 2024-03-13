@@ -90,16 +90,17 @@ public class SerializationTest {
          * serialize the data model, then parse again in a new data model.
          * That would give us two data models to compare, where
          * small differences in spacing or quoting does not matter.
-         * But we don't have (yet) an implementation of `equals` on of the data model classes. 
-         */       
-        pattern = pattern.replace('\n', ' ')
-                .replaceAll("  +", " ")
-                // Naive normalization for `|1234.56|` to `1234.56` 
-                .replaceAll("\\|([\\d\\.]+)\\|", "$1")
-                // Naive normalization for `|asBaC12|` to `asBaC12` 
-                .replaceAll("\\|([a-zA-Z\\d]+)\\|", "$1")
-                .replaceAll(" }", "}")
-                .trim();
+         * But we don't have (yet) an implementation of `equals` on of the data model classes.
+         */
+        pattern =
+                pattern.replace('\n', ' ')
+                        .replaceAll("  +", " ")
+                        // Naive normalization for `|1234.56|` to `1234.56`
+                        .replaceAll("\\|([\\d\\.]+)\\|", "$1")
+                        // Naive normalization for `|asBaC12|` to `asBaC12`
+                        .replaceAll("\\|([a-zA-Z\\d]+)\\|", "$1")
+                        .replaceAll(" }", "}")
+                        .trim();
         assertEquals(pattern, parsed);
     }
 }

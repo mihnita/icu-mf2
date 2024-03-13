@@ -8,12 +8,11 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-@SuppressWarnings({ "static-method", "javadoc" })
+@SuppressWarnings({"static-method", "javadoc"})
 @RunWith(JUnit4.class)
 public class MFFunctionsTest {
     private static final String JSON_FILE = "test-functions.json";

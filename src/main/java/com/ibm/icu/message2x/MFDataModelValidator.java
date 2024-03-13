@@ -177,7 +177,7 @@ class MFDataModelValidator {
         // .local $foo = {$a :b option=$foo}
         if (argName != null) {
             // if we come from `.input {$foo :function}` then `varName` is null
-            // and `argName` is `foo` 
+            // and `argName` is `foo`
             if (fromInput) {
                 addVariableDeclaration(argName);
             } else {

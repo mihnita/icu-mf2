@@ -19,7 +19,6 @@ import com.ibm.icu.text.PluralRules;
 import com.ibm.icu.text.PluralRules.PluralType;
 import com.ibm.icu.util.CurrencyAmount;
 import com.ibm.icu.util.MeasureUnit;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,11 +31,11 @@ import java.util.Objects;
  * in {@link com.ibm.icu.text.MessageFormat}.
  */
 class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
-    private final String kind; 
+    private final String kind;
 
     public NumberFormatterFactory(String kind) {
         switch (kind) {
-            case "number": //$FALL-THROUGH$
+            case "number": // $FALL-THROUGH$
             case "integer":
                 break;
             default:
@@ -65,7 +64,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
             case "ordinal":
                 pluralType = PluralType.ORDINAL;
                 break;
-            case "cardinal": //$FALL-THROUGH$
+            case "cardinal": // $FALL-THROUGH$
             default:
                 pluralType = PluralType.CARDINAL;
         }
@@ -198,7 +197,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
         // The order is exact values, key, other
         // There is no need to be very strict, as these are keys that are already equal
         // So we will not get to compare "1" vs "2", or "one" vs "few".
-        // TODO: This is quite ugly, change when time. 
+        // TODO: This is quite ugly, change when time.
         private static int pluralComparator(String o1, String o2) {
             if (o1.equals(o2)) {
                 return 0;
@@ -295,18 +294,18 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
                             case "long":
                                 notation = Notation.compactLong();
                                 break;
-                            case "short": //$FALL-THROUGH$
+                            case "short": // $FALL-THROUGH$
                             default:
                                 notation = Notation.compactShort();
                         }
                     }
                     break;
-                case "standard": //$FALL-THROUGH$
+                case "standard": // $FALL-THROUGH$
                 default:
                     notation = Notation.simple();
             }
             nf = nf.notation(notation);
-            
+
             strOption = OptUtils.getString(fixedOptions, "style", "decimal");
             if (strOption.equals("percent")) {
                 nf = nf.unit(MeasureUnit.PERCENT).scale(Scale.powerOfTen(2));
@@ -334,7 +333,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
             nf = nf.symbols(ns);
         }
 
-        // The options below apply to both `:number` and `:integer` 
+        // The options below apply to both `:number` and `:integer`
         option = OptUtils.getInteger(fixedOptions, "minimumIntegerDigits");
         if (option != null) {
             // TODO! Ask Shane. nf.integerWidth(null) ?
@@ -359,7 +358,7 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
             case "never":
                 signDisplay = SignDisplay.NEVER;
                 break;
-            case "auto": //$FALL-THROUGH$
+            case "auto": // $FALL-THROUGH$
             default:
                 signDisplay = SignDisplay.AUTO;
         }
@@ -377,12 +376,12 @@ class NumberFormatterFactory implements FormatterFactory, SelectorFactory {
             case "min2":
                 grp = GroupingStrategy.MIN2;
                 break;
-            case "auto": //$FALL-THROUGH$
+            case "auto": // $FALL-THROUGH$
             default:
                 grp = GroupingStrategy.AUTO;
         }
         nf = nf.grouping(grp);
-        
+
         if (kind.equals("integer")) {
             nf = nf.precision(Precision.integer());
         }

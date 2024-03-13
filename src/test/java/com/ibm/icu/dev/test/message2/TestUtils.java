@@ -6,6 +6,9 @@ package com.ibm.icu.dev.test.message2;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.ibm.icu.message2x.MessageFormatter;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URISyntaxException;
@@ -14,19 +17,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Map;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.ibm.icu.message2x.MessageFormatter;
 import org.junit.Ignore;
 
 /** Utility class, has no test methods. */
 @Ignore("Utility class, has no test methods.")
 public class TestUtils {
-    static final Gson GSON = new GsonBuilder()
-            .setDateFormat("yyyy-MM-dd HH:mm:ss")
-            .create();
-
+    static final Gson GSON = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 
     static boolean expectsErrors(Unit unit) {
         return unit.errors != null && !unit.errors.isEmpty();
@@ -46,14 +42,14 @@ public class TestUtils {
             for (String src : unit.srcs) {
                 pattern.append(src);
             }
-        } else if (unit.src != null){
+        } else if (unit.src != null) {
             pattern.append(unit.src);
         }
 
         // We can call the "complete" constructor with null values, but we want to test that
         // all constructors work properly.
-        MessageFormatter.Builder mfBuilder = MessageFormatter.builder()
-                .setPattern(pattern.toString());
+        MessageFormatter.Builder mfBuilder =
+                MessageFormatter.builder().setPattern(pattern.toString());
         if (unit.locale != null && !unit.locale.isEmpty()) {
             mfBuilder.setLocale(Locale.forLanguageTag(unit.locale));
         } else {
@@ -81,7 +77,7 @@ public class TestUtils {
             }
         }
     }
-    
+
     private static String reportCase(Unit unit) {
         return unit.toString();
     }
