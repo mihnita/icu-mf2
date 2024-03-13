@@ -17,7 +17,7 @@ import org.junit.runners.JUnit4;
 
 @SuppressWarnings({"static-method", "javadoc"})
 @RunWith(JUnit4.class)
-public class MFDataModelErrorsTest {
+public class DataModelErrorsTest {
     private static final String JSON_FILE = "data-model-errors.json";
 
     @Test

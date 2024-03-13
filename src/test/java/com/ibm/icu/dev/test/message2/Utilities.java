@@ -16,30 +16,20 @@ class Utilities {
         }
 
         StringBuilder result = new StringBuilder();
-        str.chars()
-                .forEach(
-                        c -> {
-                            switch (c) {
-                                case '\\':
-                                    result.append("\\\\");
-                                    break;
-                                case '\t':
-                                    result.append("\\t");
-                                    break;
-                                case '\n':
-                                    result.append("\\n");
-                                    break;
-                                case '\r':
-                                    result.append("\\r");
-                                    break;
-                                default:
-                                    if (c < 0x0020 || (c >= 0x3000 && c <= 3020)) {
-                                        result.append(String.format("\\u%04X", c));
-                                    } else {
-                                        result.append((char) c);
-                                    }
-                            }
-                        });
+        str.chars().forEach(c -> {
+                switch (c) {
+                    case '\\': result.append("\\\\"); break;
+                    case '\t': result.append("\\t"); break;
+                    case '\n': result.append("\\n"); break;
+                    case '\r': result.append("\\r"); break;
+                    default:
+                        if (c < 0x0020 || (c >= 0x3000 && c <= 3020)) {
+                            result.append(String.format("\\u%04X", c));
+                        } else {
+                            result.append((char) c);
+                        }
+                }
+        });
         return "\"" + result.toString() + "\"";
     }
 

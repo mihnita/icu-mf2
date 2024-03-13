@@ -15,7 +15,7 @@ import org.junit.runners.JUnit4;
  */
 @SuppressWarnings({"static-method", "javadoc"})
 @RunWith(JUnit4.class)
-public class MFFirstReleaseTests {
+public class FirstReleaseTests {
     private static final String JSON_FILE = "icu-test-previous-release.json";
 
     @Test
