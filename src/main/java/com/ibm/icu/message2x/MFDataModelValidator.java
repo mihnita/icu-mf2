@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 
+// I can merge all this in the MFDataModel class and make it private
 class MFDataModelValidator {
     private final MFDataModel.Message message;
     private final Set<String> declaredVars = new HashSet<>();

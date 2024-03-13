@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 /*
- * This is the equivalent of the `FromJsonTest` class in the previous release.:w
+ * This is the equivalent of the `FromJsonTest` class in the previous release.
  * That class was originally a json file, converted to some hard-coded tests in the Java class.
  * Now that we can use gson for testing we reverted those tests back to json, tested in this class.
  */
