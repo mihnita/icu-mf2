@@ -11,10 +11,12 @@ import com.google.gson.GsonBuilder;
 import com.ibm.icu.message2x.MessageFormatter;
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.Ignore;
@@ -83,7 +85,14 @@ public class TestUtils {
     }
 
     static Reader jsonReader(String jsonFileName) throws URISyntaxException, IOException {
-        Path json = Utilities.getTestFile(TestUtils.class, jsonFileName);
+        Path json = getTestFile(TestUtils.class, jsonFileName);
         return Files.newBufferedReader(json, StandardCharsets.UTF_8);
     }
-}
+
+    private static Path getTestFile(Class<?> cls, String fileName) throws URISyntaxException {
+        String packageName = cls.getPackage().getName().replace('.', '/');
+        URI getPath = cls.getClassLoader().getResource(packageName).toURI();
+        Path filePath = Paths.get(getPath);
+        Path json = Paths.get(fileName);
+        return filePath.resolve(json);
+    }}

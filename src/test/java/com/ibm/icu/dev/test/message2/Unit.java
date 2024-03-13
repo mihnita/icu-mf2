@@ -1,4 +1,4 @@
-// © 2022 and later: Unicode, Inc. and others.
+// © 2024 and later: Unicode, Inc. and others.
 // License & terms of use: https://www.unicode.org/copyright.html
 
 package com.ibm.icu.dev.test.message2;
@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
+// Class corresponding to the json test files.
+// Since this is serialized by Gson, the field names should match the keys in the .json files.
 class Unit {
     final String src;
     final List<String> srcs;
@@ -54,16 +56,24 @@ class Unit {
     @Override
     public String toString() {
         StringJoiner result = new StringJoiner(", ", "UnitTest {", "}");
-        result.add("src=" + Utilities.str(src));
+        result.add("src=" + escapeString(src));
         if (params != null) {
             result.add("params=" + params);
         }
         if (exp != null) {
-            result.add("exp=" + Utilities.str(exp));
+            result.add("exp=" + escapeString(exp));
         }
         return result.toString();
     }
 
+    /**
+     * Creates and returns a new Unit created by merging the current unit with the `other` one.
+     *
+     * <p>Each value in `other`, if not null, will override the corresponding current value.</p>
+     *
+     * @param other the unit to merge into the current one
+     * @return a new unit created by merging `this` unit and `other`
+     */
     public Unit merge(Unit other) {
         String newSrc = other.src != null ? other.src : this.src;
         List<String> newSrcs = other.srcs != null ? other.srcs : this.srcs;
@@ -73,5 +83,28 @@ class Unit {
         String newIgnore = other.ignore != null ? other.ignore : this.ignore;
         List<Error> newErrors = other.errors != null ? other.errors : this.errors;
         return new Unit(newSrc, newSrcs, newLocale, newParams, newExp, newIgnore, newErrors);
+    }
+
+    private static String escapeString(String str) {
+        if (str == null) {
+            return "null";
+        }
+
+        StringBuilder result = new StringBuilder();
+        str.chars().forEach(c -> {
+                switch (c) {
+                    case '\\': result.append("\\\\"); break;
+                    case '\t': result.append("\\t"); break;
+                    case '\n': result.append("\\n"); break;
+                    case '\r': result.append("\\r"); break;
+                    default:
+                        if (c < 0x0020 || (c >= 0x3000 && c <= 3020)) {
+                            result.append(String.format("\\u%04X", c));
+                        } else {
+                            result.append((char) c);
+                        }
+                }
+        });
+        return "\"" + result.toString() + "\"";
     }
 }
