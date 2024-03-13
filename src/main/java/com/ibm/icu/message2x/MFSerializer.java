@@ -33,12 +33,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-// TODO: find a better name for this class
+/**
+ * This class serializes a MessageFormat 2 data model {@link MFDataModel.Message} to a string,
+ * with the proper MessageFormat 2 syntax.
+ *
+ * @internal ICU 75 technology preview
+ * TzuAt deprecated This API is for technology preview only.
+ */
+// TZUAT Deprecated
 public class MFSerializer {
     private boolean shouldDoubleQuotePattern = false;
     private boolean needSpace = false;
     private final StringBuilder result = new StringBuilder();
 
+    /**
+     * Method converting the {@link MFDataModel.Message} to a string in MessageFormat 2 syntax.
+     *
+     * <p>The result is not necessarily identical with the original string parsed to generate
+     * the data model. But is is functionally equivalent.</p>
+     *
+     * @param message the data model message to serialize
+     * @return the serialized message, in MessageFormat 2 syntax
+     *
+     * @internal ICU 75 technology preview
+     * TzuAt deprecated This API is for technology preview only.
+     */
+    // TZUAT Deprecated
     public static String dataModelToString(MFDataModel.Message message) {
         return new MFSerializer().messageToString(message);
     }

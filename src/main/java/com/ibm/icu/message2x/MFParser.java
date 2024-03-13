@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This class parses a {@code MessageFormat 2} syntax into a datamodel {@link MFDataModel.Message}.
+ * This class parses a {@code MessageFormat 2} syntax into a data model {@link MFDataModel.Message}.
  *
  * <p>It is used by {@link MessageFormatter}, but it might be handy for various tools.</p>
  *
@@ -199,7 +199,7 @@ public class MFParser {
                     // Safe to cast to char, the code point is in BMP 
                     identifier = (char) cp + getIdentifier();
                     String body = getReservedBody();
-                    return new MFDataModel.UnsupportedAnnotation(identifier + " " + body);
+                    return new MFDataModel.UnsupportedAnnotation(identifier + body);
                 }
         }
         input.gotoPosition(position);

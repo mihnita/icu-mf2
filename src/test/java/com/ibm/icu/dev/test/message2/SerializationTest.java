@@ -3,6 +3,8 @@
 
 package com.ibm.icu.dev.test.message2;
 
+import static org.junit.Assert.assertEquals;
+
 import com.ibm.icu.message2x.MFDataModel.Message;
 import com.ibm.icu.message2x.MFParser;
 import com.ibm.icu.message2x.MFSerializer;
@@ -32,7 +34,7 @@ public class SerializationTest {
                     + "one {{You deleted {$count} file}}\n"
                     + "*   {{You deleted {$count} files}}",
             ".match {$count :number}\n"
-                    + "one {{You deleted {$count} file}}"
+                    + "one {{You deleted {$count} file}}\n"
                     + "*   {{You deleted {$count} files}}",
             ".match {$place :number select=ordinal}\n"
                     + "*   {{You fininshed in the {$place}th place}}\n"
@@ -83,6 +85,13 @@ public class SerializationTest {
         Message dm = MFParser.parse(pattern);
         String parsed = MFSerializer.dataModelToString(dm);
 
+        /* This is a quick test.
+         * A better idea would be to parse the original string,
+         * serialize the data model, then parse again in a new data model.
+         * That would give us two data models to compare, where
+         * small differences in spacing or quoting does not matter.
+         * But we don't have (yet) an implementation of `equals` on of the data model classes. 
+         */       
         pattern = pattern.replace('\n', ' ')
                 .replaceAll("  +", " ")
                 // Naive normalization for `|1234.56|` to `1234.56` 
@@ -91,10 +100,6 @@ public class SerializationTest {
                 .replaceAll("\\|([a-zA-Z\\d]+)\\|", "$1")
                 .replaceAll(" }", "}")
                 .trim();
-        if (!pattern.equals(parsed)) {
-            System.out.println("========================");
-            System.out.println(Utilities.str(pattern));
-            System.out.println(Utilities.str(parsed));
-        }
+        assertEquals(pattern, parsed);
     }
 }

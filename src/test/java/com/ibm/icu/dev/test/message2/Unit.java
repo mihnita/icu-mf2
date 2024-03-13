@@ -10,9 +10,9 @@ import java.util.StringJoiner;
 class Unit {
     final String src;
     final List<String> srcs;
-    final String exp;
     final String locale;
     final Map<String, Object> params;
+    final String exp;
     final String ignore;
     final List<Error> errors;
 
@@ -50,5 +50,16 @@ class Unit {
             result.add("exp=" + Utilities.str(exp));
         }
         return result.toString();
+    }
+
+    public Unit merge(Unit other) {
+        String newSrc = other.src != null ? other.src : this.src;
+        List<String> newSrcs = other.srcs != null ? other.srcs : this.srcs;
+        String newLocale = other.locale != null ? other.locale : this.locale;
+        Map<String, Object> newParams = other.params != null ? other.params : this.params;
+        String newExp = other.exp != null ? other.exp : this.exp;
+        String newIgnore = other.ignore != null ? other.ignore : this.ignore;
+        List<Error> newErrors = other.errors != null ? other.errors : this.errors;
+        return new Unit(newSrc, newSrcs, newLocale, newParams, newExp, newIgnore, newErrors);
     }
 }
