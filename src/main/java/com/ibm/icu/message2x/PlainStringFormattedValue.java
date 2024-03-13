@@ -14,9 +14,9 @@ import java.text.AttributedCharacterIterator;
  * Expect it to change.
  *
  * @internal Visible For Testing.
- * TzuAt deprecated This API is for unit testing only.
+ * @deprecated This API is for unit testing only.
  */
-// TZUAT Deprecated
+@Deprecated
 public class PlainStringFormattedValue implements FormattedValue {
     private final String value;
 
@@ -26,9 +26,9 @@ public class PlainStringFormattedValue implements FormattedValue {
      * @param value the string value to store
      *
      * @internal Visible For Testing.
-     * TzuAt deprecated This API is for unit testing only.
+     * @deprecated This API is for unit testing only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public PlainStringFormattedValue(String value) {
         if (value == null) {
             throw new IllegalAccessError("Should not try to wrap a null in a formatted value");
@@ -40,9 +40,9 @@ public class PlainStringFormattedValue implements FormattedValue {
      * {@inheritDoc}
      *
      * @internal Visible For Testing.
-     * TzuAt deprecated This API is for unit testing only.
+     * @deprecated This API is for unit testing only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     @Override
     public int length() {
         return value == null ? 0 : value.length();
@@ -52,9 +52,9 @@ public class PlainStringFormattedValue implements FormattedValue {
      * {@inheritDoc}
      *
      * @internal Visible For Testing.
-     * TzuAt deprecated This API is for unit testing only.
+     * @deprecated This API is for unit testing only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     @Override
     public char charAt(int index) {
         return value.charAt(index);
@@ -64,9 +64,9 @@ public class PlainStringFormattedValue implements FormattedValue {
      * {@inheritDoc}
      *
      * @internal Visible For Testing.
-     * TzuAt deprecated This API is for unit testing only.
+     * @deprecated This API is for unit testing only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     @Override
     public CharSequence subSequence(int start, int end) {
         return value.subSequence(start, end);
@@ -76,9 +76,9 @@ public class PlainStringFormattedValue implements FormattedValue {
      * {@inheritDoc}
      *
      * @internal Visible For Testing.
-     * TzuAt deprecated This API is for unit testing only.
+     * @deprecated This API is for unit testing only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     @Override
     public <A extends Appendable> A appendTo(A appendable) {
         try {
@@ -95,9 +95,9 @@ public class PlainStringFormattedValue implements FormattedValue {
      * {@inheritDoc}
      *
      * @internal Visible For Testing.
-     * TzuAt deprecated This API is for unit testing only.
+     * @deprecated This API is for unit testing only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     @Override
     public boolean nextPosition(ConstrainedFieldPosition cfpos) {
         throw new RuntimeException("nextPosition not yet implemented");
@@ -109,9 +109,9 @@ public class PlainStringFormattedValue implements FormattedValue {
      * {@inheritDoc}
      *
      * @internal Visible For Testing.
-     * TzuAt deprecated This API is for unit testing only.
+     * @deprecated This API is for unit testing only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     @Override
     public AttributedCharacterIterator toCharacterIterator() {
         throw new RuntimeException("toCharacterIterator not yet implemented");
@@ -121,9 +121,9 @@ public class PlainStringFormattedValue implements FormattedValue {
      * {@inheritDoc}
      *
      * @internal Visible For Testing.
-     * TzuAt deprecated This API is for unit testing only.
+     * @deprecated This API is for unit testing only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     @Override
     public String toString() {
         return value;

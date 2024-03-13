@@ -15,9 +15,9 @@ import java.util.Map;
  * latest description</a>.</p>
  *
  * @internal ICU 72 technology preview
- * TzuAt deprecated This API is for technology preview only.
+ * @deprecated This API is for technology preview only.
  */
-// TZUAT Deprecated
+@Deprecated
 @SuppressWarnings("javadoc")
 public class MFDataModel {
 
@@ -29,27 +29,27 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public interface Message {
         // Provides a common type for PatternMessage and SelectMessage.
     }
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class PatternMessage implements Message {
         final List<Declaration> declarations;
         final Pattern pattern;
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public PatternMessage(List<Declaration> declarations, Pattern pattern) {
             this.declarations = declarations;
             this.pattern = pattern;
@@ -58,9 +58,9 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class SelectMessage implements Message {
         final List<Declaration> declarations;
         final List<Expression> selectors;
@@ -68,9 +68,9 @@ public class MFDataModel {
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public SelectMessage(
                 List<Declaration> declarations,
                 List<Expression> selectors,
@@ -83,27 +83,27 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public interface Declaration {
         // Provides a common type for InputDeclaration, LocalDeclaration, and UnsupportedStatement.
     }
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class InputDeclaration implements Declaration {
         final String name;
         final VariableExpression value;
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public InputDeclaration(String name, VariableExpression value) {
             this.name = name;
             this.value = value;
@@ -112,18 +112,18 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class LocalDeclaration implements Declaration {
         final String name;
         final Expression value;
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public LocalDeclaration(String name, Expression value) {
             this.name = name;
             this.value = value;
@@ -132,9 +132,9 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class UnsupportedStatement implements Declaration {
         final String keyword;
         final String body;
@@ -142,9 +142,9 @@ public class MFDataModel {
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public UnsupportedStatement(String keyword, String body, List<Expression> expressions) {
             this.keyword = keyword;
             this.body = body;
@@ -154,27 +154,27 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public interface LiteralOrCatchallKey {
         // Provides a common type for the selection keys: Variant, Literal, or CatchallKey.
     }
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class Variant implements LiteralOrCatchallKey {
         final List<LiteralOrCatchallKey> keys;
         final Pattern value;
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public Variant(List<LiteralOrCatchallKey> keys, Pattern value) {
             this.keys = keys;
             this.value = value;
@@ -183,9 +183,9 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class CatchallKey implements LiteralOrCatchallKey {
         // String value; // Always '*' in MF2
     }
@@ -195,9 +195,9 @@ public class MFDataModel {
     // type Pattern = Array<string | Expression | Markup>;
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class Pattern {
         final List<PatternPart> parts;
 
@@ -208,18 +208,18 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public interface PatternPart {
         // Provides a common type for StringPart and Expression.
     }
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class StringPart implements PatternPart {
         final String value;
 
@@ -230,9 +230,9 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public interface Expression extends PatternPart {
         // Provides a common type for all kind of expressions:
         // LiteralExpression, VariableExpression, FunctionExpression, UnsupportedExpression, Markup
@@ -240,9 +240,9 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class LiteralExpression implements Expression {
         final Literal arg;
         final Annotation annotation;
@@ -250,9 +250,9 @@ public class MFDataModel {
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public LiteralExpression(Literal arg, Annotation annotation, List<Attribute> attributes) {
             this.arg = arg;
             this.annotation = annotation;
@@ -262,9 +262,9 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class VariableExpression implements Expression {
         final VariableRef arg;
         final Annotation annotation;
@@ -272,9 +272,9 @@ public class MFDataModel {
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public VariableExpression(
                 VariableRef arg, Annotation annotation, List<Attribute> attributes) {
             this.arg = arg;
@@ -285,27 +285,27 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public interface Annotation {
         // Provides a common type for FunctionAnnotation, UnsupportedAnnotation
     }
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class FunctionExpression implements Expression {
         final FunctionAnnotation annotation;
         final List<Attribute> attributes;
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public FunctionExpression(FunctionAnnotation annotation, List<Attribute> attributes) {
             this.annotation = annotation;
             this.attributes = attributes;
@@ -314,18 +314,18 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class UnsupportedExpression implements Expression {
         final UnsupportedAnnotation annotation;
         final List<Attribute> attributes;
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public UnsupportedExpression(UnsupportedAnnotation annotation, List<Attribute> attributes) {
             this.annotation = annotation;
             this.attributes = attributes;
@@ -334,18 +334,18 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class Attribute {
         final String name;
         final LiteralOrVariableRef value;
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public Attribute(String name, LiteralOrVariableRef value) {
             this.name = name;
             this.value = value;
@@ -356,9 +356,9 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public interface LiteralOrVariableRef {
         // Provides a common type for Literal and VariableRef,
         // to represent things like `foo` / `|foo|` / `1234` (literals)
@@ -367,17 +367,17 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class Literal implements LiteralOrVariableRef, LiteralOrCatchallKey {
         final String value;
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public Literal(String value) {
             this.value = value;
         }
@@ -385,17 +385,17 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class VariableRef implements LiteralOrVariableRef {
         final String name;
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public VariableRef(String name) {
             this.name = name;
         }
@@ -403,18 +403,18 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class FunctionAnnotation implements Annotation {
         final String name;
         final Map<String, Option> options;
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public FunctionAnnotation(String name, Map<String, Option> options) {
             this.name = name;
             this.options = options;
@@ -423,18 +423,18 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class Option {
         final String name;
         final LiteralOrVariableRef value;
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public Option(String name, LiteralOrVariableRef value) {
             this.name = name;
             this.value = value;
@@ -443,17 +443,17 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class UnsupportedAnnotation implements Annotation {
         final String source;
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public UnsupportedAnnotation(String source) {
             this.source = source;
         }
@@ -463,9 +463,9 @@ public class MFDataModel {
 
     /**
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static class Markup implements Expression {
         enum Kind {
             OPEN,
@@ -480,9 +480,9 @@ public class MFDataModel {
 
         /**
          * @internal ICU 72 technology preview
-         * TzuAt deprecated This API is for technology preview only.
+         * @deprecated This API is for technology preview only.
          */
-        // TZUAT Deprecated
+        @Deprecated
         public Markup(
                 Kind kind, String name, Map<String, Option> options, List<Attribute> attributes) {
             this.kind = kind;

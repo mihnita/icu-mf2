@@ -16,9 +16,9 @@ import java.util.regex.Pattern;
  * <p>It is used by {@link MessageFormatter}, but it might be handy for various tools.</p>
  *
  * @internal ICU 75 technology preview
- * TzuAt deprecated This API is for technology preview only.
+ * @deprecated This API is for technology preview only.
  */
-// TZUAT Deprecated
+@Deprecated
 public class MFParser {
     private static final int EOF = -1;
     private final InputSource input;
@@ -36,9 +36,9 @@ public class MFParser {
      * @throws MFParseException if errors are detected
      *
      * @internal ICU 75 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static MFDataModel.Message parse(String input) throws MFParseException {
         return new MFParser(input).parseImpl();
     }

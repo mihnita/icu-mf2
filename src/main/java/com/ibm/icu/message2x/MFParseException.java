@@ -9,9 +9,9 @@ import java.text.ParseException;
  * Used to report parsing errors in {@link MessageFormatter}.
  *
  * @internal ICU 75 technology preview
- * TzuAt deprecated This API is for technology preview only.
+ * @deprecated This API is for technology preview only.
  */
-// TZUAT Deprecated
+@Deprecated
 public class MFParseException extends ParseException {
     private static final long serialVersionUID = -7634219305388292407L;
 

@@ -15,9 +15,9 @@ import java.util.Map;
  * and <code>select</code> in {@link com.ibm.icu.text.MessageFormat}.</p>
  *
  * @internal ICU 72 technology preview
- * TzuAt deprecated This API is for technology preview only.
+ * @deprecated This API is for technology preview only.
  */
-// TZUAT Deprecated
+@Deprecated
 public interface Selector {
     /**
      * A method that is invoked for the object to match and each key.
@@ -31,8 +31,8 @@ public interface Selector {
      * @return the formatted string.
      *
      * @internal ICU 72 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     List<String> matches(Object value, List<String> keys, Map<String, Object> variableOptions);
 }

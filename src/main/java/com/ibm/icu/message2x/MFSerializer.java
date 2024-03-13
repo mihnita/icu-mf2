@@ -38,9 +38,9 @@ import java.util.regex.Matcher;
  * with the proper MessageFormat 2 syntax.
  *
  * @internal ICU 75 technology preview
- * TzuAt deprecated This API is for technology preview only.
+ * @deprecated This API is for technology preview only.
  */
-// TZUAT Deprecated
+@Deprecated
 public class MFSerializer {
     private boolean shouldDoubleQuotePattern = false;
     private boolean needSpace = false;
@@ -56,9 +56,9 @@ public class MFSerializer {
      * @return the serialized message, in MessageFormat 2 syntax
      *
      * @internal ICU 75 technology preview
-     * TzuAt deprecated This API is for technology preview only.
+     * @deprecated This API is for technology preview only.
      */
-    // TZUAT Deprecated
+    @Deprecated
     public static String dataModelToString(MFDataModel.Message message) {
         return new MFSerializer().messageToString(message);
     }
