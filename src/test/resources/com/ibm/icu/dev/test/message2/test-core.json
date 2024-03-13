@@ -25,7 +25,7 @@
   },
   {
     "src": "hello {$place}",
-    "errors": [{ "type": "unresolved-var" }],
+    "errorsJs": [{ "type": "unresolved-var" }],
     "exp": "hello {$place}"
   },
   {

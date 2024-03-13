@@ -25,6 +25,7 @@ import com.ibm.icu.message2x.MFDataModel.VariableRef;
 import com.ibm.icu.message2x.MFDataModel.Variant;
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.CurrencyAmount;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -79,6 +80,7 @@ class MFDataModelFormatter {
                         .setSelector("number", new NumberFormatterFactory("number"))
                         .setSelector("integer", new NumberFormatterFactory("integer"))
                         .setSelector("string", new TextSelectorFactory())
+                        .setSelector("icu:gender", new TextSelectorFactory())
                         .build();
     }
 
@@ -150,6 +152,18 @@ class MFDataModelFormatter {
                 argument = re.argument;
                 functionName = re.functionName;
                 options.putAll(re.options);
+            } else if (fph.getInput() instanceof MFDataModel.VariableExpression) {
+                MFDataModel.VariableExpression ve = (MFDataModel.VariableExpression) fph.getInput();
+                argument = resolveLiteralOrVariable(ve.arg, variables, arguments);
+                if (ve.annotation instanceof FunctionAnnotation) {
+                    functionName = ((FunctionAnnotation) ve.annotation).name;
+                }
+            } else if (fph.getInput() instanceof LiteralExpression) {
+                LiteralExpression le = (LiteralExpression) fph.getInput();
+                argument = le.arg;
+                if (le.annotation instanceof FunctionAnnotation) {
+                    functionName = ((FunctionAnnotation) le.annotation).name;
+                }
             }
             SelectorFactory funcFactory = standardFunctions.getSelector(functionName);
             if (funcFactory == null) {
@@ -408,10 +422,6 @@ class MFDataModelFormatter {
         FormatterFactory func = standardFunctions.getFormatter(functionName);
         if (func == null) {
             func = customFunctions.getFormatter(functionName);
-            if (func == null) {
-                throw new IllegalArgumentException(
-                        "Can't find an implementation for function: '" + functionName + "'");
-            }
         }
         return func;
     }
@@ -466,9 +476,11 @@ class MFDataModelFormatter {
         String functionName = null;
         Object toFormat = null;
         Map<String, Object> options = new HashMap<>();
+        String fallbackString = "{\uFFFD}";
 
         if (expression instanceof MFDataModel.VariableExpression) {
             MFDataModel.VariableExpression varPart = (MFDataModel.VariableExpression) expression;
+            fallbackString = "{$" + varPart.arg.name + "}";
             annotation = varPart.annotation; // function name & options
             Object resolved = resolveLiteralOrVariable(varPart.arg, variables, arguments);
             if (resolved instanceof FormattedPlaceholder) {
@@ -487,10 +499,12 @@ class MFDataModelFormatter {
         } else if (expression
                 instanceof MFDataModel.FunctionExpression) { // Function without arguments
             MFDataModel.FunctionExpression fe = (FunctionExpression) expression;
+            fallbackString = "{:" + fe.annotation.name + "}";
             annotation = fe.annotation;
         } else if (expression instanceof MFDataModel.LiteralExpression) {
             MFDataModel.LiteralExpression le = (LiteralExpression) expression;
             annotation = le.annotation;
+            fallbackString = "{|" + le.arg.value + "|}";
             toFormat = resolveLiteralOrVariable(le.arg, variables, arguments);
         } else if (expression instanceof MFDataModel.Markup) {
             // No output on markup, for now (we only format to string)
@@ -513,12 +527,18 @@ class MFDataModelFormatter {
             options.putAll(newOptions);
         } else if (annotation instanceof UnsupportedAnnotation) {
             // We don't know how to format unsupported annotations
-            return new FormattedPlaceholder(expression, new PlainStringFormattedValue("{\uFFFD}"));
+            return new FormattedPlaceholder(expression, new PlainStringFormattedValue(fallbackString));
         }
 
         FormatterFactory funcFactory = getFormattingFunctionFactoryByName(toFormat, functionName);
+        if (funcFactory == null) {
+            return new FormattedPlaceholder(expression, new PlainStringFormattedValue(fallbackString));
+        }
         Formatter ff = funcFactory.createFormatter(locale, options);
         String res = ff.formatToString(toFormat, arguments);
+        if (res == null) {
+            res = fallbackString;
+        }
 
         ResolvedExpression resExpression = new ResolvedExpression(toFormat, functionName, options);
         return new FormattedPlaceholder(resExpression, new PlainStringFormattedValue(res));

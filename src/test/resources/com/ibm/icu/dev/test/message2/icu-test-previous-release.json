@@ -19,7 +19,7 @@
     {
       "src": "hello {$place}",
       "exp": "hello {$place}",
-      "errors": [{ "type": "missing-var" }]
+      "errorsJs": [{ "type": "missing-var" }]
     },
     {
       "src": "{$one} and {$two}",
@@ -273,13 +273,13 @@
     {
       "src": "no braces",
       "exp": "no braces",
-      "errorsJs": [{ "type":  "parse-error"}, {"type": "junk-element" }]
+      "errorsJs": [{ "type":  "parse-error" }, { "type": "junk-element" }]
     },
     {
       "src": "no braces {$foo}",
       "params": { "foo": 2 },
       "exp": "no braces 2",
-      "errorsJs": [{ "type":  "parse-error"}, {"type": "junk-element" }]
+      "errorsJs": [{ "type":  "parse-error" }, { "type": "junk-element" }]
     },
     {
       "src": "{missing end brace",
@@ -304,7 +304,7 @@
     {
       "src": "bad {:}",
       "exp": "bad {:}",
-      "errors": [{ "type": "empty-token" }, {"type": "missing-func" }]
+      "errors": [{ "type": "empty-token" }, { "type": "missing-func" }]
     },
     {
       "src": "bad {placeholder}",
@@ -319,7 +319,7 @@
     {
       "src": "bad {:placeholder option=}",
       "exp": "bad {:placeholder}",
-      "errors": [{ "type": "empty-token" }, { "type": "missing-func" }]
+      "errorsJs": [{ "type": "empty-token" }, { "type": "missing-func" }]
     },
     {
       "src": "bad {:placeholder option value}",

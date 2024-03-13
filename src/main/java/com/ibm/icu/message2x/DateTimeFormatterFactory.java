@@ -346,7 +346,7 @@ class DateTimeFormatterFactory implements FormatterFactory {
         public FormattedPlaceholder format(Object toFormat, Map<String, Object> variableOptions) {
             // TODO: use a special type to indicate function without input argument.
             if (toFormat == null) {
-                throw new IllegalArgumentException("The date to format can't be null");
+                return null;
             }
             if (toFormat instanceof CharSequence) {
                 toFormat = parseIso8601(toFormat.toString());
@@ -374,7 +374,8 @@ class DateTimeFormatterFactory implements FormatterFactory {
          */
         @Override
         public String formatToString(Object toFormat, Map<String, Object> variableOptions) {
-            return format(toFormat, variableOptions).toString();
+            FormattedPlaceholder result = format(toFormat, variableOptions);
+            return result != null ? result.toString() : null;
         }
     }
 

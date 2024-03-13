@@ -1,6 +1,6 @@
 {
   "date": [
-    { "src": "{:date}", "exp": "{:date}", "errors": [{ "type": "bad-input" }] },
+    { "src": "{:date}", "exp": "{:date}", "errorsJs": [{ "type": "bad-input" }] },
     {
       "src": "{horse :date}",
       "exp": "{|horse|}",
@@ -20,7 +20,7 @@
     }
   ],
   "time": [
-    { "src": "{:time}", "exp": "{:time}", "errors": [{ "type": "bad-input" }] },
+    { "src": "{:time}", "exp": "{:time}", "errorsJs": [{ "type": "bad-input" }] },
     {
       "src": "{horse :time}",
       "exp": "{|horse|}",
@@ -47,7 +47,7 @@
     {
       "src": "{:datetime}",
       "exp": "{:datetime}",
-      "errors": [{ "type": "bad-input" }]
+      "errorsJs": [{ "type": "bad-input" }]
     },
     {
       "src": "{$x :datetime}",
@@ -284,7 +284,7 @@
     {
       "src": "hello {42 :ordinal}",
       "exp": "hello {|42|}",
-      "errors": [{ "type": "missing-func" }]
+      "errorsJs": [{ "type": "missing-func" }]
     }
   ],
   "plural": [
@@ -297,7 +297,7 @@
     {
       "src": "hello {42 :plural}",
       "exp": "hello {|42|}",
-      "errors": [{ "type": "missing-func" }]
+      "errorsJs": [{ "type": "missing-func" }]
     }
   ],
   "string": [

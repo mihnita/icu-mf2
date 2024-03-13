@@ -101,6 +101,6 @@ public class SerializationTest {
                         .replaceAll("\\|([a-zA-Z\\d]+)\\|", "$1")
                         .replaceAll(" }", "}")
                         .trim();
-        assertEquals(pattern, parsed);
+        assertEquals("Serialization different from to the initial source", pattern, parsed);
     }
 }
