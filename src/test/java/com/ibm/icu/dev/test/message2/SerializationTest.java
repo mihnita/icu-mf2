@@ -3,8 +3,7 @@
 
 package com.ibm.icu.dev.test.message2;
 
-import static org.junit.Assert.assertEquals;
-
+import com.ibm.icu.dev.test.CoreTestFmwk;
 import com.ibm.icu.message2x.MFDataModel.Message;
 import com.ibm.icu.message2x.MFParser;
 import com.ibm.icu.message2x.MFSerializer;
@@ -14,7 +13,7 @@ import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 @SuppressWarnings({"static-method", "javadoc"})
-public class SerializationTest {
+public class SerializationTest extends CoreTestFmwk {
 
     @Test
     public void test() throws Exception {

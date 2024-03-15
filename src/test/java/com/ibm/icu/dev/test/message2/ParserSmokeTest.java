@@ -4,6 +4,7 @@
 package com.ibm.icu.dev.test.message2;
 
 import com.google.gson.reflect.TypeToken;
+import com.ibm.icu.dev.test.CoreTestFmwk;
 import com.ibm.icu.message2x.MFParser;
 import java.io.Reader;
 import java.lang.reflect.Type;
@@ -18,7 +19,7 @@ import org.junit.runners.JUnit4;
  */
 @RunWith(JUnit4.class)
 @SuppressWarnings({"static-method", "javadoc"})
-public class ParserSmokeTest {
+public class ParserSmokeTest extends CoreTestFmwk {
     private static final String JSON_FILE = "icu-parser-tests.json";
 
     @Test(expected = IllegalArgumentException.class)

@@ -4,6 +4,7 @@
 package com.ibm.icu.dev.test.message2;
 
 import com.google.gson.reflect.TypeToken;
+import com.ibm.icu.dev.test.CoreTestFmwk;
 import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.Date;
@@ -15,7 +16,7 @@ import org.junit.runners.JUnit4;
 
 @SuppressWarnings({"static-method", "javadoc"})
 @RunWith(JUnit4.class)
-public class IcuFunctionsTest {
+public class IcuFunctionsTest extends CoreTestFmwk {
     private static final String JSON_FILE = "icu-test-functions.json";
 
     // Some default parameters for all messages, to use if the message does not have its own

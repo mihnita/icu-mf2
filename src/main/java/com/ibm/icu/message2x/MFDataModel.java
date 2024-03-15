@@ -42,8 +42,8 @@ public class MFDataModel {
      */
     @Deprecated
     public static class PatternMessage implements Message {
-        final List<Declaration> declarations;
-        final Pattern pattern;
+        public final List<Declaration> declarations;
+        public final Pattern pattern;
 
         /**
          * @internal ICU 72 technology preview
@@ -62,9 +62,9 @@ public class MFDataModel {
      */
     @Deprecated
     public static class SelectMessage implements Message {
-        final List<Declaration> declarations;
-        final List<Expression> selectors;
-        final List<Variant> variants;
+        public final List<Declaration> declarations;
+        public final List<Expression> selectors;
+        public final List<Variant> variants;
 
         /**
          * @internal ICU 72 technology preview
@@ -96,8 +96,8 @@ public class MFDataModel {
      */
     @Deprecated
     public static class InputDeclaration implements Declaration {
-        final String name;
-        final VariableExpression value;
+        public final String name;
+        public final VariableExpression value;
 
         /**
          * @internal ICU 72 technology preview
@@ -116,8 +116,8 @@ public class MFDataModel {
      */
     @Deprecated
     public static class LocalDeclaration implements Declaration {
-        final String name;
-        final Expression value;
+        public final String name;
+        public final Expression value;
 
         /**
          * @internal ICU 72 technology preview
@@ -136,9 +136,9 @@ public class MFDataModel {
      */
     @Deprecated
     public static class UnsupportedStatement implements Declaration {
-        final String keyword;
-        final String body;
-        final List<Expression> expressions;
+        public final String keyword;
+        public final String body;
+        public final List<Expression> expressions;
 
         /**
          * @internal ICU 72 technology preview
@@ -167,8 +167,8 @@ public class MFDataModel {
      */
     @Deprecated
     public static class Variant implements LiteralOrCatchallKey {
-        final List<LiteralOrCatchallKey> keys;
-        final Pattern value;
+        public final List<LiteralOrCatchallKey> keys;
+        public final Pattern value;
 
         /**
          * @internal ICU 72 technology preview
@@ -199,7 +199,7 @@ public class MFDataModel {
      */
     @Deprecated
     public static class Pattern {
-        final List<PatternPart> parts;
+        public final List<PatternPart> parts;
 
         Pattern() {
             this.parts = new ArrayList<>();
@@ -221,7 +221,7 @@ public class MFDataModel {
      */
     @Deprecated
     public static class StringPart implements PatternPart {
-        final String value;
+        public final String value;
 
         StringPart(String value) {
             this.value = value;
@@ -244,9 +244,9 @@ public class MFDataModel {
      */
     @Deprecated
     public static class LiteralExpression implements Expression {
-        final Literal arg;
-        final Annotation annotation;
-        final List<Attribute> attributes;
+        public final Literal arg;
+        public final Annotation annotation;
+        public final List<Attribute> attributes;
 
         /**
          * @internal ICU 72 technology preview
@@ -266,9 +266,9 @@ public class MFDataModel {
      */
     @Deprecated
     public static class VariableExpression implements Expression {
-        final VariableRef arg;
-        final Annotation annotation;
-        final List<Attribute> attributes;
+        public final VariableRef arg;
+        public final Annotation annotation;
+        public final List<Attribute> attributes;
 
         /**
          * @internal ICU 72 technology preview
@@ -298,8 +298,8 @@ public class MFDataModel {
      */
     @Deprecated
     public static class FunctionExpression implements Expression {
-        final FunctionAnnotation annotation;
-        final List<Attribute> attributes;
+        public final FunctionAnnotation annotation;
+        public final List<Attribute> attributes;
 
         /**
          * @internal ICU 72 technology preview
@@ -318,8 +318,8 @@ public class MFDataModel {
      */
     @Deprecated
     public static class UnsupportedExpression implements Expression {
-        final UnsupportedAnnotation annotation;
-        final List<Attribute> attributes;
+        public final UnsupportedAnnotation annotation;
+        public final List<Attribute> attributes;
 
         /**
          * @internal ICU 72 technology preview
@@ -338,8 +338,8 @@ public class MFDataModel {
      */
     @Deprecated
     public static class Attribute {
-        final String name;
-        final LiteralOrVariableRef value;
+        public final String name;
+        public final LiteralOrVariableRef value;
 
         /**
          * @internal ICU 72 technology preview
@@ -371,7 +371,7 @@ public class MFDataModel {
      */
     @Deprecated
     public static class Literal implements LiteralOrVariableRef, LiteralOrCatchallKey {
-        final String value;
+        public final String value;
 
         /**
          * @internal ICU 72 technology preview
@@ -389,7 +389,7 @@ public class MFDataModel {
      */
     @Deprecated
     public static class VariableRef implements LiteralOrVariableRef {
-        final String name;
+        public final String name;
 
         /**
          * @internal ICU 72 technology preview
@@ -407,8 +407,8 @@ public class MFDataModel {
      */
     @Deprecated
     public static class FunctionAnnotation implements Annotation {
-        final String name;
-        final Map<String, Option> options;
+        public final String name;
+        public final Map<String, Option> options;
 
         /**
          * @internal ICU 72 technology preview
@@ -427,8 +427,8 @@ public class MFDataModel {
      */
     @Deprecated
     public static class Option {
-        final String name;
-        final LiteralOrVariableRef value;
+        public final String name;
+        public final LiteralOrVariableRef value;
 
         /**
          * @internal ICU 72 technology preview
@@ -447,7 +447,7 @@ public class MFDataModel {
      */
     @Deprecated
     public static class UnsupportedAnnotation implements Annotation {
-        final String source;
+        public final String source;
 
         /**
          * @internal ICU 72 technology preview
@@ -473,10 +473,10 @@ public class MFDataModel {
             STANDALONE
         }
 
-        final Kind kind;
-        final String name;
-        final Map<String, Option> options;
-        final List<Attribute> attributes;
+        public final Kind kind;
+        public final String name;
+        public final Map<String, Option> options;
+        public final List<Attribute> attributes;
 
         /**
          * @internal ICU 72 technology preview

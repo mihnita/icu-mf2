@@ -4,6 +4,7 @@
 package com.ibm.icu.dev.test.message2;
 
 import com.google.gson.reflect.TypeToken;
+import com.ibm.icu.dev.test.CoreTestFmwk;
 import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -14,7 +15,7 @@ import org.junit.runners.JUnit4;
 
 @SuppressWarnings({"static-method", "javadoc"})
 @RunWith(JUnit4.class)
-public class FunctionsTest {
+public class FunctionsTest extends CoreTestFmwk {
     private static final String JSON_FILE = "test-functions.json";
 
     @Test
