@@ -174,7 +174,7 @@ public class MFParser {
         return result;
     }
 
-    private MFDataModel.Annotation getAnnotationOrMarkup() throws MFParseException {
+    private MFDataModel.Annotation getAnnotation() throws MFParseException {
         int position = input.getPosition();
         skipOptionalWhitespaces();
 
@@ -182,8 +182,6 @@ public class MFParser {
         switch (cp) {
             case '}':
                 return null;
-            case '#':
-            case '/':
             case ':': // annotation, function
                 // abnf: function = ":" identifier *(s option)
                 input.readCodePoint(); // Consume the sigil
@@ -206,6 +204,28 @@ public class MFParser {
         return null;
     }
 
+    private MFDataModel.Annotation getMarkupAnnotation() throws MFParseException {
+        skipOptionalWhitespaces();
+
+        int cp = input.peekChar();
+        switch (cp) {
+            case '}':
+                return null;
+            case '#':
+            case '/':
+                // abnf: markup = "{" [s] "#" identifier *(s option) *(s attribute) [s] ["/"] "}"  ; open and standalone
+                // abnf:        / "{" [s] "/" identifier *(s option) *(s attribute) [s] "}"  ; close
+                input.readCodePoint(); // Consume the sigil
+                String identifier = getIdentifier();
+                checkCondition(identifier != null, "Annotation / function name missing");
+                Map<String, MFDataModel.Option> options = getOptions();
+                return new MFDataModel.FunctionAnnotation(identifier, options);
+            default:
+                // reserved, private, function, something else,
+                return null;
+        }
+    }
+
     // abnf: literal-expression = "{" [s] literal [s annotation] *(s attribute) [s] "}"
     private MFDataModel.Expression getLiteralExpression() throws MFParseException {
         MFDataModel.Literal literal = getLiteral();
@@ -214,7 +234,7 @@ public class MFParser {
         MFDataModel.Annotation annotation = null;
         int wsCount = skipWhitespaces();
         if (wsCount > 0) { // we might have an annotation
-            annotation = getAnnotationOrMarkup();
+            annotation = getAnnotation();
             if (annotation == null) {
                 // We had some spaces, but no annotation.
                 // So we put (some) back for the possible attributes.
@@ -231,7 +251,7 @@ public class MFParser {
     // abnf: variable-expression = "{" [s] variable [s annotation] *(s attribute) [s] "}"
     private MFDataModel.VariableExpression getVariableExpression() throws MFParseException {
         MFDataModel.VariableRef variableRef = getVariableRef();
-        MFDataModel.Annotation annotation = getAnnotationOrMarkup();
+        MFDataModel.Annotation annotation = getAnnotation();
         List<MFDataModel.Attribute> attributes = getAttributes();
         // Variable without a function, for example {$foo}
         return new MFDataModel.VariableExpression(variableRef, annotation, attributes);
@@ -239,7 +259,7 @@ public class MFParser {
 
     // abnf: annotation-expression = "{" [s] annotation *(s attribute) [s] "}"
     private MFDataModel.Expression getAnnotationExpression() throws MFParseException {
-        MFDataModel.Annotation annotation = getAnnotationOrMarkup();
+        MFDataModel.Annotation annotation = getAnnotation();
         List<MFDataModel.Attribute> attributes = getAttributes();
 
         if (annotation instanceof MFDataModel.FunctionAnnotation) {
@@ -263,7 +283,7 @@ public class MFParser {
         MFDataModel.Markup.Kind kind =
                 cp == '/' ? MFDataModel.Markup.Kind.CLOSE : MFDataModel.Markup.Kind.OPEN;
 
-        MFDataModel.Annotation annotation = getAnnotationOrMarkup();
+        MFDataModel.Annotation annotation = getMarkupAnnotation();
         List<MFDataModel.Attribute> attributes = getAttributes();
 
         cp = input.peekChar();
@@ -404,6 +424,9 @@ public class MFParser {
         checkCondition(cp == '=', "Expected '='");
         // skipOptionalWhitespaces();
         MFDataModel.LiteralOrVariableRef litOrVar = getLiteralOrVariableRef();
+        if (litOrVar == null) {
+            error("Options must have a value. An empty string should be quoted.");
+        }
         return new MFDataModel.Option(identifier, litOrVar);
     }
 
@@ -581,8 +604,10 @@ public class MFParser {
     // abnf: key = literal / "*"
     private MFDataModel.Variant getVariant() throws MFParseException {
         List<MFDataModel.LiteralOrCatchallKey> keys = new ArrayList<>();
+        // abnf variant = key *(s key) [s] quoted-pattern
         while (true) {
-            MFDataModel.LiteralOrCatchallKey key = getKey();
+            // Space is required between keys
+            MFDataModel.LiteralOrCatchallKey key = getKey(!keys.isEmpty());
             if (key == null) {
                 break;
             }
@@ -598,8 +623,12 @@ public class MFParser {
         return new MFDataModel.Variant(keys, pattern);
     }
 
-    private MFDataModel.LiteralOrCatchallKey getKey() throws MFParseException {
-        skipOptionalWhitespaces();
+    private MFDataModel.LiteralOrCatchallKey getKey(boolean requireSpaces) throws MFParseException {
+        if (requireSpaces) {
+            skipMandatoryWhitespaces();
+        } else {
+            skipOptionalWhitespaces();
+        }
         int cp = input.peekChar();
         if (cp == '*') {
             input.readCodePoint(); // consume the '*'

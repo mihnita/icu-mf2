@@ -319,7 +319,7 @@
     {
       "src": "bad {:placeholder option=}",
       "exp": "bad {:placeholder}",
-      "errorsJs": [{ "type": "empty-token" }, { "type": "missing-func" }]
+      "errors": [{ "type": "empty-token" }, { "type": "missing-func" }]
     },
     {
       "src": "bad {:placeholder option value}",

@@ -439,7 +439,7 @@ public class MessageFormat2Test extends CoreTestFmwk {
                 + "{{The message uses {$baz} and works}}\n";
         // Circular references on variables is now detected.
         // So we check that this throws (see expected in the @Test above)
-        MessageFormatter mf2 = MessageFormatter.builder()
+        MessageFormatter.builder()
                 .setPattern(message)
                 .build();
     }
