@@ -26,7 +26,7 @@ import com.ibm.icu.text.ListFormatter.Width;
  * Showing a custom formatter for a list, using the existing ICU {@link ListFormatter}.
  */
 @RunWith(JUnit4.class)
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"static-method", "javadoc"})
 public class CustomFormatterListTest extends CoreTestFmwk {
 
     static class ListFormatterFactory implements FormatterFactory {

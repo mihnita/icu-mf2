@@ -22,7 +22,7 @@ import com.ibm.icu.message2x.PlainStringFormattedValue;
  * Showing a custom formatter that can handle grammatical cases.
  */
 @RunWith(JUnit4.class)
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"static-method", "javadoc"})
 public class CustomFormatterGrammarCaseTest extends CoreTestFmwk {
 
     static class GrammarCasesFormatterFactory implements FormatterFactory {

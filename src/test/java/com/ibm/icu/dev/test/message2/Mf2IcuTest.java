@@ -23,7 +23,7 @@ import com.ibm.icu.util.GregorianCalendar;
  * <p>It does not include all the tests for edge cases and error handling, only the ones that show real functionality.</p>
  */
 @RunWith(JUnit4.class)
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"static-method", "javadoc"})
 public class Mf2IcuTest extends CoreTestFmwk {
 
     @Test

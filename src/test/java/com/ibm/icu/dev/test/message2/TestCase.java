@@ -64,6 +64,7 @@ class TestCase {
                 return this;
             }
 
+            @SuppressWarnings("unused")
             public TestCase.Builder patternJs(String patternJs) {
                 // Ignore the JavaScript stuff
                 return this;

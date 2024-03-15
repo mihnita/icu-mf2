@@ -22,7 +22,7 @@ import com.ibm.icu.message2x.PlainStringFormattedValue;
  * Showing a custom formatter for a user defined class.
  */
 @RunWith(JUnit4.class)
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"static-method", "javadoc"})
 public class CustomFormatterPersonTest extends CoreTestFmwk {
 
     public static class Person {

@@ -26,6 +26,7 @@ public class SyntaxErrorsTest extends CoreTestFmwk {
                     MessageFormatter.builder().setPattern(source).build();
                     fail("Pattern expected to fail, but didn't: '" + source + "'");
                 } catch (Exception e) {
+                    // If we get here it is fine
                 }
             }
         }

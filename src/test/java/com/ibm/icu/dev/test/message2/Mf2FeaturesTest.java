@@ -25,7 +25,7 @@ import com.ibm.icu.util.CurrencyAmount;
  * </p>
  */
 @RunWith(JUnit4.class)
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"static-method", "javadoc"})
 public class Mf2FeaturesTest extends CoreTestFmwk {
 
     // November 23, 2022 at 7:42:37.123 PM

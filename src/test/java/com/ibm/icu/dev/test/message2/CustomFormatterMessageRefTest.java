@@ -27,7 +27,7 @@ import com.ibm.icu.message2.PlainStringFormattedValue;
  * But this shows that it can be easily implemented as a custom function.</p>
  */
 @RunWith(JUnit4.class)
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"static-method", "javadoc"})
 public class CustomFormatterMessageRefTest extends CoreTestFmwk {
 
     static class ResourceManagerFactory implements FormatterFactory {
@@ -40,6 +40,7 @@ public class CustomFormatterMessageRefTest extends CoreTestFmwk {
         static class ResourceManagerFactoryImpl implements Formatter {
             final Map<String, Object> options;
 
+            @SuppressWarnings("unused")
             ResourceManagerFactoryImpl(Locale locale, Map<String, Object> options) {
                 this.options = options;
             }
