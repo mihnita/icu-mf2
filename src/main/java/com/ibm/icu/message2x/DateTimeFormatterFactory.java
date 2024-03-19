@@ -4,19 +4,12 @@
 package com.ibm.icu.message2x;
 
 import com.ibm.icu.text.DateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.ZonedDateTime;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Creates a {@link Formatter} doing formatting of date / time, similar to
@@ -379,74 +372,63 @@ class DateTimeFormatterFactory implements FormatterFactory {
         }
     }
 
-    // TODO: make this better with my own parsing
+    private final static Pattern ISO_PATTERN = Pattern.compile(
+            "^(([0-9]{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])){1}(T([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]{1,3})?(Z|[+-]((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?)?$");
+
+    private static Integer safeParse(String str) {
+        if (str == null || str.isEmpty())
+            return null;
+        return Integer.parseInt(str);
+    }
+
     private static Object parseIso8601(String text) {
-        if (text == null || text.isEmpty()) {
-            return text;
-        }
+        Matcher m = ISO_PATTERN.matcher(text);
+        if (m.find() && m.groupCount() == 12 && !m.group().isEmpty()) {
+            Integer year = safeParse(m.group(2));
+            Integer month = safeParse(m.group(3));
+            Integer day = safeParse(m.group(4));
+            Integer hour = safeParse(m.group(6));
+            Integer minute = safeParse(m.group(7));
+            Integer second = safeParse(m.group(8));
+            Integer millisecond = 0;
+            if (m.group(9) != null) {
+                String z = (m.group(9) + "000").substring(1, 4);
+                millisecond = safeParse(z);
+            } else {
+                millisecond = 0;
+            }
+            String tzPart = m.group(10);
 
-        try {
-            LocalDate ld = LocalDate.parse(text);
-            return new Date(ld.getYear() - 1900, ld.getMonthValue() - 1, ld.getDayOfMonth());
-        } catch (Exception e) {
-            // just ignore, we want to try more
-        }
+            if (hour == null) {
+                hour = 0;
+                minute = 0;
+                second = 0;
+            }
 
-        try {
-            LocalDateTime ldt = LocalDateTime.parse(text);
-            return new Date(
-                    ldt.getYear() - 1900,
-                    ldt.getMonthValue() - 1,
-                    ldt.getDayOfMonth(),
-                    ldt.getHour(),
-                    ldt.getMinute(),
-                    ldt.getSecond());
-        } catch (Exception e) {
-            // just ignore, we want to try more
-        }
+            com.ibm.icu.util.GregorianCalendar gc = new com.ibm.icu.util.GregorianCalendar(
+                    year, month - 1, day, hour, minute, second);
+            gc.set(com.ibm.icu.util.Calendar.MILLISECOND, millisecond);
 
-        try {
-            LocalTime lt = LocalTime.parse(text);
-            LocalDateTime ldt = LocalDateTime.of(LocalDate.now(), lt);
-            return new Date(
-                    ldt.getYear() - 1900,
-                    ldt.getMonthValue() - 1,
-                    ldt.getDayOfMonth(),
-                    ldt.getHour(),
-                    ldt.getMinute(),
-                    ldt.getSecond());
-        } catch (Exception e) {
-            // just ignore, we want to try more
-        }
+            if (tzPart != null) {
+                if (tzPart.equals("Z")) {
+                    gc.setTimeZone(com.ibm.icu.util.TimeZone.GMT_ZONE);
+                } else {
+                    int sign = tzPart.startsWith("-") ? -1 : 1;
+                    String[] tzParts = tzPart.substring(1).split(":");
+                    if (tzParts.length == 2) {
+                        Integer tzHour = safeParse(tzParts[0]);
+                        Integer tzMin = safeParse(tzParts[1]);
+                        if (tzHour != null && tzMin != null) {
+                            int offset = sign * (tzHour * 60 + tzMin) * 60 * 1000;
+                            gc.setTimeZone(new com.ibm.icu.util.SimpleTimeZone(offset, "offset"));
+                        }
+                    }
+                }
+            }
 
-        try {
-            Instant instant = Instant.parse(text);
-            return new Date(instant.toEpochMilli());
-        } catch (Exception e) {
-            // just ignore, we want to try more
+            return gc;
         }
-
-        try {
-            OffsetDateTime odt = OffsetDateTime.parse(text);
-            return GregorianCalendar.from(odt.toZonedDateTime());
-        } catch (Exception e) {
-            // just ignore, we want to try more
-        }
-
-        try {
-            OffsetTime ot = OffsetTime.parse(text);
-            return GregorianCalendar.from(OffsetDateTime.from(ot).toZonedDateTime());
-        } catch (Exception e) {
-            // just ignore, we want to try more
-        }
-
-        try {
-            ZonedDateTime zdt = ZonedDateTime.parse(text);
-            return GregorianCalendar.from(zdt);
-        } catch (Exception e) {
-            // just ignore, we want to try more
-        }
-
         return text;
     }
+
 }

@@ -75,11 +75,11 @@
       "exp": "Expires on Thursday, February 27, 2025"
     },
     {
-      "src": "Expires at {|19:23:45| :datetime timeStyle=full}",
+      "src": "Expires at {|2024-07-02T19:23:45| :datetime timeStyle=full}",
       "exp": "Expires at 7:23:45 PM Pacific Daylight Time"
     },
     {
-      "src": "Expires at {|19:23:45.123| :datetime timeStyle=full}",
+      "src": "Expires at {|2024-07-02T19:23:45.123| :datetime timeStyle=full}",
       "exp": "Expires at 7:23:45 PM Pacific Daylight Time"
     },
     {
@@ -87,19 +87,17 @@
       "exp": "Expires on Thursday, February 27, 2025"
     },
     {
-      "comment": "TODO: better ISO 8601 parsing",
-      "src": "Expires at {|19:23:45Z| :datetime timeStyle=full}",
-      "exp": "Expires at {|19:23:45Z|}"
+      "src": "Expires at {|2024-07-02T19:23:45Z| :datetime timeStyle=long}",
+      "exp": "Expires at 7:23:45 PM GMT"
     },
     {
-      "src": "Expires at {|19:23:45+03:30:00| :datetime timeStyle=full}",
-      "exp": "Expires at {|19:23:45+03:30:00|}"
+      "src": "Expires at {|2024-07-02T19:23:45+03:30| :datetime timeStyle=full}",
+      "exp": "Expires at 7:23:45 PM GMT+03:30"
     }
   ],
   "Chaining" : [
     {
       "comment": "Horibly long, but I really wanted to test multiple declarations with overrides, and you can't join strings in JSON",
-      "srcXXX": ".input {$exp :datetime timeStyle=short}\n.input {$user :string}\n.local $longExp = {$exp :datetime dateStyle=long}\n.local $zooExp = {$exp :datetime dateStyle=short timeStyle=$tsOver}\n{{Hello John, you want '{$exp}', '{$longExp}', or '{$zooExp}' or even '{$exp :datetime dateStyle=full}'?}}",
       "srcs": [
         ".input {$exp :datetime timeStyle=short}\n",
         ".input {$user :string}\n",
