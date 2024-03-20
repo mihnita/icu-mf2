@@ -36,9 +36,6 @@ class OptUtils {
 
     static String getString(Map<String, Object> options, String key, String defaultVal) {
         Object value = options.get(key);
-        if (value == null) {
-            return defaultVal;
-        }
         if (value instanceof CharSequence) {
             return value.toString();
         }

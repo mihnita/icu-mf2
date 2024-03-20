@@ -19,7 +19,7 @@ class StringUtils {
     static boolean isContentChar(int cp) {
         return (cp >= 0x0001 && cp <= 0x0008) // omit HTAB (%x09) and LF (%x0A)
                 || (cp >= 0x000B && cp <= 0x000C) // omit CR (%x0D)
-                || (cp >= 0x000E && cp <= 0x0019) // omit SP (%x20)
+                || (cp >= 0x000E && cp <= 0x001F) // omit SP (%x20)
                 || (cp >= 0x0021 && cp <= 0x002D) // omit . (%x2E)
                 || (cp >= 0x002F && cp <= 0x003F) // omit @ (%x40)
                 || (cp >= 0x0041 && cp <= 0x005B) // omit \ (%x5C)
@@ -29,13 +29,13 @@ class StringUtils {
     }
 
     // abnf: text-char = content-char / s / "." / "@" / "|"
-    static boolean isTextChar(int c) {
-        return isContentChar(c) || isWhitespace(c) || c == '.' || c == '@' || c == '|';
+    static boolean isTextChar(int cp) {
+        return isContentChar(cp) || isWhitespace(cp) || cp == '.' || cp == '@' || cp == '|';
     }
 
     // abnf: backslash = %x5C ; U+005C REVERSE SOLIDUS "\"
-    static boolean isBackslash(int c) {
-        return c == '\\';
+    static boolean isBackslash(int cp) {
+        return cp == '\\';
     }
 
     /*
@@ -85,8 +85,8 @@ class StringUtils {
     }
 
     // abnf: private-start = "^" / "&"
-    static boolean isPrivateStart(int codePoint) {
-        return codePoint == '^' || codePoint == '&';
+    static boolean isPrivateStart(int cp) {
+        return cp == '^' || cp == '&';
     }
 
     // abnf: quoted-char = content-char / s / "." / "@" / "{" / "}"
