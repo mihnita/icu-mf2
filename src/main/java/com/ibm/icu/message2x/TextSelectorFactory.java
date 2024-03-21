@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Creates a {@link Selector} doing literal selection, similar to <code>{exp, select}</code>
@@ -47,7 +48,7 @@ class TextSelectorFactory implements SelectorFactory {
             if ("*".equals(key)) {
                 return true;
             }
-            return key.equals(value);
+            return key.equals(Objects.toString(value));
         }
     }
 }

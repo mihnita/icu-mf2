@@ -14,7 +14,7 @@
       "exp": "January 2, 2006"
     },
     {
-      "ignore": "Can't chain :time and :date, they are differnet types",
+      "ignore": "Can't chain :time and :date, they are different types",
       "src": ".local $t = {|2006-01-02T15:04:06| :time} {{{$t :date}}}",
       "exp": "1/2/06"
     }
@@ -38,7 +38,7 @@
       "exp": "3:04:06 PM"
     },
     {
-      "ignore": "Can't chain :time and :date, they are differnet types",
+      "ignore": "Can't chain :time and :date, they are different types",
       "src": ".local $d = {|2006-01-02T15:04:06| :date} {{{$d :time}}}",
       "exp": "3:04 PM"
     }
@@ -56,10 +56,9 @@
       "errors": [{ "type": "bad-input" }]
     },
     {
-      "ignore": "TODO",
       "src": "{horse :datetime}",
       "exp": "{|horse|}",
-      "errors": [{ "name": "RangeError" }]
+      "errorsJs": [{ "name": "RangeError" }]
     },
     { "src": "{|2006-01-02T15:04:06| :datetime}", "expJs": "1/2/06, 3:04 PM", "exp": "1/2/06, 3:04 PM" },
     {
@@ -82,7 +81,7 @@
       "exp": "1/2/06, 3:04 PM"
     },
     {
-      "ignore": "Can't chain :time and :date, they are differnet types",
+      "ignore": "Can't chain :time and :date, they are different types",
       "src": ".input {$dt :time style=medium} {{{$dt :datetime dateStyle=long}}}",
       "params": { "dt": "2006-01-02T15:04:06" },
       "exp": "January 2, 2006 at 3:04:06 PM"
@@ -304,7 +303,6 @@
     {
       "src": ".match {$foo :string} |1| {{one}} * {{other}}",
       "params": { "foo": "1" },
-      "expJs": "one",
       "exp": "one"
     },
     {
