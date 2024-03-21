@@ -1,21 +1,19 @@
 // © 2022 and later: Unicode, Inc. and others.
-// License & terms of use: http://www.unicode.org/copyright.html
+// License & terms of use: https://www.unicode.org/copyright.html
 
 package com.ibm.icu.dev.test.message2;
-
-import java.util.Date;
-import java.util.Locale;
-import java.util.Map;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import com.ibm.icu.dev.test.CoreTestFmwk;
 import com.ibm.icu.message2x.MessageFormatter;
 import com.ibm.icu.text.MessageFormat;
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.GregorianCalendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * Ported the unit tests from {@link com.ibm.icu.text.MessageFormat} to show that they work.

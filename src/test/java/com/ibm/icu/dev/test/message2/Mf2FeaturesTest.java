@@ -1,20 +1,18 @@
 // © 2022 and later: Unicode, Inc. and others.
-// License & terms of use: http://www.unicode.org/copyright.html
+// License & terms of use: https://www.unicode.org/copyright.html
 
 package com.ibm.icu.dev.test.message2;
-
-import java.util.Date;
-import java.util.Locale;
-import java.util.Map;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import com.ibm.icu.dev.test.CoreTestFmwk;
 import com.ibm.icu.math.BigDecimal;
 import com.ibm.icu.util.Currency;
 import com.ibm.icu.util.CurrencyAmount;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * Trying to show off most of the features in one place.

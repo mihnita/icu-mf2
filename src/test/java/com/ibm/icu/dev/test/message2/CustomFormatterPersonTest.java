@@ -1,15 +1,7 @@
 // © 2022 and later: Unicode, Inc. and others.
-// License & terms of use: http://www.unicode.org/copyright.html
+// License & terms of use: https://www.unicode.org/copyright.html
 
 package com.ibm.icu.dev.test.message2;
-
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import com.ibm.icu.dev.test.CoreTestFmwk;
 import com.ibm.icu.message2x.FormattedPlaceholder;
@@ -17,6 +9,12 @@ import com.ibm.icu.message2x.Formatter;
 import com.ibm.icu.message2x.FormatterFactory;
 import com.ibm.icu.message2x.MFFunctionRegistry;
 import com.ibm.icu.message2x.PlainStringFormattedValue;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * Showing a custom formatter for a user defined class.

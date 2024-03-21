@@ -20,7 +20,7 @@ public class SyntaxErrorsTest extends CoreTestFmwk {
     @Test
     public void test() throws Exception {
         try (Reader reader = TestUtils.jsonReader(JSON_FILE)) {
-            String [] srcList = TestUtils.GSON.fromJson(reader, String[].class);
+            String[] srcList = TestUtils.GSON.fromJson(reader, String[].class);
             for (String source : srcList) {
                 try {
                     MessageFormatter.builder().setPattern(source).build();

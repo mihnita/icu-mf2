@@ -1,24 +1,14 @@
 // © 2022 and later: Unicode, Inc. and others.
-// License & terms of use: http://www.unicode.org/copyright.html
+// License & terms of use: https://www.unicode.org/copyright.html
 
 package com.ibm.icu.dev.test.message2;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import com.ibm.icu.dev.test.CoreTestFmwk;
 import com.ibm.icu.message2x.FormattedPlaceholder;
 import com.ibm.icu.message2x.Formatter;
 import com.ibm.icu.message2x.FormatterFactory;
-import com.ibm.icu.message2x.MessageFormatter;
 import com.ibm.icu.message2x.MFFunctionRegistry;
+import com.ibm.icu.message2x.MessageFormatter;
 import com.ibm.icu.number.FormattedNumber;
 import com.ibm.icu.number.LocalizedNumberFormatter;
 import com.ibm.icu.number.NumberFormatter;
@@ -27,6 +17,14 @@ import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.GregorianCalendar;
 import com.ibm.icu.util.Measure;
 import com.ibm.icu.util.MeasureUnit;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * Tests migrated from {@link com.ibm.icu.text.MessageFormat}, to show what they look like and that they work.

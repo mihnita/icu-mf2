@@ -1,24 +1,22 @@
 // © 2022 and later: Unicode, Inc. and others.
-// License & terms of use: http://www.unicode.org/copyright.html
+// License & terms of use: https://www.unicode.org/copyright.html
 
 package com.ibm.icu.dev.test.message2;
 
+import com.ibm.icu.dev.test.CoreTestFmwk;
+import com.ibm.icu.message2.PlainStringFormattedValue;
+import com.ibm.icu.message2x.FormattedPlaceholder;
+import com.ibm.icu.message2x.Formatter;
+import com.ibm.icu.message2x.FormatterFactory;
+import com.ibm.icu.message2x.MFFunctionRegistry;
+import com.ibm.icu.message2x.MessageFormatter;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import com.ibm.icu.dev.test.CoreTestFmwk;
-import com.ibm.icu.message2x.FormattedPlaceholder;
-import com.ibm.icu.message2x.Formatter;
-import com.ibm.icu.message2x.FormatterFactory;
-import com.ibm.icu.message2x.MessageFormatter;
-import com.ibm.icu.message2x.MFFunctionRegistry;
-import com.ibm.icu.message2.PlainStringFormattedValue;
 
 /**
  * Showing a custom formatter that can implement message references.
@@ -57,8 +55,8 @@ public class CustomFormatterMessageRefTest extends CoreTestFmwk {
                     Properties props = (Properties) oProps;
                     Object msg = props.get(toFormat.toString());
                     MessageFormatter mf = MessageFormatter.builder()
-                        .setPattern(msg.toString())
-                        .build();
+                            .setPattern(msg.toString())
+                            .build();
                     result = mf.formatToString(options);
                 }
                 return new FormattedPlaceholder(toFormat, new PlainStringFormattedValue(result));
@@ -78,7 +76,7 @@ public class CustomFormatterMessageRefTest extends CoreTestFmwk {
     static final Properties PROPERTIES = new Properties();
 
     @BeforeClass
-    static public void beforeClass() {
+    public static void beforeClass() {
         PROPERTIES.put("firefox", ".match {$gcase :string} genitive {{Firefoxin}} * {{Firefox}}");
         PROPERTIES.put("chrome", ".match {$gcase :string} genitive {{Chromen}} * {{Chrome}}");
         PROPERTIES.put("safari", ".match {$gcase :string} genitive {{Safarin}} * {{Safari}}");

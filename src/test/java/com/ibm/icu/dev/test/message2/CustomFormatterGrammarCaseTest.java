@@ -1,22 +1,20 @@
 // © 2022 and later: Unicode, Inc. and others.
-// License & terms of use: http://www.unicode.org/copyright.html
+// License & terms of use: https://www.unicode.org/copyright.html
 
 package com.ibm.icu.dev.test.message2;
-
-import java.util.Locale;
-import java.util.Map;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import com.ibm.icu.dev.test.CoreTestFmwk;
 import com.ibm.icu.message2x.FormattedPlaceholder;
 import com.ibm.icu.message2x.Formatter;
 import com.ibm.icu.message2x.FormatterFactory;
-import com.ibm.icu.message2x.MessageFormatter;
 import com.ibm.icu.message2x.MFFunctionRegistry;
+import com.ibm.icu.message2x.MessageFormatter;
 import com.ibm.icu.message2x.PlainStringFormattedValue;
+import java.util.Locale;
+import java.util.Map;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /**
  * Showing a custom formatter that can handle grammatical cases.
@@ -42,14 +40,18 @@ public class CustomFormatterGrammarCaseTest extends CoreTestFmwk {
 
             // Romanian naive and incomplete rules, just to make things work for testing.
             private static String getDativeAndGenitive(String value) {
-                if (value.endsWith("ana"))
+                if (value.endsWith("ana")) {
                     return value.substring(0, value.length() - 3) + "nei";
-                if (value.endsWith("ca"))
+                }
+                if (value.endsWith("ca")) {
                     return value.substring(0, value.length() - 2) + "căi";
-                if (value.endsWith("ga"))
+                }
+                if (value.endsWith("ga")) {
                     return value.substring(0, value.length() - 2) + "găi";
-                if (value.endsWith("a"))
+                }
+                if (value.endsWith("a")) {
                     return value.substring(0, value.length() - 1) + "ei";
+                }
                 return "lui " + value;
             }
 
@@ -80,7 +82,6 @@ public class CustomFormatterGrammarCaseTest extends CoreTestFmwk {
                 return new FormattedPlaceholder(toFormat, new PlainStringFormattedValue(result));
             }
         }
-
     }
 
     static final MFFunctionRegistry REGISTRY = MFFunctionRegistry.builder()

@@ -8,8 +8,8 @@ import static org.junit.Assert.fail;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.ibm.icu.message2x.MessageFormatter;
 import com.ibm.icu.message2x.MFFunctionRegistry;
+import com.ibm.icu.message2x.MessageFormatter;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URI;
